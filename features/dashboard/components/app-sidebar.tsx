@@ -150,7 +150,7 @@ export function AppSidebar({ session }: { session: Session | null }) {
             user={{
               name: session?.user?.name || "User",
               email: session?.user?.email || "",
-              avatar: "",
+              avatar: session?.user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(session?.user?.name || "User")}&background=random&color=fff`,
             }}
           />
         </SidebarFooter>
@@ -194,7 +194,9 @@ export function AppSidebar({ session }: { session: Session | null }) {
             <SidebarContent>
               <SidebarGroup className="px-0 pt-0">
               <SidebarGroupContent>
-                {!mounted || isLoading ? (
+                {!mounted ? (
+                  <div className="p-4" suppressHydrationWarning />
+                ) : isLoading ? (
                   <div className="flex flex-col gap-2 p-4">
                     <div className="h-12 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
                     <div className="h-12 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
