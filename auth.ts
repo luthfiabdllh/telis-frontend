@@ -2,27 +2,42 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import type { JWT } from "next-auth/jwt"
 
-// Simulasi fungsi refresh token ke API Golang
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
+// Fungsi utilitas untuk men-decode JWT di Node.js
+function decodeJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = Buffer.from(base64, 'base64').toString('utf-8')
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    return {}
+  }
+}
+
+// Fungsi refresh token ke API Golang
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    // Nanti ganti dengan fetch() ke http://localhost:8000/auth/refresh
-    console.log("Mencoba refresh token...")
-    
-    // Simulasi respons sukses dari server
-    const refreshedTokens = {
-      accessToken: "mock-jwt-token-xyz-123-REFRESHED-" + Math.floor(Math.random() * 1000),
-      refreshToken: token.refreshToken ?? "mock-refresh-token",
-      expiresIn: 15 * 60, // 15 menit dalam detik
-    }
+    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: token.refreshToken })
+    })
+
+    if (!res.ok) throw new Error("Gagal me-refresh token")
+
+    const data = await res.json()
+    const decoded = decodeJwt(data.access_token)
 
     return {
       ...token,
-      accessToken: refreshedTokens.accessToken,
-      refreshToken: refreshedTokens.refreshToken,
-      expiresAt: Date.now() + refreshedTokens.expiresIn * 1000,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token || token.refreshToken,
+      expiresAt: decoded.exp ? decoded.exp * 1000 : Date.now() + 15 * 60 * 1000,
     }
   } catch (error) {
-    console.error("Error refreshing access token", error)
+    console.error("Error refreshing access token:", error)
     return {
       ...token,
       error: "RefreshAccessTokenError",
@@ -35,24 +50,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "admin@telis.id" },
+        email: { label: "Email", type: "email", placeholder: "user@telis.id" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // MOCK LOGIN FOR DEVELOPMENT
-        if (credentials?.email === "admin@telis.id" && credentials?.password === "admin123") {
-          return {
-            id: "1",
-            name: "Admin TELIS",
-            email: "admin@telis.id",
-            role: "Admin",
-            accessToken: "mock-jwt-token-xyz-123", // Simulasi JWT dari Golang
-            refreshToken: "mock-refresh-token-7days",
-            expiresAt: Date.now() + 15 * 60 * 1000, // Kedaluwarsa dalam 15 menit
+        if (!credentials?.email || !credentials?.password) return null
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password
+            })
+          })
+
+          const data = await res.json()
+
+          if (!res.ok || !data.access_token) {
+            return null // Jika 401 Unauthorized, kembalikan null agar NextAuth melempar CredentialsSignin
           }
+
+          const decoded = decodeJwt(data.access_token)
+
+          return {
+            id: decoded.sub || decoded.user_id || "1",
+            email: decoded.email || credentials.email,
+            name: decoded.name || decoded.username || "User TELIS",
+            role: decoded.role || "User",
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            expiresAt: decoded.exp ? decoded.exp * 1000 : Date.now() + 15 * 60 * 1000,
+          }
+        } catch (error) {
+          console.error("Login API Error:", error)
+          return null
         }
-        
-        return null;
       }
     })
   ],
