@@ -1,8 +1,10 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import GoogleProvider from "next-auth/providers/google"
 import type { JWT } from "next-auth/jwt"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+const INTERNAL_SSO_SECRET = process.env.INTERNAL_SSO_SECRET || "telis_super_secret_sso_key_2026"
 
 // Fungsi utilitas untuk men-decode JWT di Node.js
 function decodeJwt(token: string) {
@@ -47,6 +49,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -91,7 +97,44 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+        try {
+          // Verify with Golang Backend
+          const res = await fetch(`${API_BASE_URL}/auth/sso/google`, {
+            method: 'POST',
+            headers: { 
+              "Content-Type": "application/json",
+              "X-Internal-Secret": INTERNAL_SSO_SECRET
+            },
+            body: JSON.stringify({ email: user.email })
+          })
+
+          const data = await res.json()
+
+          if (!res.ok || !data.access_token) {
+            // Tolak akses jika email tidak ada di database kita
+            console.error("SSO Login Denied:", data.error)
+            return false // Ini akan membatalkan login dan mengembalikan error ke frontend
+          }
+
+          const decoded = decodeJwt(data.access_token)
+          
+          // Inject token dari Golang ke object user agar ditangkap oleh callback jwt()
+          user.role = decoded.role || "User"
+          user.accessToken = data.access_token
+          user.refreshToken = data.refresh_token
+          user.expiresAt = decoded.exp ? decoded.exp * 1000 : Date.now() + 15 * 60 * 1000
+          
+          return true
+        } catch (error) {
+          console.error("SSO Backend Integration Error:", error)
+          return false
+        }
+      }
+      return true
+    },
+    async jwt({ token, user, account }) {
       // 1. Initial Sign In
       if (user) {
         return {
