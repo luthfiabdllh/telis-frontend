@@ -12,6 +12,7 @@ export function useChatLogic(initialSessionId?: string) {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [streamingContent, setStreamingContent] = useState<string>("");
   const [streamingReasoning, setStreamingReasoning] = useState<string>("");
+  const [streamingSources, setStreamingSources] = useState<{title: string, href: string}[] | undefined>();
   const [sessionId, setSessionId] = useState<string | undefined>(initialSessionId);
   const sessionIdRef = useRef(initialSessionId);
 
@@ -51,6 +52,7 @@ export function useChatLogic(initialSessionId?: string) {
     setStatus("streaming");
     setStreamingContent("");
     setStreamingReasoning("");
+    setStreamingSources(undefined);
 
     let currentSessionId = sessionIdRef.current;
     if (!currentSessionId) {
@@ -60,22 +62,23 @@ export function useChatLogic(initialSessionId?: string) {
       window.history.replaceState(null, "", `/dashboard/chat/${currentSessionId}`);
     }
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+
     try {
       const session = await getSession();
-      // Ensure we don't append /api/v1 if it's already in the env variable
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-      const streamUrl = baseUrl.endsWith("/api/v1") ? `${baseUrl}/chat/stream` : `${baseUrl}/api/v1/chat/stream`;
+      const token = session?.accessToken || "";
       
       let fullText = "";
+      let collectedSources: {title: string, href: string}[] | undefined;
       class RetriableError extends Error {}
       class FatalError extends Error {}
 
       await new Promise<void>((resolve, reject) => {
-        fetchEventSource(streamUrl, {
+        fetchEventSource(`${apiUrl}/chat/stream`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.accessToken || ""}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             session_id: currentSessionId,
@@ -106,7 +109,15 @@ export function useChatLogic(initialSessionId?: string) {
               resolve();
               return;
             }
-            if (ev.event === "status") {
+            if (ev.event === "sources") {
+              try {
+                const parsedSources = JSON.parse(ev.data);
+                collectedSources = parsedSources;
+                setStreamingSources(parsedSources);
+              } catch (e) {
+                console.error("Failed to parse sources", e);
+              }
+            } else if (ev.event === "status") {
               setStreamingReasoning((prev) => prev ? `${prev}\n- ${ev.data}` : `- ${ev.data}`);
             } else if (ev.event === "message" || ev.event === "") {
               setStreamingContent((prev) => {
@@ -133,6 +144,7 @@ export function useChatLogic(initialSessionId?: string) {
       const assistantMessage: MessageType = {
         from: "assistant",
         key: `assistant-${Date.now()}`,
+        sources: collectedSources,
         versions: [
           {
             content: fullText,
@@ -144,6 +156,7 @@ export function useChatLogic(initialSessionId?: string) {
       setMessages((prev) => [...prev, assistantMessage]);
       setStatus("ready");
       setStreamingContent("");
+      setStreamingSources(undefined);
     } catch (error) {
       console.error("Streaming error:", error);
       setStatus("error");
@@ -213,6 +226,7 @@ export function useChatLogic(initialSessionId?: string) {
         {
           from: "assistant",
           key: "streaming-key",
+          sources: streamingSources,
           reasoning: streamingReasoning ? { content: streamingReasoning, duration: 0 } : undefined,
           versions: [
             {
@@ -224,7 +238,7 @@ export function useChatLogic(initialSessionId?: string) {
       ];
     }
     return messages;
-  }, [messages, status, streamingContent, streamingReasoning]);
+  }, [messages, status, streamingContent, streamingReasoning, streamingSources]);
 
   return {
     text,

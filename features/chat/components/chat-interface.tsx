@@ -77,10 +77,10 @@ export const ChatInterface = ({
                         <Sources>
                           <SourcesTrigger count={message.sources.length} />
                           <SourcesContent>
-                            {message.sources.map((source) => (
+                            {message.sources.map((source, index) => (
                               <Source
                                 href={source.href}
-                                key={source.href}
+                                key={source.title + index}
                                 title={source.title}
                               />
                             ))}
