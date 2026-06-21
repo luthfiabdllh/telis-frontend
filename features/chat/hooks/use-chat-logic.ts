@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { toast } from "sonner";
+
 import { type MessageType, initialMessages, mockResponses } from "../schemas/chat";
 import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 
@@ -98,22 +98,13 @@ export function useChatLogic() {
 
   const handleSubmit = useCallback(
     (message: PromptInputMessage) => {
-      const hasText = Boolean(message.text);
-      const hasAttachments = Boolean(message.files?.length);
-
-      if (!(hasText || hasAttachments)) {
+      if (!message.text) {
         return;
       }
 
       setStatus("submitted");
 
-      if (message.files?.length) {
-        toast.success("Files attached", {
-          description: `${message.files.length} file(s) attached to message`,
-        });
-      }
-
-      addUserMessage(message.text || "Sent with attachments");
+      addUserMessage(message.text);
       setText("");
     },
     [addUserMessage]

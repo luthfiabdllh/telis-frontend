@@ -17,10 +17,6 @@ import {
 
 import {
   PromptInput,
-  PromptInputActionAddAttachments,
-  PromptInputActionMenu,
-  PromptInputActionMenuContent,
-  PromptInputActionMenuTrigger,
   PromptInputBody,
   PromptInputFooter,
   PromptInputHeader,
@@ -43,7 +39,6 @@ import { SpeechInput } from "@/components/ai-elements/speech-input";
 import { Suggestions } from "@/components/ai-elements/suggestion";
 import { type MessageType, suggestions } from "../schemas/chat";
 import { SuggestionItem } from "./suggestion-item";
-import { PromptInputAttachmentsDisplay } from "./prompt-input-attachments-display";
 
 export interface ChatInterfaceProps {
   text: string;
@@ -131,21 +126,13 @@ export const ChatInterface = ({
           ))}
         </Suggestions>
         <div className="w-full px-4 pb-4">
-          <PromptInput globalDrop multiple onSubmit={handleSubmit}>
-            <PromptInputHeader>
-              <PromptInputAttachmentsDisplay />
-            </PromptInputHeader>
+          <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
               <PromptInputTextarea onChange={handleTextChange} value={text} />
             </PromptInputBody>
             <PromptInputFooter>
               <PromptInputTools>
-                <PromptInputActionMenu>
-                  <PromptInputActionMenuTrigger />
-                  <PromptInputActionMenuContent>
-                    <PromptInputActionAddAttachments />
-                  </PromptInputActionMenuContent>
-                </PromptInputActionMenu>
+
                 <SpeechInput
                   className="shrink-0"
                   onTranscriptionChange={handleTranscriptionChange}
