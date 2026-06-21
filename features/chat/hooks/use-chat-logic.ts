@@ -89,10 +89,9 @@ export function useChatLogic(initialSessionId?: string) {
           async onopen(res) {
             if (res.ok && res.status === 200) {
               return; // everything's good
-            } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
-              throw new FatalError(); // client error
             } else {
-              throw new RetriableError();
+              // Treat all non-200 as fatal to prevent infinite loops (e.g. 429 or 500)
+              throw new FatalError(`Server returned ${res.status}`); 
             }
           },
           onmessage(ev) {
@@ -130,12 +129,8 @@ export function useChatLogic(initialSessionId?: string) {
             resolve();
           },
           onerror(err) {
-            if (err instanceof FatalError) {
-              reject(err);
-              throw err; // rethrow to stop retrying
-            } else {
-              // retry
-            }
+            reject(err);
+            throw err; // rethrow to stop all retries
           }
         });
       });
