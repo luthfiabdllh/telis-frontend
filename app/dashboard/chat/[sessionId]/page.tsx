@@ -1,13 +1,15 @@
 import { ChatContainer } from "@/features/chat/components/chat-container";
 import { notFound } from "next/navigation";
 
-export default function ChatSessionPage({
+export default async function ChatSessionPage({
   params,
 }: {
-  params: { sessionId: string };
+  params: Promise<{ sessionId: string }>;
 }) {
-  if (!params.sessionId) {
+  const { sessionId } = await params;
+  
+  if (!sessionId) {
     return notFound();
   }
-  return <ChatContainer sessionId={params.sessionId} />;
+  return <ChatContainer sessionId={sessionId} />;
 }

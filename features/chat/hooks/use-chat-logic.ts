@@ -4,12 +4,14 @@ import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import { getSession } from "next-auth/react";
 import { nanoid } from "nanoid";
 import { apiClient } from "@/lib/api-client";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 export function useChatLogic(initialSessionId?: string) {
   const [text, setText] = useState<string>("");
   const [status, setStatus] = useState<"submitted" | "streaming" | "ready" | "error">("ready");
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [streamingContent, setStreamingContent] = useState<string>("");
+  const [streamingReasoning, setStreamingReasoning] = useState<string>("");
   const [sessionId, setSessionId] = useState<string | undefined>(initialSessionId);
   const sessionIdRef = useRef(initialSessionId);
 
@@ -17,12 +19,12 @@ export function useChatLogic(initialSessionId?: string) {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
 
-  // Fetch History if sessionId exists
   useEffect(() => {
     if (initialSessionId) {
       const fetchHistory = async () => {
         try {
-          const res = await apiClient.get(`/api/v1/chat/sessions/${initialSessionId}/messages`);
+          // apiClient automatically prepends NEXT_PUBLIC_API_URL which already contains /api/v1
+          const res = await apiClient.get(`/chat/sessions/${initialSessionId}/messages`);
           const history = res.data;
           if (Array.isArray(history)) {
             const mappedMessages: MessageType[] = history.map((msg: any) => ({
@@ -48,6 +50,7 @@ export function useChatLogic(initialSessionId?: string) {
   const streamResponse = async (content: string) => {
     setStatus("streaming");
     setStreamingContent("");
+    setStreamingReasoning("");
 
     let currentSessionId = sessionIdRef.current;
     if (!currentSessionId) {
@@ -59,54 +62,72 @@ export function useChatLogic(initialSessionId?: string) {
 
     try {
       const session = await getSession();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/chat/stream`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.accessToken || ""}`,
-        },
-        body: JSON.stringify({
-          session_id: currentSessionId,
-          message: content,
-          document_filters: [],
-          llm_temperature: 0.7,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText}`);
-      }
-
-      if (!response.body) {
-        throw new Error("No response body");
-      }
-
-      const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+      // Ensure we don't append /api/v1 if it's already in the env variable
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+      const streamUrl = baseUrl.endsWith("/api/v1") ? `${baseUrl}/chat/stream` : `${baseUrl}/api/v1/chat/stream`;
+      
       let fullText = "";
-      let currentEvent = "";
+      class RetriableError extends Error {}
+      class FatalError extends Error {}
 
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-
-        const lines = value.split("\n");
-        for (const line of lines) {
-          if (line.startsWith("event:")) {
-             currentEvent = line.substring(6).trim();
-          } else if (line.startsWith("data:")) {
-            let data = line.substring(5);
-            if (data.startsWith(" ")) data = data.substring(1);
-            
-            if (currentEvent === "done" || data === "[DONE]") {
-              // stream finished
-              break;
-            } else if (currentEvent === "message" || currentEvent === "") {
-              fullText += data;
-              setStreamingContent(fullText);
+      await new Promise<void>((resolve, reject) => {
+        fetchEventSource(streamUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.accessToken || ""}`,
+          },
+          body: JSON.stringify({
+            session_id: currentSessionId,
+            message: content,
+            document_filters: [],
+            llm_temperature: 0.7,
+          }),
+          async onopen(res) {
+            if (res.ok && res.status === 200) {
+              return; // everything's good
+            } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+              throw new FatalError(); // client error
+            } else {
+              throw new RetriableError();
+            }
+          },
+          onmessage(ev) {
+            if (ev.event === "error") {
+              setStreamingContent((prev) => {
+                fullText = prev + `\n\n**[ERROR]: ${ev.data}**`;
+                return fullText;
+              });
+              setStatus("error");
+              reject(new Error(ev.data));
+              return;
+            }
+            if (ev.event === "done" || ev.data === "[DONE]") {
+              resolve();
+              return;
+            }
+            if (ev.event === "status") {
+              setStreamingReasoning((prev) => prev ? `${prev}\n- ${ev.data}` : `- ${ev.data}`);
+            } else if (ev.event === "message" || ev.event === "") {
+              setStreamingContent((prev) => {
+                fullText = prev + ev.data;
+                return fullText;
+              });
+            }
+          },
+          onclose() {
+            resolve();
+          },
+          onerror(err) {
+            if (err instanceof FatalError) {
+              reject(err);
+              throw err; // rethrow to stop retrying
+            } else {
+              // retry
             }
           }
-        }
-      }
+        });
+      });
 
       // Finalize message
       const assistantMessage: MessageType = {
@@ -192,6 +213,7 @@ export function useChatLogic(initialSessionId?: string) {
         {
           from: "assistant",
           key: "streaming-key",
+          reasoning: streamingReasoning ? { content: streamingReasoning, duration: 0 } : undefined,
           versions: [
             {
               id: "streaming-id",
@@ -202,7 +224,7 @@ export function useChatLogic(initialSessionId?: string) {
       ];
     }
     return messages;
-  }, [messages, status, streamingContent]);
+  }, [messages, status, streamingContent, streamingReasoning]);
 
   return {
     text,

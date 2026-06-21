@@ -127,7 +127,7 @@ export const ChatInterface = ({
         <div className="w-full px-4 pb-4">
           <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
-              <PromptInputTextarea onChange={handleTextChange} value={text} />
+              <PromptInputTextarea onChange={handleTextChange} value={text} disabled={status === "streaming" || status === "submitted"} />
             </PromptInputBody>
             <PromptInputFooter>
               <PromptInputTools>

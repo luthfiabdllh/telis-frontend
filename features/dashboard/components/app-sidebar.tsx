@@ -210,8 +210,11 @@ export function AppSidebar({ session }: { session: Session | null }) {
                     filteredSessions.map((chat) => (
                       <button
                         key={chat.id}
-                        onClick={() => setSelectedSessionId(chat.id)}
-                        className={`hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex w-full flex-col items-start gap-2 border-b p-4 text-sm leading-tight text-left transition-colors ${selectedSessionId === chat.id ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
+                        onClick={() => {
+                          setSelectedSessionId(chat.id);
+                          window.location.href = `/dashboard/chat/${chat.id}`;
+                        }}
+                        className={`hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex w-full flex-col items-start gap-2 border-b p-4 text-sm leading-tight text-left transition-colors ${selectedSessionId === chat.id || pathname === `/dashboard/chat/${chat.id}` ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
                       >
                         <div className="flex w-full items-center justify-between gap-2">
                           <span className="truncate font-semibold">
