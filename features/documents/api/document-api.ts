@@ -75,6 +75,7 @@ export const documentApi = {
     } else if (folderId === null) {
       params.append("folder_id", "null");
     }
+    params.append("_t", Date.now().toString()); // Cache-buster
     const res = await apiClient.get(`/documents?${params.toString()}`);
     return res.data.data as DocumentType[]; // Assuming backend returns { data: [...] }
   },
@@ -129,6 +130,7 @@ export const documentApi = {
     } else if (folderId === null) {
       docParams.append("folder_id", "null");
     }
+    docParams.append("_t", Date.now().toString()); // Cache-buster
 
     const [folderRes, docRes] = await Promise.all([
       apiClient.get(`/folders?${folderParams.toString()}`),
