@@ -5,9 +5,10 @@ import { getSession } from "next-auth/react";
 import { nanoid } from "nanoid";
 import { apiClient } from "@/lib/api-client";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useChatLogic(initialSessionId?: string) {
+  const queryClient = useQueryClient();
   const [text, setText] = useState<string>("");
   const [status, setStatus] = useState<"submitted" | "streaming" | "ready" | "error">("ready");
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -91,6 +92,8 @@ export function useChatLogic(initialSessionId?: string) {
           }),
           async onopen(res) {
             if (res.ok && res.status === 200) {
+              // Invalidate sessions list so the sidebar updates automatically
+              queryClient.invalidateQueries({ queryKey: ["chat-sessions"] });
               return; // everything's good
             } else {
               // Treat all non-200 as fatal to prevent infinite loops (e.g. 429 or 500)
