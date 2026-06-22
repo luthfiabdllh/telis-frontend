@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   MessageSquare,
   X,
+  Plus,
 } from "lucide-react";
 import {
   Sidebar,
@@ -175,14 +176,26 @@ export function AppSidebar({ session }: { session: Session | null }) {
                   <MessageSquare className="h-4 w-4" />
                   Riwayat Obrolan
                 </div>
-                <button
-                  onClick={() =>
-                    useChatStore.getState().setChatHistoryOpen(false)
-                  }
-                  className="md:hidden p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      setSelectedSessionId(null);
+                      window.location.href = "/dashboard/chat";
+                    }}
+                    className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                    title="Obrolan Baru"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      useChatStore.getState().setChatHistoryOpen(false)
+                    }
+                    className="md:hidden p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
               <SidebarInput
                 placeholder="Cari obrolan..."
