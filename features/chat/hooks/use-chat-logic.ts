@@ -52,7 +52,12 @@ export function useChatLogic(initialSessionId?: string) {
     }
   }, [historyData]);
 
+  const isSubmittingRef = useRef(false);
+
   const streamResponse = async (content: string) => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    
     setStatus("streaming");
     setStreamingContent("");
     setStreamingReasoning("");
@@ -172,6 +177,8 @@ export function useChatLogic(initialSessionId?: string) {
     } catch (error) {
       console.error("Streaming error:", error);
       setStatus("error");
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
@@ -200,6 +207,7 @@ export function useChatLogic(initialSessionId?: string) {
   const handleSubmit = useCallback(
     (message: PromptInputMessage) => {
       if (!message.text) return;
+      if (isSubmittingRef.current) return;
       setStatus("submitted");
       addUserMessage(message.text);
       setText("");
