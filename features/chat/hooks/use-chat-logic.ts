@@ -77,9 +77,12 @@ export function useChatLogic(initialSessionId?: string) {
       class RetriableError extends Error {}
       class FatalError extends Error {}
 
+      const ctrl = new AbortController();
+
       await new Promise<void>((resolve, reject) => {
         fetchEventSource(`${apiUrl}/chat/stream`, {
           method: "POST",
+          signal: ctrl.signal,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -108,10 +111,12 @@ export function useChatLogic(initialSessionId?: string) {
               });
               setStatus("error");
               reject(new Error(ev.data));
+              ctrl.abort();
               return;
             }
             if (ev.event === "done" || ev.data === "[DONE]") {
               resolve();
+              ctrl.abort();
               return;
             }
             if (ev.event === "sources") {
@@ -133,9 +138,11 @@ export function useChatLogic(initialSessionId?: string) {
           },
           onclose() {
             resolve();
+            ctrl.abort();
           },
           onerror(err) {
             reject(err);
+            ctrl.abort();
             throw err; // rethrow to stop all retries
           }
         });
