@@ -182,6 +182,10 @@ export function DriveContainer() {
                         onRename={(f) => openRename("folder", f)}
                         onMove={(f) => openMove("folder", f)}
                         onDelete={(f) => handleDelete("folder", f)}
+                        onOpenLocation={searchQuery ? (f) => {
+                          const url = f.parent_id ? `/dashboard/documents?folder_id=${f.parent_id}` : `/dashboard/documents`;
+                          window.location.href = url; // Force reload to clear search if using link, or push to router
+                        } : undefined}
                       />
                     ))}
                   </div>
@@ -201,6 +205,10 @@ export function DriveContainer() {
                         onMove={(f) => openMove("file", f)}
                         onDelete={(f) => handleDelete("file", f)}
                         onDeprecate={(f) => handleDeprecate(f)}
+                        onOpenLocation={searchQuery ? (f) => {
+                          const url = f.folder_id ? `/dashboard/documents?folder_id=${f.folder_id}` : `/dashboard/documents`;
+                          window.location.href = url;
+                        } : undefined}
                       />
                     ))}
                   </div>

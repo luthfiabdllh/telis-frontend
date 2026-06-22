@@ -16,10 +16,11 @@ interface FileCardProps {
   onMove: (file: DocumentType) => void;
   onDelete: (file: DocumentType) => void;
   onDeprecate: (file: DocumentType) => void;
+  onOpenLocation?: (file: DocumentType) => void;
   viewMode: "grid" | "list";
 }
 
-export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, viewMode }: FileCardProps) {
+export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpenLocation, viewMode }: FileCardProps) {
   const isDeprecated = file.is_deprecated;
   const sizeMB = (file.file_size_bytes / (1024 * 1024)).toFixed(2);
 
@@ -46,6 +47,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, viewMo
           onMove={onMove}
           onDelete={onDelete}
           onDeprecate={onDeprecate}
+          onOpenLocation={onOpenLocation}
         />
       </div>
     );
@@ -64,6 +66,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, viewMo
           onMove={onMove}
           onDelete={onDelete}
           onDeprecate={onDeprecate}
+          onOpenLocation={onOpenLocation}
         />
       </div>
       
@@ -82,7 +85,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, viewMo
   );
 }
 
-function FileActions({ file, onRename, onMove, onDelete, onDeprecate }: Omit<FileCardProps, "viewMode">) {
+function FileActions({ file, onRename, onMove, onDelete, onDeprecate, onOpenLocation }: Omit<FileCardProps, "viewMode">) {
   const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'}/documents/${file.id}/download`;
 
   return (
@@ -99,6 +102,12 @@ function FileActions({ file, onRename, onMove, onDelete, onDeprecate }: Omit<Fil
             Download
           </a>
         </DropdownMenuItem>
+        {onOpenLocation && (
+          <DropdownMenuItem onClick={() => onOpenLocation(file)}>
+            <FolderInput className="h-4 w-4 mr-2" />
+            Tampilkan Lokasi
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onRename(file)}>
           <Pencil className="h-4 w-4 mr-2" />

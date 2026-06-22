@@ -15,10 +15,11 @@ interface FolderCardProps {
   onRename: (folder: Folder) => void;
   onMove: (folder: Folder) => void;
   onDelete: (folder: Folder) => void;
+  onOpenLocation?: (folder: Folder) => void;
   viewMode: "grid" | "list";
 }
 
-export function FolderCard({ folder, onRename, onMove, onDelete, viewMode }: FolderCardProps) {
+export function FolderCard({ folder, onRename, onMove, onDelete, onOpenLocation, viewMode }: FolderCardProps) {
   const router = useRouter();
 
   const handleNavigate = () => {
@@ -43,6 +44,7 @@ export function FolderCard({ folder, onRename, onMove, onDelete, viewMode }: Fol
             onRename={onRename}
             onMove={onMove}
             onDelete={onDelete}
+            onOpenLocation={onOpenLocation}
           />
         </div>
       </div>
@@ -65,6 +67,7 @@ export function FolderCard({ folder, onRename, onMove, onDelete, viewMode }: Fol
             onRename={onRename}
             onMove={onMove}
             onDelete={onDelete}
+            onOpenLocation={onOpenLocation}
           />
         </div>
       </div>
@@ -78,7 +81,7 @@ export function FolderCard({ folder, onRename, onMove, onDelete, viewMode }: Fol
   );
 }
 
-function FolderActions({ folder, onRename, onMove, onDelete }: Omit<FolderCardProps, "viewMode">) {
+function FolderActions({ folder, onRename, onMove, onDelete, onOpenLocation }: Omit<FolderCardProps, "viewMode">) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -87,6 +90,15 @@ function FolderActions({ folder, onRename, onMove, onDelete }: Omit<FolderCardPr
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        {onOpenLocation && (
+          <>
+            <DropdownMenuItem onClick={() => onOpenLocation(folder)}>
+              <FolderInput className="h-4 w-4 mr-2" />
+              Tampilkan Lokasi
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem onClick={() => onRename(folder)}>
           <Pencil className="h-4 w-4 mr-2" />
           Rename
