@@ -1,0 +1,106 @@
+import { Folder as FolderIcon, MoreVertical, Pencil, FolderInput, Trash2 } from "lucide-react";
+import { Folder } from "../api/document-api";
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+
+interface FolderCardProps {
+  folder: Folder;
+  onRename: (folder: Folder) => void;
+  onMove: (folder: Folder) => void;
+  onDelete: (folder: Folder) => void;
+  viewMode: "grid" | "list";
+}
+
+export function FolderCard({ folder, onRename, onMove, onDelete, viewMode }: FolderCardProps) {
+  const router = useRouter();
+
+  const handleNavigate = () => {
+    router.push(`/dashboard/documents?folder_id=${folder.id}`);
+  };
+
+  if (viewMode === "list") {
+    return (
+      <div 
+        onClick={handleNavigate}
+        className="flex items-center justify-between p-3 border-b hover:bg-muted/50 transition-colors group cursor-pointer"
+      >
+        <div className="flex items-center space-x-3 flex-1">
+          <div className="p-2 bg-primary/10 rounded-lg text-primary">
+            <FolderIcon className="w-5 h-5 fill-current" />
+          </div>
+          <span className="font-medium">{folder.name}</span>
+        </div>
+        <div onClick={(e) => e.stopPropagation()}>
+          <FolderActions
+            folder={folder}
+            onRename={onRename}
+            onMove={onMove}
+            onDelete={onDelete}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Grid View
+  return (
+    <div 
+      onClick={handleNavigate}
+      className="border rounded-xl p-4 hover:shadow-md hover:border-primary/50 transition-all group bg-card cursor-pointer"
+    >
+      <div className="flex justify-between items-start mb-2">
+        <div className="p-3 bg-primary/10 rounded-xl text-primary">
+          <FolderIcon className="w-8 h-8 fill-current" />
+        </div>
+        <div onClick={(e) => e.stopPropagation()}>
+          <FolderActions
+            folder={folder}
+            onRename={onRename}
+            onMove={onMove}
+            onDelete={onDelete}
+          />
+        </div>
+      </div>
+      <div>
+        <h3 className="font-semibold text-sm truncate mt-3">{folder.name}</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          {new Date(folder.created_at).toLocaleDateString()}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function FolderActions({ folder, onRename, onMove, onDelete }: Omit<FolderCardProps, "viewMode">) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={() => onRename(folder)}>
+          <Pencil className="h-4 w-4 mr-2" />
+          Rename
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onMove(folder)}>
+          <FolderInput className="h-4 w-4 mr-2" />
+          Move to...
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => onDelete(folder)} className="text-destructive focus:text-destructive">
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
