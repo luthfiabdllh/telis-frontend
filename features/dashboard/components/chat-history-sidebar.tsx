@@ -11,61 +11,50 @@ import {
   SidebarInput,
 } from "@/components/ui/sidebar";
 import { Session } from "next-auth";
-import { useChatStore } from "@/features/chat/store/use-chat-store";
+import { useChatStore, type ChatSession } from "@/features/chat/store/use-chat-store";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 export function ChatHistorySidebar({ session }: { session: Session | null }) {
   const pathname = usePathname();
   const isChatRoute = pathname?.startsWith("/dashboard/chat");
   const {
-    chatSessions,
-    setChatSessions,
     selectedSessionId,
     setSelectedSessionId,
     isChatHistoryOpen,
   } = useChatStore();
   
   const [query, setQuery] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(true);
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  React.useEffect(() => {
-    async function fetchSessions() {
-      if (!session?.accessToken) return;
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/chat/sessions`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.accessToken}`,
-            },
+  const { data: chatSessions = [], isLoading } = useQuery({
+    queryKey: ["chat-sessions"],
+    queryFn: async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/chat/sessions`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
           },
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setChatSessions(data || []);
         }
-      } catch (error) {
-        console.error("Failed to fetch chat sessions:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchSessions();
-  }, [session, setChatSessions]);
+      );
+      if (!res.ok) throw new Error("Failed to fetch chat sessions");
+      return res.json();
+    },
+    enabled: !!session?.accessToken,
+  });
 
   const filteredSessions = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return chatSessions;
-    return chatSessions.filter((c) => c.title.toLowerCase().includes(q));
+    return chatSessions.filter((c: any) => c.title.toLowerCase().includes(q));
   }, [chatSessions, query]);
 
   if (!isChatRoute) return null;
@@ -132,7 +121,7 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
                   Belum ada obrolan
                 </div>
               ) : (
-                filteredSessions.map((chat) => (
+                filteredSessions.map((chat: ChatSession) => (
                   <button
                     key={chat.id}
                     onClick={() => {

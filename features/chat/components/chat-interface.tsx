@@ -73,11 +73,11 @@ export const ChatInterface = ({
                     key={`${message.key}-${version.id}`}
                   >
                     <div>
-                      {message.sources?.length && (
+                      {(message.sources?.length ?? 0) > 0 && (
                         <Sources>
-                          <SourcesTrigger count={message.sources.length} />
+                          <SourcesTrigger count={message.sources?.length || 0} />
                           <SourcesContent>
-                            {message.sources.map((source, index) => (
+                            {message.sources?.map((source, index) => (
                               <Source
                                 href={source.href}
                                 key={source.title + index}

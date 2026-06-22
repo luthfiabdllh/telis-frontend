@@ -5,6 +5,7 @@ import { getSession } from "next-auth/react";
 import { nanoid } from "nanoid";
 import { apiClient } from "@/lib/api-client";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { useQuery } from "@tanstack/react-query";
 
 export function useChatLogic(initialSessionId?: string) {
   const [text, setText] = useState<string>("");
@@ -20,38 +21,35 @@ export function useChatLogic(initialSessionId?: string) {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
 
+  const { data: historyData } = useQuery({
+    queryKey: ["chat-messages", initialSessionId],
+    queryFn: async () => {
+      const res = await apiClient.get(`/chat/sessions/${initialSessionId}/messages`);
+      return res.data;
+    },
+    enabled: !!initialSessionId,
+    staleTime: 0, // ensure it refetches if we revisit
+  });
+
   useEffect(() => {
-    if (initialSessionId) {
-      const fetchHistory = async () => {
-        try {
-          // apiClient automatically prepends NEXT_PUBLIC_API_URL which already contains /api/v1
-          const res = await apiClient.get(`/chat/sessions/${initialSessionId}/messages`);
-          const history = res.data;
-          if (Array.isArray(history)) {
-            const mappedMessages: MessageType[] = history.map((msg: any) => {
-              // Ensure sources is properly passed if it exists and is an array
-              const parsedSources = Array.isArray(msg.sources) ? msg.sources : [];
-              return {
-                from: msg.sender as "user" | "assistant",
-                key: msg.id || nanoid(),
-                sources: parsedSources,
-                versions: [
-                  {
-                    id: msg.id || nanoid(),
-                    content: msg.content,
-                  },
-                ],
-              };
-            });
-            setMessages(mappedMessages);
-          }
-        } catch (error) {
-          console.error("Failed to fetch history", error);
-        }
-      };
-      fetchHistory();
+    if (historyData && Array.isArray(historyData)) {
+      const mappedMessages: MessageType[] = historyData.map((msg: any) => {
+        const parsedSources = Array.isArray(msg.sources) ? msg.sources : [];
+        return {
+          from: msg.sender as "user" | "assistant",
+          key: msg.id || nanoid(),
+          sources: parsedSources,
+          versions: [
+            {
+              id: msg.id || nanoid(),
+              content: msg.content,
+            },
+          ],
+        };
+      });
+      setMessages(mappedMessages);
     }
-  }, [initialSessionId]);
+  }, [historyData]);
 
   const streamResponse = async (content: string) => {
     setStatus("streaming");
