@@ -28,16 +28,21 @@ export function useChatLogic(initialSessionId?: string) {
           const res = await apiClient.get(`/chat/sessions/${initialSessionId}/messages`);
           const history = res.data;
           if (Array.isArray(history)) {
-            const mappedMessages: MessageType[] = history.map((msg: any) => ({
-              from: msg.sender as "user" | "assistant",
-              key: msg.id || nanoid(),
-              versions: [
-                {
-                  id: msg.id || nanoid(),
-                  content: msg.content,
-                },
-              ],
-            }));
+            const mappedMessages: MessageType[] = history.map((msg: any) => {
+              // Ensure sources is properly passed if it exists and is an array
+              const parsedSources = Array.isArray(msg.sources) ? msg.sources : [];
+              return {
+                from: msg.sender as "user" | "assistant",
+                key: msg.id || nanoid(),
+                sources: parsedSources,
+                versions: [
+                  {
+                    id: msg.id || nanoid(),
+                    content: msg.content,
+                  },
+                ],
+              };
+            });
             setMessages(mappedMessages);
           }
         } catch (error) {
