@@ -115,15 +115,17 @@ export const ChatInterface = ({
         <ConversationScrollButton />
       </Conversation>
       <div className="grid shrink-0 gap-4 pt-4">
-        <Suggestions className="px-4">
-          {suggestions.map((suggestion) => (
-            <SuggestionItem
-              key={suggestion}
-              onClick={handleSuggestionClick}
-              suggestion={suggestion}
-            />
-          ))}
-        </Suggestions>
+        {messages.length === 0 && (
+          <Suggestions className="px-4">
+            {suggestions.map((suggestion) => (
+              <SuggestionItem
+                key={suggestion}
+                onClick={handleSuggestionClick}
+                suggestion={suggestion}
+              />
+            ))}
+          </Suggestions>
+        )}
         <div className="w-full px-4 pb-4">
           <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
