@@ -128,10 +128,14 @@ export function useChatLogic(initialSessionId?: string) {
                 console.error("Failed to parse sources", e);
               }
             } else if (ev.event === "status") {
-              setStreamingReasoning((prev) => prev ? `${prev}\n- ${ev.data}` : `- ${ev.data}`);
+              let chunk = ev.data;
+              try { chunk = JSON.parse(ev.data); } catch (e) {}
+              setStreamingReasoning((prev) => prev ? `${prev}\n- ${chunk}` : `- ${chunk}`);
             } else if (ev.event === "message" || ev.event === "") {
+              let chunk = ev.data;
+              try { chunk = JSON.parse(ev.data); } catch (e) {}
               setStreamingContent((prev) => {
-                fullText = prev + ev.data;
+                fullText = prev + chunk;
                 return fullText;
               });
             }
