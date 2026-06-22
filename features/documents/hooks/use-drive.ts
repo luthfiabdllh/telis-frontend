@@ -1,17 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { documentApi } from "../api/document-api";
 
-export function useDrive(currentFolderId?: string | null) {
+export function useDrive(currentFolderId?: string | null, search?: string, isGlobal?: boolean) {
   const queryClient = useQueryClient();
 
   const foldersQuery = useQuery({
-    queryKey: ["folders", currentFolderId],
-    queryFn: () => documentApi.getFolders(currentFolderId),
+    queryKey: ["folders", currentFolderId, search, isGlobal],
+    queryFn: () => documentApi.getFolders(currentFolderId, search, isGlobal),
   });
 
   const documentsQuery = useQuery({
-    queryKey: ["documents", currentFolderId],
-    queryFn: () => documentApi.getDocuments(currentFolderId),
+    queryKey: ["documents", currentFolderId, search, isGlobal],
+    queryFn: () => documentApi.getDocuments(currentFolderId, search, isGlobal),
   });
 
   const pathQuery = useQuery({

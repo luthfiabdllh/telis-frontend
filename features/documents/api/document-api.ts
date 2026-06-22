@@ -7,6 +7,7 @@ export interface Folder {
   created_by: string;
   created_at: string;
   updated_at: string;
+  folder_path?: string;
 }
 
 export interface DocumentType {
@@ -20,13 +21,17 @@ export interface DocumentType {
   version: number;
   created_at: string;
   updated_at: string;
+  folder_path?: string;
 }
 
 export const documentApi = {
   // Folders
-  getFolders: async (parentId?: string | null) => {
+  getFolders: async (parentId?: string | null, search?: string, isGlobal?: boolean) => {
     const params = new URLSearchParams();
-    if (parentId !== undefined && parentId !== null) {
+    if (search) params.append("search", search);
+    if (isGlobal) {
+      params.append("is_global", "true");
+    } else if (parentId !== undefined && parentId !== null) {
       params.append("parent_id", parentId);
     } else if (parentId === null) {
       params.append("parent_id", "null");
@@ -60,9 +65,12 @@ export const documentApi = {
   },
 
   // Documents
-  getDocuments: async (folderId?: string | null) => {
+  getDocuments: async (folderId?: string | null, search?: string, isGlobal?: boolean) => {
     const params = new URLSearchParams();
-    if (folderId !== undefined && folderId !== null) {
+    if (search) params.append("search", search);
+    if (isGlobal) {
+      params.append("is_global", "true");
+    } else if (folderId !== undefined && folderId !== null) {
       params.append("folder_id", folderId);
     } else if (folderId === null) {
       params.append("folder_id", "null");
@@ -98,5 +106,38 @@ export const documentApi = {
       },
     });
     return res.data;
+  },
+  searchDrive: async (query: string, folderId?: string | null, isGlobal: boolean = false) => {
+    if (!query) return { folders: [], documents: [] };
+    
+    const folderParams = new URLSearchParams();
+    folderParams.append("search", query);
+    if (isGlobal) {
+      folderParams.append("is_global", "true");
+    } else if (folderId) {
+      folderParams.append("parent_id", folderId);
+    } else if (folderId === null) {
+      folderParams.append("parent_id", "null");
+    }
+
+    const docParams = new URLSearchParams();
+    docParams.append("search", query);
+    if (isGlobal) {
+      docParams.append("is_global", "true");
+    } else if (folderId) {
+      docParams.append("folder_id", folderId);
+    } else if (folderId === null) {
+      docParams.append("folder_id", "null");
+    }
+
+    const [folderRes, docRes] = await Promise.all([
+      apiClient.get(`/folders?${folderParams.toString()}`),
+      apiClient.get(`/documents?${docParams.toString()}`)
+    ]);
+
+    return {
+      folders: folderRes.data.data as Folder[] || [],
+      documents: docRes.data.data as DocumentType[] || [],
+    };
   },
 };

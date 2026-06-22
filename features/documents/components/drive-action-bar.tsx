@@ -3,6 +3,8 @@ import { FolderPlus, UploadCloud, LayoutGrid, List as ListIcon } from "lucide-re
 import { DriveBreadcrumb } from "./drive-breadcrumb";
 import { Folder } from "../api/document-api";
 
+import { DriveSearch } from "./drive-search";
+
 interface DriveActionBarProps {
   path: Folder[];
   viewMode: "grid" | "list";
@@ -18,15 +20,19 @@ export function DriveActionBar({
   onCreateFolderClick,
   onUploadClick,
 }: DriveActionBarProps) {
+  const currentFolderId = path.length > 0 ? path[path.length - 1].id : null;
+
   return (
-    <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:justify-between md:items-end mb-6">
-      <div className="flex-1">
-        <h1 className="text-2xl font-bold tracking-tight mb-2">Documents</h1>
-        <DriveBreadcrumb path={path} />
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center bg-muted rounded-md p-1 mr-2">
+    <div className="flex flex-col mb-6 space-y-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+        <h1 className="text-2xl font-bold tracking-tight">Documents</h1>
+        
+        <div className="flex-1 flex justify-center w-full md:max-w-2xl px-0 md:px-4">
+          <DriveSearch currentFolderId={currentFolderId} />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <div className="flex items-center bg-muted rounded-md p-1 mr-2">
           <Button
             variant={viewMode === "grid" ? "secondary" : "ghost"}
             size="icon"
@@ -54,6 +60,8 @@ export function DriveActionBar({
           Upload
         </Button>
       </div>
+      </div>
+      <DriveBreadcrumb path={path} />
     </div>
   );
 }

@@ -26,6 +26,9 @@ export function DriveContainer() {
   const searchParams = useSearchParams();
   const folderIdParam = searchParams.get("folder_id");
   const currentFolderId = folderIdParam === "null" ? null : folderIdParam;
+  
+  const searchQuery = searchParams.get("search") || undefined;
+  const isGlobal = searchParams.get("is_global") === "true";
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [modals, setModals] = useState<ModalState>({
@@ -49,7 +52,7 @@ export function DriveContainer() {
     moveDocument,
     deleteDocument,
     deprecateDocument,
-  } = useDrive(currentFolderId);
+  } = useDrive(currentFolderId, searchQuery, isGlobal);
 
   const handleRenameSubmit = async (newName: string) => {
     const { type, item } = modals.rename;
