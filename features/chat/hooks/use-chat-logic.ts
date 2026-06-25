@@ -79,6 +79,7 @@ export function useChatLogic(initialSessionId?: string) {
       
       let fullText = "";
       let collectedSources: {title: string, href: string}[] | undefined;
+      let finished = false;
       class RetriableError extends Error {}
       class FatalError extends Error {}
 
@@ -120,6 +121,7 @@ export function useChatLogic(initialSessionId?: string) {
               return;
             }
             if (ev.event === "done" || ev.data === "[DONE]") {
+              finished = true;
               resolve();
               ctrl.abort();
               return;
@@ -146,8 +148,12 @@ export function useChatLogic(initialSessionId?: string) {
             }
           },
           onclose() {
-            resolve();
-            ctrl.abort();
+            if (!finished) {
+              reject(new Error("Stream closed unexpectedly by the server"));
+            } else {
+              resolve();
+            }
+            throw new FatalError("Stop fetch-event-source from retrying");
           },
           onerror(err) {
             reject(err);
