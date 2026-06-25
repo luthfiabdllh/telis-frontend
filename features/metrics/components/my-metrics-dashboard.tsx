@@ -22,7 +22,7 @@ export function MyMetricsDashboard() {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20 max-w-md">
+    <Card className="bg-linear-to-br from-primary/10 to-transparent border-primary/20 max-w-md">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
           Total Pemakaian Saya (Bulan Ini)
