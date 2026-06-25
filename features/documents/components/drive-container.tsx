@@ -46,6 +46,7 @@ export function DriveContainer() {
 
   const queryClient = useQueryClient();
   const addUpload = useUploadStore((state) => state.addUpload);
+  const updateStatus = useUploadStore((state) => state.updateStatus);
 
   const {
     folders,
@@ -116,6 +117,19 @@ export function DriveContainer() {
     const { action, type, item } = modals.confirm;
     if (!item) return;
 
+    const actionId = nanoid();
+    const itemName = type === "folder" ? (item as Folder).name : (item as DocumentType).filename;
+
+    addUpload({
+      id: actionId,
+      filename: itemName,
+      progress: 0,
+      status: "processing",
+      type: action,
+    });
+    
+    closeModal("confirm");
+
     try {
       if (action === "delete") {
         if (type === "folder") {
@@ -123,18 +137,28 @@ export function DriveContainer() {
         } else {
           await deleteDocument.mutateAsync(item.id);
         }
-        toast.success("Deleted successfully");
       } else if (action === "deprecate") {
         await deprecateDocument.mutateAsync(item.id);
-        toast.success("Document deprecated");
       } else if (action === "restore") {
         await restoreDocument.mutateAsync(item.id);
-        toast.success("Document restore queued. Processing may take a moment.");
       }
-      closeModal("confirm");
+
+      // Polling for UI update
+      let count = 0;
+      const interval = setInterval(() => {
+        queryClient.invalidateQueries({ queryKey: ["documents"] });
+        queryClient.invalidateQueries({ queryKey: ["folders"] });
+        count++;
+        if (count > 7) {
+          clearInterval(interval);
+          updateStatus(actionId, "success");
+        }
+      }, 2000);
+
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       toast.error(`Failed to ${action}`, { description: msg });
+      updateStatus(actionId, "error", msg);
     }
   };
 

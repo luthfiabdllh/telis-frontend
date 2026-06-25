@@ -4,12 +4,13 @@ export type UploadStatus = 'uploading' | 'processing' | 'success' | 'error';
 
 export interface UploadItem {
   id: string;
-  file: File;
+  file?: File;
   filename: string;
   folderId?: string | null;
   progress: number;
   status: UploadStatus;
   errorMessage?: string;
+  type?: 'upload' | 'delete' | 'deprecate' | 'restore';
 }
 
 interface UploadStore {

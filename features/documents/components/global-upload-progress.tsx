@@ -1,7 +1,7 @@
 "use client";
 
 import { useUploadStore } from '../store/upload-store';
-import { ChevronDown, ChevronUp, X, CheckCircle2, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, CheckCircle2, FileText, Loader2, AlertCircle, Trash2, Ban, RefreshCw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 export function GlobalUploadProgress() {
@@ -43,9 +43,24 @@ export function GlobalUploadProgress() {
       {/* Body */}
       {!isMinimized && (
         <div className="max-h-72 overflow-y-auto p-2 space-y-1">
-          {uploads.map((upload) => (
+          {uploads.map((upload) => {
+            const getIcon = () => {
+              if (upload.type === 'delete') return <Trash2 className="w-6 h-6 text-destructive mr-3 shrink-0" />;
+              if (upload.type === 'deprecate') return <Ban className="w-6 h-6 text-amber-600 mr-3 shrink-0" />;
+              if (upload.type === 'restore') return <RefreshCw className="w-6 h-6 text-teal-600 mr-3 shrink-0" />;
+              return <FileText className="w-6 h-6 text-red-500 mr-3 shrink-0" />;
+            };
+
+            const getActionText = () => {
+              if (upload.type === 'delete') return 'Menghapus di latar belakang...';
+              if (upload.type === 'deprecate') return 'Mengusangkan dokumen...';
+              if (upload.type === 'restore') return 'AI memproses ulang dokumen...';
+              return 'Memproses di latar belakang...';
+            };
+
+            return (
             <div key={upload.id} className="flex items-center p-2 rounded-lg hover:bg-muted/50 transition-colors">
-              <FileText className="w-6 h-6 text-red-500 mr-3 shrink-0" />
+              {getIcon()}
               
               <div className="flex-1 min-w-0 mr-3">
                 <p className="text-xs font-medium truncate" title={upload.filename}>
@@ -55,7 +70,7 @@ export function GlobalUploadProgress() {
                   <Progress value={upload.progress} className="h-1 mt-1.5" />
                 )}
                 {upload.status === 'processing' && (
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Memproses di latar belakang...</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{getActionText()}</p>
                 )}
                 {upload.status === 'error' && (
                   <p className="text-[10px] text-destructive mt-0.5 truncate" title={upload.errorMessage}>
@@ -79,7 +94,8 @@ export function GlobalUploadProgress() {
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
