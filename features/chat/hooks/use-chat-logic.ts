@@ -37,9 +37,10 @@ export function useChatLogic(initialSessionId?: string) {
       const mappedMessages: MessageType[] = historyData.map((msg: any) => {
         const parsedSources = Array.isArray(msg.sources) ? msg.sources : [];
         return {
-          from: msg.sender as "user" | "assistant",
+          from: (msg.sender === "ai" ? "assistant" : msg.sender) as "user" | "assistant",
           key: msg.id || nanoid(),
           sources: parsedSources,
+          feedback: msg.feedback,
           versions: [
             {
               id: msg.id || nanoid(),
@@ -123,6 +124,7 @@ export function useChatLogic(initialSessionId?: string) {
             }
             if (ev.event === "done" || ev.data === "[DONE]") {
               finished = true;
+              queryClient.invalidateQueries({ queryKey: ["chat-messages", currentSessionId] });
               resolve();
               ctrl.abort();
               return;

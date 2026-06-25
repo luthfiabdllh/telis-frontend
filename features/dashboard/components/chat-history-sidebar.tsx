@@ -16,7 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function ChatHistorySidebar({ session }: { session: Session | null }) {
   const pathname = usePathname();
@@ -122,32 +122,110 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
                 </div>
               ) : (
                 filteredSessions.map((chat: ChatSession) => (
-                  <button
-                    key={chat.id}
-                    onClick={() => {
-                      setSelectedSessionId(chat.id);
-                      window.location.href = `/dashboard/chat/${chat.id}`;
-                    }}
-                    className={`hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex w-full flex-col items-start gap-2 border-b p-4 text-sm leading-tight text-left transition-colors ${selectedSessionId === chat.id || pathname === `/dashboard/chat/${chat.id}` ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
-                  >
-                    <div className="flex w-full items-center justify-between gap-2">
-                      <span className="truncate font-semibold">
-                        {chat.title}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground line-clamp-1 w-full whitespace-break-spaces">
-                      {formatDistanceToNow(new Date(chat.updated_at), {
-                        addSuffix: true,
-                        locale: id,
-                      })}
-                    </span>
-                  </button>
+                  <ChatItem 
+                    key={chat.id} 
+                    chat={chat} 
+                    session={session} 
+                    selectedSessionId={selectedSessionId} 
+                    setSelectedSessionId={setSelectedSessionId} 
+                    pathname={pathname} 
+                  />
                 ))
               )}
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
+    </div>
+  );
+}
+
+function ChatItem({ chat, session, selectedSessionId, setSelectedSessionId, pathname }: any) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [title, setTitle] = React.useState(chat.title);
+  const queryClient = useQueryClient();
+
+  const handleRename = async (e: React.KeyboardEvent | React.FocusEvent) => {
+    if (e.type === "keydown" && (e as React.KeyboardEvent).key !== "Enter") return;
+    
+    setIsEditing(false);
+    if (title.trim() === "" || title === chat.title) {
+      setTitle(chat.title);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/chat/sessions/${chat.id}/title`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.accessToken}`,
+        },
+        body: JSON.stringify({ title: title.trim() }),
+      });
+      
+      if (!res.ok) throw new Error("Failed to rename chat");
+      
+      // Update cache
+      queryClient.invalidateQueries({ queryKey: ["chat-sessions"] });
+    } catch (error) {
+      console.error(error);
+      setTitle(chat.title); // revert on error
+    }
+  };
+
+  return (
+    <div
+      className={`group relative flex w-full flex-col items-start gap-2 border-b p-4 text-sm leading-tight text-left transition-colors cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${selectedSessionId === chat.id || pathname === "/dashboard/chat/" + chat.id ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
+    >
+      <div className="flex w-full items-center justify-between gap-2">
+        {isEditing ? (
+          <input
+            autoFocus
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={handleRename}
+            onBlur={handleRename}
+            className="w-full bg-background/50 border px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <span 
+            className="truncate font-semibold flex-1"
+            onClick={() => {
+              setSelectedSessionId(chat.id);
+              window.location.href = `/dashboard/chat/${chat.id}`;
+            }}
+          >
+            {title}
+          </span>
+        )}
+        {!isEditing && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true);
+            }}
+            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition-opacity"
+            title="Ubah Judul"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+          </button>
+        )}
+      </div>
+      <span 
+        className="text-xs text-muted-foreground line-clamp-1 w-full whitespace-break-spaces"
+        onClick={() => {
+          setSelectedSessionId(chat.id);
+          window.location.href = `/dashboard/chat/${chat.id}`;
+        }}
+      >
+        {formatDistanceToNow(new Date(chat.updated_at), {
+          addSuffix: true,
+          locale: id,
+        })}
+      </span>
     </div>
   );
 }

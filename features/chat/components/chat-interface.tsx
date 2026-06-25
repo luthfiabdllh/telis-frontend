@@ -38,6 +38,7 @@ import { SpeechInput } from "@/components/ai-elements/speech-input";
 import { Suggestions } from "@/components/ai-elements/suggestion";
 import { type MessageType, suggestions } from "../schemas/chat";
 import { SuggestionItem } from "./suggestion-item";
+import { MessageFeedback } from "./message-feedback";
 
 export interface ChatInterfaceProps {
   text: string;
@@ -98,6 +99,11 @@ export const ChatInterface = ({
                       <MessageContent>
                         <MessageResponse>{version.content}</MessageResponse>
                       </MessageContent>
+                      {message.from === "assistant" && versions[0].id && (
+                        <div className="opacity-0 transition-opacity group-hover:opacity-100 flex items-center gap-1 mt-2">
+                          <MessageFeedback messageId={versions[0].id} initialFeedback={message.feedback} />
+                        </div>
+                      )}
                     </div>
                   </Message>
                 ))}

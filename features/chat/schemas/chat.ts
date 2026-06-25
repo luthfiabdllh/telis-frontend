@@ -9,6 +9,7 @@ export interface MessageType {
     id: string;
     content: string;
   }[];
+  feedback?: any;
   reasoning?: {
     content: string;
     duration: number;

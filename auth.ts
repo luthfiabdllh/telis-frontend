@@ -121,6 +121,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const decoded = decodeJwt(data.access_token)
           
           // Inject token dari Golang ke object user agar ditangkap oleh callback jwt()
+          user.id = decoded.sub || decoded.user_id || user.id
           user.role = decoded.role || "User"
           user.accessToken = data.access_token
           user.refreshToken = data.refresh_token
