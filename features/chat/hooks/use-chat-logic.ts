@@ -89,6 +89,7 @@ export function useChatLogic(initialSessionId?: string) {
         fetchEventSource(`${apiUrl}/chat/stream`, {
           method: "POST",
           signal: ctrl.signal,
+          openWhenHidden: true,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -156,9 +157,9 @@ export function useChatLogic(initialSessionId?: string) {
             throw new FatalError("Stop fetch-event-source from retrying");
           },
           onerror(err) {
+            ctrl.abort(); // Immediately cancel any internal fetch state to prevent retry
             reject(err);
-            ctrl.abort();
-            throw err; // rethrow to stop all retries
+            throw new FatalError(err?.message || "Streaming Error"); // Rethrow FatalError to force stop
           }
         });
       });
