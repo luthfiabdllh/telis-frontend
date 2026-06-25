@@ -125,7 +125,7 @@ export function DriveContainer() {
       filename: itemName,
       progress: 0,
       status: "processing",
-      type: action,
+      type: action as "delete" | "deprecate" | "restore",
     });
     
     closeModal("confirm");

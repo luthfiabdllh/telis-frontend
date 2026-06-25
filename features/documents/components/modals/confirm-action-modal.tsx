@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Button } from "@/components/ui/button";
 import { Trash2, Ban, RefreshCw, Info } from "lucide-react";
 
-export type ConfirmActionType = "delete" | "deprecate" | "restore";
+export type ConfirmActionType = "delete" | "deprecate" | "restore" | "ban" | "unban";
 
 interface ConfirmActionModalProps {
   isOpen: boolean;
@@ -47,6 +47,22 @@ export function ConfirmActionModal({ isOpen, onClose, onConfirm, isLoading, acti
       Icon = RefreshCw;
       iconColor = "text-teal-600";
       break;
+    case "ban":
+      title = "Ban Pengguna";
+      description = `Apakah Anda yakin ingin melakukan BANNED pada pengguna "${itemName}"? Pengguna tidak akan bisa mengakses sistem.`;
+      buttonText = "Ban Pengguna";
+      buttonVariant = "destructive";
+      Icon = Ban;
+      iconColor = "text-amber-600";
+      break;
+    case "unban":
+      title = "Unban Pengguna";
+      description = `Apakah Anda yakin ingin mencabut BANNED dari pengguna "${itemName}"? Pengguna akan bisa mengakses sistem kembali.`;
+      buttonText = "Unban Pengguna";
+      buttonVariant = "default";
+      Icon = RefreshCw;
+      iconColor = "text-green-600";
+      break;
   }
 
   return (
@@ -77,9 +93,9 @@ export function ConfirmActionModal({ isOpen, onClose, onConfirm, isLoading, acti
             className={
               action === "deprecate" 
                 ? "bg-amber-600 hover:bg-amber-700 text-white" 
-                : action === "restore" 
+                : action === "restore" || action === "unban"
                   ? "bg-teal-600 hover:bg-teal-700 text-white" 
-                  : ""
+                  : action === "ban" ? "bg-amber-600 hover:bg-amber-700 text-white" : ""
             }
           >
             {isLoading ? "Processing..." : buttonText}
