@@ -36,10 +36,18 @@ export function formatBytes(bytes?: number | null, decimals = 2) {
 export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpenLocation, viewMode }: FileCardProps) {
   const isDeprecated = file.is_deprecated;
   const formattedSize = formatBytes(file.file_size_bytes);
+  const viewUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'}/documents/${file.id}/download?view=true`;
+
+  const handleCardClick = () => {
+    window.open(viewUrl, "_blank");
+  };
 
   if (viewMode === "list") {
     return (
-      <div className={`flex items-center justify-between p-3 border-b hover:bg-muted/50 transition-colors group ${isDeprecated ? 'opacity-60' : ''}`}>
+      <div 
+        onClick={handleCardClick}
+        className={`flex items-center justify-between p-3 border-b hover:bg-muted/50 transition-colors group cursor-pointer ${isDeprecated ? 'opacity-60' : ''}`}
+      >
         <div className="flex items-center space-x-3 flex-1 overflow-hidden">
           <div className={`p-2 rounded-lg ${isDeprecated ? 'bg-muted text-muted-foreground' : 'bg-red-500/10 text-red-500'}`}>
             <FileText className="w-5 h-5" />
@@ -54,33 +62,40 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpen
             </span>
           </div>
         </div>
-        <FileActions
-          file={file}
-          onRename={onRename}
-          onMove={onMove}
-          onDelete={onDelete}
-          onDeprecate={onDeprecate}
-          onOpenLocation={onOpenLocation}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <FileActions
+            file={file}
+            onRename={onRename}
+            onMove={onMove}
+            onDelete={onDelete}
+            onDeprecate={onDeprecate}
+            onOpenLocation={onOpenLocation}
+          />
+        </div>
       </div>
     );
   }
 
   // Grid View
   return (
-    <div className={`border rounded-xl p-4 hover:shadow-md hover:border-red-500/50 transition-all group bg-card flex flex-col ${isDeprecated ? 'opacity-60 grayscale' : ''}`}>
+    <div 
+      onClick={handleCardClick}
+      className={`border rounded-xl p-4 hover:shadow-md hover:border-red-500/50 transition-all group bg-card flex flex-col cursor-pointer ${isDeprecated ? 'opacity-60 grayscale' : ''}`}
+    >
       <div className="flex justify-between items-start mb-3">
         <div className="p-3 bg-red-500/10 rounded-xl text-red-500">
           <FileText className="w-8 h-8" />
         </div>
-        <FileActions
-          file={file}
-          onRename={onRename}
-          onMove={onMove}
-          onDelete={onDelete}
-          onDeprecate={onDeprecate}
-          onOpenLocation={onOpenLocation}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <FileActions
+            file={file}
+            onRename={onRename}
+            onMove={onMove}
+            onDelete={onDelete}
+            onDeprecate={onDeprecate}
+            onOpenLocation={onOpenLocation}
+          />
+        </div>
       </div>
       
       <div className="flex-1">
