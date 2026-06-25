@@ -8,6 +8,7 @@ import {
   Home,
   FileText,
   ShieldCheck,
+  BarChart3,
 } from "lucide-react";
 import {
   Sidebar,
@@ -108,8 +109,8 @@ export function AppSidebar({ session }: { session: Session | null }) {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="Laporan Pemakaian">
-                      <Link href="/dashboard/admin/reports">
-                        <FileText className="h-4 w-4" />
+                      <Link href="/dashboard/admin/metrics">
+                        <BarChart3 className="h-4 w-4" />
                         <span>Laporan Pemakaian</span>
                       </Link>
                     </SidebarMenuButton>
