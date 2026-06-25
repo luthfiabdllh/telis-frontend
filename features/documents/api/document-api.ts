@@ -95,7 +95,12 @@ export const documentApi = {
     const res = await apiClient.post(`/documents/${id}/deprecate`);
     return res.data;
   },
-  uploadDocument: async (file: File, folderId?: string | null, replacesId?: string | null) => {
+  uploadDocument: async (
+    file: File, 
+    folderId?: string | null, 
+    replacesId?: string | null,
+    onProgress?: (progress: number) => void
+  ) => {
     const formData = new FormData();
     formData.append("file", file);
     if (folderId) formData.append("folder_id", folderId);
@@ -104,6 +109,12 @@ export const documentApi = {
     const res = await apiClient.post("/documents/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total && onProgress) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percentCompleted);
+        }
       },
     });
     return res.data;

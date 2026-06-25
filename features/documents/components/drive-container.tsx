@@ -14,6 +14,9 @@ import { Folder, DocumentType } from "../api/document-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Folder as FolderIcon } from "lucide-react";
+import { useUploadStore, triggerUpload } from "../store/upload-store";
+import { useQueryClient } from "@tanstack/react-query";
+import { nanoid } from "nanoid";
 
 type ModalState = {
   createFolder: boolean;
@@ -37,6 +40,9 @@ export function DriveContainer() {
     rename: { isOpen: false, type: "folder", item: null },
     move: { isOpen: false, type: "folder", item: null },
   });
+
+  const queryClient = useQueryClient();
+  const addUpload = useUploadStore((state) => state.addUpload);
 
   const {
     folders,
@@ -231,11 +237,19 @@ export function DriveContainer() {
 
       <UploadDocumentModal
         isOpen={modals.uploadDocument}
-        isLoading={uploadDocument.isPending}
         onClose={() => closeModal("uploadDocument")}
-        onSubmit={async (file) => {
-          await uploadDocument.mutateAsync(file);
+        onSubmit={(file) => {
+          const uploadId = nanoid();
+          addUpload({
+            id: uploadId,
+            file,
+            filename: file.name,
+            folderId: currentFolderId,
+            progress: 0,
+            status: "uploading",
+          });
           closeModal("uploadDocument");
+          triggerUpload(uploadId, file, currentFolderId, queryClient);
         }}
       />
 

@@ -46,8 +46,18 @@ export function useDrive(currentFolderId?: string | null, search?: string, isGlo
   });
 
   const uploadDocument = useMutation({
-    mutationFn: (file: File) => documentApi.uploadDocument(file, currentFolderId),
-    onSuccess: () => invalidateDrive(),
+    mutationFn: ({ file, onProgress }: { file: File; onProgress?: (p: number) => void }) => 
+      documentApi.uploadDocument(file, currentFolderId, null, onProgress),
+    onSuccess: () => {
+      invalidateDrive();
+      // Ingestion is asynchronous in the background worker, so we poll for a few seconds to update the UI automatically
+      let count = 0;
+      const interval = setInterval(() => {
+        invalidateDrive();
+        count++;
+        if (count > 7) clearInterval(interval); // Poll up to 14 seconds
+      }, 2000);
+    },
   });
 
   const renameDocument = useMutation({

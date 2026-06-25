@@ -7,10 +7,9 @@ interface UploadDocumentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (file: File) => void;
-  isLoading: boolean;
 }
 
-export function UploadDocumentModal({ isOpen, onClose, onSubmit, isLoading }: UploadDocumentModalProps) {
+export function UploadDocumentModal({ isOpen, onClose, onSubmit }: UploadDocumentModalProps) {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,15 +62,17 @@ export function UploadDocumentModal({ isOpen, onClose, onSubmit, isLoading }: Up
               onChange={handleFileChange}
             />
           </div>
+          
           {file && (
             <div className="bg-primary/10 text-primary px-3 py-2 rounded-md text-sm truncate">
               Selected: <span className="font-medium">{file.name}</span>
             </div>
           )}
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>Cancel</Button>
-            <Button type="button" onClick={handleSubmit} disabled={!file || isLoading}>
-              {isLoading ? "Uploading..." : "Upload"}
+
+          <DialogFooter className="mt-6">
+            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button type="button" onClick={handleSubmit} disabled={!file}>
+              Upload
             </Button>
           </DialogFooter>
         </div>
@@ -79,3 +80,4 @@ export function UploadDocumentModal({ isOpen, onClose, onSubmit, isLoading }: Up
     </Dialog>
   );
 }
+

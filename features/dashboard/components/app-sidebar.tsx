@@ -24,6 +24,7 @@ import {
 import { Session } from "next-auth";
 import { NavUser } from "./nav-user";
 import { ChatHistorySidebar } from "./chat-history-sidebar";
+import Link from "next/link";
 
 export function AppSidebar({ session }: { session: Session | null }) {
   return (
@@ -58,34 +59,34 @@ export function AppSidebar({ session }: { session: Session | null }) {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Beranda">
-                    <a href="/dashboard">
+                    <Link href="/dashboard">
                       <Home className="h-4 w-4" />
                       <span>Beranda</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Obrolan AI">
-                    <a href="/dashboard/chat">
+                    <Link href="/dashboard/chat">
                       <ShieldCheck className="h-4 w-4" />
                       <span>Obrolan AI</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Repositori Dokumen">
-                    <a href="/dashboard/documents">
+                    <Link href="/dashboard/documents">
                       <Archive className="h-4 w-4" />
                       <span>Repositori Dokumen</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Analisis Redline">
-                    <a href="/dashboard/redline">
+                    <Link href="/dashboard/redline">
                       <FileText className="h-4 w-4" />
                       <span>Analisis Redline</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -99,18 +100,18 @@ export function AppSidebar({ session }: { session: Session | null }) {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="Pengelolaan Pengguna">
-                      <a href="/dashboard/admin/users">
+                      <Link href="/dashboard/admin/users">
                         <Flag className="h-4 w-4" />
                         <span>Pengelolaan Pengguna</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="Laporan Pemakaian">
-                      <a href="/dashboard/admin/reports">
+                      <Link href="/dashboard/admin/reports">
                         <FileText className="h-4 w-4" />
                         <span>Laporan Pemakaian</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
