@@ -6,8 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
-import { DollarSign, AlertTriangle } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { DollarSign, AlertTriangle, Users, FileText, FolderOpen } from "lucide-react";
 
 const ANOMALY_THRESHOLD = 5.00;
 
@@ -46,24 +46,48 @@ export function MetricsDashboard() {
     }
   };
 
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
   return (
     <div className="space-y-8">
       {/* Summary Row */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Biaya LLM (Bulan Ini)
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Biaya LLM</CardTitle>
             <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-primary">
+            <div className="text-3xl font-bold text-primary">
               ${data.total_cost_this_month.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Estimasi pengeluaran token API AI.
-            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Pengguna</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{data.total_users}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Dokumen</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{data.total_documents}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Direktori</CardTitle>
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{data.total_folders}</div>
           </CardContent>
         </Card>
       </div>
@@ -157,6 +181,82 @@ export function MetricsDashboard() {
                   })}
                 </TableBody>
               </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
+        {/* Pie Chart: Document Status */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Distribusi Status Dokumen</CardTitle>
+            <CardDescription>Komposisi dokumen berdasarkan status ingestion.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!data.doc_status_dist || data.doc_status_dist.length === 0 ? (
+              <div className="h-[250px] flex items-center justify-center text-muted-foreground">Belum ada dokumen.</div>
+            ) : (
+              <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data.doc_status_dist}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="count"
+                      nameKey="status"
+                      label={({ name, value }) => `${name} (${value})`}
+                    >
+                      {data.doc_status_dist.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Pie Chart: User Roles */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Demografi Wewenang Pengguna</CardTitle>
+            <CardDescription>Sebaran peran (role) pengguna dalam sistem.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!data.user_role_dist || data.user_role_dist.length === 0 ? (
+              <div className="h-[250px] flex items-center justify-center text-muted-foreground">Belum ada pengguna.</div>
+            ) : (
+              <div className="h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data.user_role_dist}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      fill="#82ca9d"
+                      paddingAngle={5}
+                      dataKey="count"
+                      nameKey="role"
+                      label={({ name, value }) => `${name} (${value})`}
+                    >
+                      {data.user_role_dist.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             )}
           </CardContent>
         </Card>

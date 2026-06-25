@@ -13,10 +13,25 @@ export interface DailyUsage {
   cost_usd: number;
 }
 
+export interface DocStatusDist {
+  status: string;
+  count: number;
+}
+
+export interface UserRoleDist {
+  role: string;
+  count: number;
+}
+
 export interface DashboardMetrics {
   total_cost_this_month: number;
   top_users: UserCost[];
   daily_trend: DailyUsage[];
+  total_users: number;
+  total_documents: number;
+  total_folders: number;
+  doc_status_dist: DocStatusDist[];
+  user_role_dist: UserRoleDist[];
 }
 
 export interface MyMetrics {
