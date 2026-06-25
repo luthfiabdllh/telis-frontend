@@ -93,6 +93,7 @@ export function DriveSearch({ currentFolderId }: DriveSearchProps) {
         <PopoverContent
           className="w-(--radix-popover-trigger-width) p-0 rounded-xl overflow-hidden shadow-lg border"
           align="start"
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <Command shouldFilter={false} className="border-none">
             <div className="flex items-center px-3 py-2 border-b bg-muted/30">
