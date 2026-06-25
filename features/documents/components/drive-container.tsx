@@ -10,6 +10,7 @@ import { CreateFolderModal } from "./modals/create-folder-modal";
 import { UploadDocumentModal } from "./modals/upload-document-modal";
 import { RenameModal } from "./modals/rename-modal";
 import { MoveItemModal } from "./modals/move-item-modal";
+import { ConfirmActionModal, ConfirmActionType } from "./modals/confirm-action-modal";
 import { Folder, DocumentType } from "../api/document-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ type ModalState = {
   uploadDocument: boolean;
   rename: { isOpen: boolean; type: "folder" | "file"; item: Folder | DocumentType | null };
   move: { isOpen: boolean; type: "folder" | "file"; item: Folder | DocumentType | null };
+  confirm: { isOpen: boolean; action: ConfirmActionType; type: "folder" | "file"; item: Folder | DocumentType | null };
 };
 
 export function DriveContainer() {
@@ -39,6 +41,7 @@ export function DriveContainer() {
     uploadDocument: false,
     rename: { isOpen: false, type: "folder", item: null },
     move: { isOpen: false, type: "folder", item: null },
+    confirm: { isOpen: false, action: "delete", type: "folder", item: null },
   });
 
   const queryClient = useQueryClient();
@@ -105,45 +108,38 @@ export function DriveContainer() {
     setModals((prev) => ({ ...prev, move: { isOpen: true, type, item } }));
   };
 
-  const handleDelete = async (type: "folder" | "file", item: Folder | DocumentType) => {
-    if (!confirm(`Are you sure you want to permanently delete this ${type}?`)) return;
+  const openConfirm = (action: ConfirmActionType, type: "folder" | "file", item: Folder | DocumentType) => {
+    setModals((prev) => ({ ...prev, confirm: { isOpen: true, action, type, item } }));
+  };
+
+  const handleConfirmAction = async () => {
+    const { action, type, item } = modals.confirm;
+    if (!item) return;
+
     try {
-      if (type === "folder") {
-        await deleteFolder.mutateAsync(item.id);
-      } else {
-        await deleteDocument.mutateAsync(item.id);
+      if (action === "delete") {
+        if (type === "folder") {
+          await deleteFolder.mutateAsync(item.id);
+        } else {
+          await deleteDocument.mutateAsync(item.id);
+        }
+        toast.success("Deleted successfully");
+      } else if (action === "deprecate") {
+        await deprecateDocument.mutateAsync(item.id);
+        toast.success("Document deprecated");
+      } else if (action === "restore") {
+        await restoreDocument.mutateAsync(item.id);
+        toast.success("Document restore queued. Processing may take a moment.");
       }
-      toast.success("Deleted successfully");
+      closeModal("confirm");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      toast.error("Failed to delete", { description: msg });
-    }
-  };
-
-  const handleDeprecate = async (file: DocumentType) => {
-    if (!confirm("Are you sure you want to deprecate this document? It will no longer be used for AI reasoning.")) return;
-    try {
-      await deprecateDocument.mutateAsync(file.id);
-      toast.success("Document deprecated");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      toast.error("Failed to deprecate", { description: msg });
-    }
-  };
-
-  const handleRestore = async (file: DocumentType) => {
-    if (!confirm("Are you sure you want to restore this document? It will be re-processed by AI.")) return;
-    try {
-      await restoreDocument.mutateAsync(file.id);
-      toast.success("Document restore queued. Processing may take a moment.");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      toast.error("Failed to restore", { description: msg });
+      toast.error(`Failed to ${action}`, { description: msg });
     }
   };
 
   const closeModal = (key: keyof ModalState) => {
-    if (key === "rename" || key === "move") {
+    if (key === "rename" || key === "move" || key === "confirm") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setModals((prev) => ({ ...prev, [key]: { ...(prev[key as keyof ModalState] as any), isOpen: false } }));
     } else {
@@ -199,7 +195,7 @@ export function DriveContainer() {
                         viewMode={viewMode}
                         onRename={(f) => openRename("folder", f)}
                         onMove={(f) => openMove("folder", f)}
-                        onDelete={(f) => handleDelete("folder", f)}
+                        onDelete={(f) => openConfirm("delete", "folder", f)}
                         onOpenLocation={searchQuery ? (f) => {
                           const url = f.parent_id ? `/dashboard/documents?folder_id=${f.parent_id}` : `/dashboard/documents`;
                           window.location.href = url; // Force reload to clear search if using link, or push to router
@@ -221,9 +217,9 @@ export function DriveContainer() {
                         viewMode={viewMode}
                         onRename={(f) => openRename("file", f)}
                         onMove={(f) => openMove("file", f)}
-                        onDelete={(f) => handleDelete("file", f)}
-                        onDeprecate={(f) => handleDeprecate(f)}
-                        onRestore={(f) => handleRestore(f)}
+                        onDelete={(f) => openConfirm("delete", "file", f)}
+                        onDeprecate={(f) => openConfirm("deprecate", "file", f)}
+                        onRestore={(f) => openConfirm("restore", "file", f)}
                         onOpenLocation={searchQuery ? (f) => {
                           const url = f.folder_id ? `/dashboard/documents?folder_id=${f.folder_id}` : `/dashboard/documents`;
                           window.location.href = url;
@@ -284,6 +280,18 @@ export function DriveContainer() {
           onClose={() => closeModal("move")}
           onSubmit={handleMoveSubmit}
           itemName={modals.move.type === "folder" ? (modals.move.item as Folder).name : (modals.move.item as DocumentType).filename}
+        />
+      )}
+
+      {modals.confirm.item && (
+        <ConfirmActionModal
+          isOpen={modals.confirm.isOpen}
+          onClose={() => closeModal("confirm")}
+          onConfirm={handleConfirmAction}
+          isLoading={deleteFolder.isPending || deleteDocument.isPending || deprecateDocument.isPending || restoreDocument.isPending}
+          action={modals.confirm.action}
+          itemName={modals.confirm.type === "folder" ? (modals.confirm.item as Folder).name : (modals.confirm.item as DocumentType).filename}
+          itemType={modals.confirm.type}
         />
       )}
     </div>
