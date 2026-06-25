@@ -20,9 +20,22 @@ interface FileCardProps {
   viewMode: "grid" | "list";
 }
 
+export function formatBytes(bytes?: number | null, decimals = 2) {
+  if (bytes === null || bytes === undefined || isNaN(bytes)) return 'Unknown Size';
+  if (!+bytes) return '0 Bytes';
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
 export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpenLocation, viewMode }: FileCardProps) {
   const isDeprecated = file.is_deprecated;
-  const sizeMB = (file.file_size_bytes / (1024 * 1024)).toFixed(2);
+  const formattedSize = formatBytes(file.file_size_bytes);
 
   if (viewMode === "list") {
     return (
@@ -37,7 +50,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpen
               {isDeprecated && <Badge variant="secondary" className="text-[10px] h-4">Deprecated</Badge>}
             </span>
             <span className="text-xs text-muted-foreground">
-              {sizeMB} MB • {new Date(file.created_at).toLocaleDateString()}
+              {formattedSize} • {new Date(file.created_at).toLocaleDateString()}
             </span>
           </div>
         </div>
@@ -78,7 +91,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpen
       </div>
 
       <div className="text-xs text-muted-foreground mt-3 pt-3 border-t flex justify-between items-center">
-        <span>{sizeMB} MB</span>
+        <span>{formattedSize}</span>
         <span>{new Date(file.created_at).toLocaleDateString()}</span>
       </div>
     </div>
