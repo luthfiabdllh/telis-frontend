@@ -78,7 +78,7 @@ export function MetricsDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {data.daily_trend.length === 0 ? (
+            {!data.daily_trend || data.daily_trend.length === 0 ? (
               <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                 Belum ada data pemakaian bulan ini.
               </div>
@@ -123,7 +123,7 @@ export function MetricsDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex-1">
-            {data.top_users.length === 0 ? (
+            {!data.top_users || data.top_users.length === 0 ? (
               <div className="h-full flex items-center justify-center text-muted-foreground">
                 Belum ada pengguna yang tercatat menggunakan AI.
               </div>

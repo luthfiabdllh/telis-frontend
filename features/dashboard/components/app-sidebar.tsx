@@ -90,6 +90,14 @@ export function AppSidebar({ session }: { session: Session | null }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Statistik Token Saya">
+                    <Link href="/dashboard/metrics">
+                      <BarChart3 className="h-4 w-4" />
+                      <span>Statistik Token Saya</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -107,14 +115,16 @@ export function AppSidebar({ session }: { session: Session | null }) {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild tooltip="Laporan Pemakaian">
-                      <Link href="/dashboard/admin/metrics">
-                        <BarChart3 className="h-4 w-4" />
-                        <span>Laporan Pemakaian</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  {session?.user?.role === "Admin" && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip="Laporan Pemakaian">
+                        <Link href="/dashboard/admin/metrics">
+                          <BarChart3 className="h-4 w-4" />
+                          <span>Laporan Pemakaian</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
