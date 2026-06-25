@@ -16,6 +16,7 @@ interface FileCardProps {
   onMove: (file: DocumentType) => void;
   onDelete: (file: DocumentType) => void;
   onDeprecate: (file: DocumentType) => void;
+  onRestore: (file: DocumentType) => void;
   onOpenLocation?: (file: DocumentType) => void;
   viewMode: "grid" | "list";
 }
@@ -33,7 +34,7 @@ export function formatBytes(bytes?: number | null, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpenLocation, viewMode }: FileCardProps) {
+export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRestore, onOpenLocation, viewMode }: FileCardProps) {
   const isDeprecated = file.is_deprecated;
   const formattedSize = formatBytes(file.file_size_bytes);
 
@@ -81,6 +82,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpen
             onMove={onMove}
             onDelete={onDelete}
             onDeprecate={onDeprecate}
+            onRestore={onRestore}
             onOpenLocation={onOpenLocation}
           />
         </div>
@@ -105,6 +107,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpen
             onMove={onMove}
             onDelete={onDelete}
             onDeprecate={onDeprecate}
+            onRestore={onRestore}
             onOpenLocation={onOpenLocation}
           />
         </div>
@@ -125,7 +128,9 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpen
   );
 }
 
-function FileActions({ file, onRename, onMove, onDelete, onDeprecate, onOpenLocation }: Omit<FileCardProps, "viewMode">) {
+import { RefreshCw } from "lucide-react";
+
+function FileActions({ file, onRename, onMove, onDelete, onDeprecate, onRestore, onOpenLocation }: Omit<FileCardProps, "viewMode">) {
   const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'}/documents/${file.id}/download`;
 
   return (
@@ -158,7 +163,12 @@ function FileActions({ file, onRename, onMove, onDelete, onDeprecate, onOpenLoca
           Move to...
         </DropdownMenuItem>
         
-        {!file.is_deprecated && (
+        {file.is_deprecated ? (
+          <DropdownMenuItem onClick={() => onRestore(file)} className="text-teal-600 focus:text-teal-600">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Restore (Un-deprecate)
+          </DropdownMenuItem>
+        ) : (
           <DropdownMenuItem onClick={() => onDeprecate(file)} className="text-amber-600 focus:text-amber-600">
             <Ban className="h-4 w-4 mr-2" />
             Deprecate

@@ -95,6 +95,10 @@ export const documentApi = {
     const res = await apiClient.post(`/documents/${id}/deprecate`);
     return res.data;
   },
+  restoreDocument: async (id: string) => {
+    const res = await apiClient.post(`/documents/${id}/restore`);
+    return res.data;
+  },
   uploadDocument: async (
     file: File, 
     folderId?: string | null, 

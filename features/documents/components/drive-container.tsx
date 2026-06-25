@@ -58,6 +58,7 @@ export function DriveContainer() {
     moveDocument,
     deleteDocument,
     deprecateDocument,
+    restoreDocument,
   } = useDrive(currentFolderId, searchQuery, isGlobal);
 
   const handleRenameSubmit = async (newName: string) => {
@@ -127,6 +128,17 @@ export function DriveContainer() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       toast.error("Failed to deprecate", { description: msg });
+    }
+  };
+
+  const handleRestore = async (file: DocumentType) => {
+    if (!confirm("Are you sure you want to restore this document? It will be re-processed by AI.")) return;
+    try {
+      await restoreDocument.mutateAsync(file.id);
+      toast.success("Document restore queued. Processing may take a moment.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error("Failed to restore", { description: msg });
     }
   };
 
@@ -211,6 +223,7 @@ export function DriveContainer() {
                         onMove={(f) => openMove("file", f)}
                         onDelete={(f) => handleDelete("file", f)}
                         onDeprecate={(f) => handleDeprecate(f)}
+                        onRestore={(f) => handleRestore(f)}
                         onOpenLocation={searchQuery ? (f) => {
                           const url = f.folder_id ? `/dashboard/documents?folder_id=${f.folder_id}` : `/dashboard/documents`;
                           window.location.href = url;

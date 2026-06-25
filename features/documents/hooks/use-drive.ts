@@ -80,6 +80,11 @@ export function useDrive(currentFolderId?: string | null, search?: string, isGlo
     onSuccess: () => invalidateDrive(),
   });
 
+  const restoreDocument = useMutation({
+    mutationFn: (id: string) => documentApi.restoreDocument(id),
+    onSuccess: () => invalidateDrive(),
+  });
+
   return {
     folders: foldersQuery.data ?? [],
     documents: documentsQuery.data ?? [],
@@ -94,5 +99,6 @@ export function useDrive(currentFolderId?: string | null, search?: string, isGlo
     moveDocument,
     deleteDocument,
     deprecateDocument,
+    restoreDocument,
   };
 }
