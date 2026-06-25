@@ -108,6 +108,12 @@ export const documentApi = {
     });
     return res.data;
   },
+  downloadFileBlob: async (id: string) => {
+    const res = await apiClient.get(`/documents/${id}/download?view=true`, {
+      responseType: "blob",
+    });
+    return res.data;
+  },
   searchDrive: async (query: string, folderId?: string | null, isGlobal: boolean = false) => {
     if (!query) return { folders: [], documents: [] };
     

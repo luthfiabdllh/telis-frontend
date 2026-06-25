@@ -1,5 +1,5 @@
 import { FileText, MoreVertical, Pencil, FolderInput, Trash2, Ban, Download } from "lucide-react";
-import { DocumentType } from "../api/document-api";
+import { DocumentType, documentApi } from "../api/document-api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,10 +36,22 @@ export function formatBytes(bytes?: number | null, decimals = 2) {
 export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onOpenLocation, viewMode }: FileCardProps) {
   const isDeprecated = file.is_deprecated;
   const formattedSize = formatBytes(file.file_size_bytes);
-  const viewUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'}/documents/${file.id}/download?view=true`;
 
-  const handleCardClick = () => {
-    window.open(viewUrl, "_blank");
+  const handleCardClick = async () => {
+    const newTab = window.open('about:blank', '_blank');
+    if (!newTab) {
+      alert("Please allow pop-ups to view the document.");
+      return;
+    }
+
+    try {
+      const blob = await documentApi.downloadFileBlob(file.id);
+      const url = window.URL.createObjectURL(blob);
+      newTab.location.href = url;
+    } catch (e) {
+      newTab.close();
+      console.error("Failed to view document", e);
+    }
   };
 
   if (viewMode === "list") {
