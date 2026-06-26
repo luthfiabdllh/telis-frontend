@@ -36,6 +36,7 @@ export function DriveContainer() {
   const isGlobal = searchParams.get("is_global") === "true";
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [documentType, setDocumentType] = useState<string>("ALL");
   const [modals, setModals] = useState<ModalState>({
     createFolder: false,
     uploadDocument: false,
@@ -63,7 +64,7 @@ export function DriveContainer() {
     deleteDocument,
     deprecateDocument,
     restoreDocument,
-  } = useDrive(currentFolderId, searchQuery, isGlobal);
+  } = useDrive(currentFolderId, searchQuery, isGlobal, documentType === "ALL" ? undefined : documentType);
 
   const handleRenameSubmit = async (newName: string) => {
     const { type, item } = modals.rename;
@@ -177,6 +178,8 @@ export function DriveContainer() {
         path={path}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        documentType={documentType}
+        onDocumentTypeChange={setDocumentType}
         onCreateFolderClick={() => setModals((p) => ({ ...p, createFolder: true }))}
         onUploadClick={() => setModals((p) => ({ ...p, uploadDocument: true }))}
       />

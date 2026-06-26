@@ -2,13 +2,24 @@ import { Button } from "@/components/ui/button";
 import { FolderPlus, UploadCloud, LayoutGrid, List as ListIcon } from "lucide-react";
 import { DriveBreadcrumb } from "./drive-breadcrumb";
 import { Folder } from "../api/document-api";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { DriveSearch } from "./drive-search";
+
+const CATEGORIES = [
+  "ALL", "NDA", "PROCUREMENT_CONTRACT", "PARTNERSHIP_AGREEMENT",
+  "SLA_AGREEMENT", "REGULATORY_DOCUMENT", "COMPLIANCE_DOCUMENT",
+  "INTERNAL_POLICY", "LEGAL_CORRESPONDENCE", "MINUTES_OF_MEETING",
+  "LITIGATION_DOCUMENT", "OTHER"
+];
+
 
 interface DriveActionBarProps {
   path: Folder[];
   viewMode: "grid" | "list";
   onViewModeChange: (mode: "grid" | "list") => void;
+  documentType: string;
+  onDocumentTypeChange: (type: string) => void;
   onCreateFolderClick: () => void;
   onUploadClick: () => void;
 }
@@ -17,6 +28,8 @@ export function DriveActionBar({
   path,
   viewMode,
   onViewModeChange,
+  documentType,
+  onDocumentTypeChange,
   onCreateFolderClick,
   onUploadClick,
 }: DriveActionBarProps) {
@@ -32,6 +45,15 @@ export function DriveActionBar({
         </div>
 
         <div className="flex items-center space-x-2">
+          <Select value={documentType} onValueChange={onDocumentTypeChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c === "ALL" ? "Semua Kategori" : c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
           <div className="flex items-center bg-muted rounded-md p-1 mr-2">
           <Button
             variant={viewMode === "grid" ? "secondary" : "ghost"}

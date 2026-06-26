@@ -1,4 +1,4 @@
-import { FileText, MoreVertical, Pencil, FolderInput, Trash2, Ban, Download } from "lucide-react";
+import { FileText, MoreVertical, Pencil, FolderInput, Trash2, Ban, Download, Eye } from "lucide-react";
 import { DocumentType, documentApi } from "../api/document-api";
 import {
   DropdownMenu,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface FileCardProps {
   file: DocumentType;
@@ -37,22 +38,10 @@ export function formatBytes(bytes?: number | null, decimals = 2) {
 export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRestore, onOpenLocation, viewMode }: FileCardProps) {
   const isDeprecated = file.is_deprecated;
   const formattedSize = formatBytes(file.file_size_bytes);
+  const router = useRouter();
 
   const handleCardClick = async () => {
-    const newTab = window.open('about:blank', '_blank');
-    if (!newTab) {
-      alert("Please allow pop-ups to view the document.");
-      return;
-    }
-
-    try {
-      const blob = await documentApi.downloadFileBlob(file.id);
-      const url = window.URL.createObjectURL(blob);
-      newTab.location.href = url;
-    } catch (e) {
-      newTab.close();
-      console.error("Failed to view document", e);
-    }
+    router.push(`/dashboard/documents/${file.id}`);
   };
 
   if (viewMode === "list") {
@@ -129,6 +118,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRest
 }
 
 import { RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function FileActions({ file, onRename, onMove, onDelete, onDeprecate, onRestore, onOpenLocation }: Omit<FileCardProps, "viewMode">) {
   const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'}/documents/${file.id}/download`;
@@ -146,6 +136,12 @@ function FileActions({ file, onRename, onMove, onDelete, onDeprecate, onRestore,
             <Download className="h-4 w-4 mr-2" />
             Download
           </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={`/dashboard/documents/${file.id}`} className="flex items-center cursor-pointer w-full">
+            <Eye className="h-4 w-4 mr-2" />
+            View Details
+          </Link>
         </DropdownMenuItem>
         {onOpenLocation && (
           <DropdownMenuItem onClick={() => onOpenLocation(file)}>

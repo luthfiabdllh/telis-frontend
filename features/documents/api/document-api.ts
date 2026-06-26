@@ -22,6 +22,13 @@ export interface DocumentType {
   created_at: string;
   updated_at: string;
   folder_path?: string;
+  document_type?: string;
+  risk_level?: string;
+  vendor_name?: string;
+  business_unit?: string;
+  effective_date?: string;
+  expiry_date?: string;
+  summary?: string;
 }
 
 export const documentApi = {
@@ -65,9 +72,10 @@ export const documentApi = {
   },
 
   // Documents
-  getDocuments: async (folderId?: string | null, search?: string, isGlobal?: boolean) => {
+  getDocuments: async (folderId?: string | null, search?: string, isGlobal?: boolean, documentType?: string) => {
     const params = new URLSearchParams();
     if (search) params.append("search", search);
+    if (documentType) params.append("document_type", documentType);
     if (isGlobal) {
       params.append("is_global", "true");
     } else if (folderId !== undefined && folderId !== null) {
@@ -78,6 +86,18 @@ export const documentApi = {
     params.append("_t", Date.now().toString()); // Cache-buster
     const res = await apiClient.get(`/documents?${params.toString()}`);
     return res.data.data as DocumentType[]; // Assuming backend returns { data: [...] }
+  },
+  getDocumentByID: async (id: string) => {
+    const res = await apiClient.get(`/documents/${id}`);
+    return res.data as DocumentType;
+  },
+  updateMetadata: async (id: string, metadata: Partial<DocumentType>) => {
+    const res = await apiClient.patch(`/documents/${id}/metadata`, metadata);
+    return res.data;
+  },
+  summarizeDocument: async (id: string, force?: boolean) => {
+    const res = await apiClient.get(`/documents/${id}/summarize${force ? '?force=true' : ''}`);
+    return res.data;
   },
   renameDocument: async (id: string, name: string) => {
     const res = await apiClient.put(`/documents/${id}/rename`, { name });

@@ -39,6 +39,14 @@ import { Suggestions } from "@/components/ai-elements/suggestion";
 import { type MessageType, suggestions } from "../schemas/chat";
 import { SuggestionItem } from "./suggestion-item";
 import { MessageFeedback } from "./message-feedback";
+import { Badge } from "@/components/ui/badge";
+
+const CATEGORIES = [
+  "NDA", "PROCUREMENT_CONTRACT", "PARTNERSHIP_AGREEMENT",
+  "SLA_AGREEMENT", "REGULATORY_DOCUMENT", "COMPLIANCE_DOCUMENT",
+  "INTERNAL_POLICY", "LEGAL_CORRESPONDENCE", "MINUTES_OF_MEETING",
+  "LITIGATION_DOCUMENT", "OTHER"
+];
 
 export interface ChatInterfaceProps {
   text: string;
@@ -49,6 +57,8 @@ export interface ChatInterfaceProps {
   handleTranscriptionChange: (transcript: string) => void;
   handleTextChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   isSubmitDisabled: boolean;
+  selectedCategories: string[];
+  setSelectedCategories: (categories: string[]) => void;
 }
 
 export const ChatInterface = ({
@@ -60,7 +70,18 @@ export const ChatInterface = ({
   handleTranscriptionChange,
   handleTextChange,
   isSubmitDisabled,
+  selectedCategories,
+  setSelectedCategories,
 }: ChatInterfaceProps) => {
+  
+  const toggleCategory = (cat: string) => {
+    if (selectedCategories.includes(cat)) {
+      setSelectedCategories(selectedCategories.filter(c => c !== cat));
+    } else {
+      setSelectedCategories([...selectedCategories, cat]);
+    }
+  };
+
   return (
     <div className="relative flex size-full flex-col divide-y overflow-hidden">
       <Conversation>
@@ -133,6 +154,18 @@ export const ChatInterface = ({
           </Suggestions>
         )}
         <div className="w-full px-4 pb-4">
+          <div className="mb-2 flex flex-wrap gap-2">
+            {CATEGORIES.map(cat => (
+              <Badge 
+                key={cat} 
+                variant={selectedCategories.includes(cat) ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => toggleCategory(cat)}
+              >
+                {cat}
+              </Badge>
+            ))}
+          </div>
           <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
               <PromptInputTextarea onChange={handleTextChange} value={text} disabled={status === "streaming" || status === "submitted"} />

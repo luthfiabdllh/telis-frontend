@@ -15,6 +15,7 @@ export function useChatLogic(initialSessionId?: string) {
   const [streamingContent, setStreamingContent] = useState<string>("");
   const [streamingReasoning, setStreamingReasoning] = useState<string>("");
   const [streamingSources, setStreamingSources] = useState<{title: string, href: string}[] | undefined>();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sessionId, setSessionId] = useState<string | undefined>(initialSessionId);
   const sessionIdRef = useRef(initialSessionId);
 
@@ -98,7 +99,7 @@ export function useChatLogic(initialSessionId?: string) {
           body: JSON.stringify({
             session_id: currentSessionId,
             message: content,
-            document_filters: [],
+            document_filters: selectedCategories,
             llm_temperature: 0.7,
           }),
           async onopen(res) {
@@ -278,5 +279,7 @@ export function useChatLogic(initialSessionId?: string) {
     handleTranscriptionChange,
     handleTextChange,
     isSubmitDisabled,
+    selectedCategories,
+    setSelectedCategories,
   };
 }
