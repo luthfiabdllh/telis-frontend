@@ -40,6 +40,7 @@ import { type MessageType, suggestions } from "../schemas/chat";
 import { SuggestionItem } from "./suggestion-item";
 import { MessageFeedback } from "./message-feedback";
 import { Badge } from "@/components/ui/badge";
+import { Filter } from "lucide-react";
 
 const CATEGORIES = [
   "NDA", "PROCUREMENT_CONTRACT", "PARTNERSHIP_AGREEMENT",
@@ -141,7 +142,7 @@ export const ChatInterface = ({
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
-      <div className="grid shrink-0 gap-4 pt-4">
+      <div className="grid shrink-0 gap-4 pt-4 min-w-0 w-full">
         {messages.length === 0 && (
           <Suggestions className="px-4">
             {suggestions.map((suggestion) => (
@@ -153,18 +154,30 @@ export const ChatInterface = ({
             ))}
           </Suggestions>
         )}
-        <div className="w-full px-4 pb-4">
-          <div className="mb-2 flex flex-wrap gap-2">
-            {CATEGORIES.map(cat => (
-              <Badge 
-                key={cat} 
-                variant={selectedCategories.includes(cat) ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => toggleCategory(cat)}
-              >
-                {cat}
-              </Badge>
-            ))}
+        <div className="w-full min-w-0 max-w-full px-4 pb-4">
+          <div className="mb-3 flex items-center w-full min-w-0">
+            <div className="flex items-center mr-3 text-muted-foreground shrink-0">
+              <Filter className="w-4 h-4 mr-1.5" />
+              <span className="text-xs font-medium uppercase tracking-wider">Filter:</span>
+            </div>
+            <div 
+              className="flex-1 min-w-0 overflow-x-auto no-scrollbar flex gap-2 pb-1 pr-14 scroll-smooth" 
+              style={{ maskImage: "linear-gradient(to right, black 90%, transparent 100%)", WebkitMaskImage: "linear-gradient(to right, black 90%, transparent 100%)" }}
+            >
+              {CATEGORIES.map(cat => {
+                const isSelected = selectedCategories.includes(cat);
+                const isLast = cat === CATEGORIES[CATEGORIES.length - 1];
+                return (
+                  <Badge 
+                    key={cat} 
+                    variant={isSelected ? "default" : "outline"}
+                    className={`cursor-pointer whitespace-nowrap transition-all duration-200 shrink-0 ${isSelected ? "bg-emerald-600 hover:bg-emerald-700 shadow-sm" : "hover:bg-muted/60 text-muted-foreground font-normal"} ${isLast ? 'mr-6' : ''}`}                    onClick={() => toggleCategory(cat)}
+                  >
+                    {cat.replace(/_/g, ' ')}
+                  </Badge>
+                );
+              })}
+            </div>
           </div>
           <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
