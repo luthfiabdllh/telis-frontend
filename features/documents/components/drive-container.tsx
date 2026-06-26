@@ -1,9 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDrive } from "../hooks/use-drive";
 import { DriveActionBar } from "./drive-action-bar";
+import { DriveFilterRow } from "./drive-filter-row";
 import { FolderCard } from "./folder-card";
 import { FileCard } from "./file-card";
 import { CreateFolderModal } from "./modals/create-folder-modal";
@@ -36,7 +37,36 @@ export function DriveContainer() {
   const isGlobal = searchParams.get("is_global") === "true";
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [documentType, setDocumentType] = useState<string>("ALL");
+  
+  // Initialize state from URL params so that navigating from Advanced Search applies to the pills
+  const [documentType, setDocumentType] = useState<string>(searchParams.get("document_type") || "ALL");
+  const [riskLevel, setRiskLevel] = useState<string>(searchParams.get("risk_level") || "ALL");
+  const [vendorName, setVendorName] = useState<string>(searchParams.get("vendor_name") || "");
+  const [businessUnit, setBusinessUnit] = useState<string>(searchParams.get("business_unit") || "");
+  const [sortBy, setSortBy] = useState<string>(searchParams.get("sort_by") || "filename");
+  const [sortOrder, setSortOrder] = useState<string>(searchParams.get("sort_order") || "asc");
+
+  // Sync state when URL search params change (e.g. from DriveSearch "Show all results")
+  useEffect(() => {
+    const docType = searchParams.get("document_type");
+    if (docType !== null) setDocumentType(docType);
+    
+    const risk = searchParams.get("risk_level");
+    if (risk !== null) setRiskLevel(risk);
+
+    const vendor = searchParams.get("vendor_name");
+    if (vendor !== null) setVendorName(vendor);
+
+    const bu = searchParams.get("business_unit");
+    if (bu !== null) setBusinessUnit(bu);
+
+    const sort = searchParams.get("sort_by");
+    if (sort !== null) setSortBy(sort);
+
+    const order = searchParams.get("sort_order");
+    if (order !== null) setSortOrder(order);
+  }, [searchParams]);
+
   const [modals, setModals] = useState<ModalState>({
     createFolder: false,
     uploadDocument: false,
@@ -48,6 +78,9 @@ export function DriveContainer() {
   const queryClient = useQueryClient();
   const addUpload = useUploadStore((state) => state.addUpload);
   const updateStatus = useUploadStore((state) => state.updateStatus);
+
+  const hasFilters = documentType !== "ALL" || riskLevel !== "ALL" || vendorName !== "" || businessUnit !== "" || sortBy !== "filename" || sortOrder !== "asc";
+  const isSearch = !!searchQuery || isGlobal || hasFilters;
 
   const {
     folders,
@@ -64,7 +97,17 @@ export function DriveContainer() {
     deleteDocument,
     deprecateDocument,
     restoreDocument,
-  } = useDrive(currentFolderId, searchQuery, isGlobal, documentType === "ALL" ? undefined : documentType);
+  } = useDrive(
+    currentFolderId, 
+    searchQuery, 
+    isGlobal, 
+    documentType === "ALL" ? undefined : documentType,
+    riskLevel === "ALL" ? undefined : riskLevel,
+    vendorName,
+    businessUnit,
+    sortBy,
+    sortOrder
+  );
 
   const handleRenameSubmit = async (newName: string) => {
     const { type, item } = modals.rename;
@@ -180,8 +223,34 @@ export function DriveContainer() {
         onViewModeChange={setViewMode}
         documentType={documentType}
         onDocumentTypeChange={setDocumentType}
+        riskLevel={riskLevel}
+        onRiskLevelChange={setRiskLevel}
+        vendorName={vendorName}
+        onVendorNameChange={setVendorName}
+        businessUnit={businessUnit}
+        onBusinessUnitChange={setBusinessUnit}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
         onCreateFolderClick={() => setModals((p) => ({ ...p, createFolder: true }))}
         onUploadClick={() => setModals((p) => ({ ...p, uploadDocument: true }))}
+        isSearch={isSearch}
+      />
+
+      <DriveFilterRow
+        documentType={documentType}
+        onDocumentTypeChange={setDocumentType}
+        riskLevel={riskLevel}
+        onRiskLevelChange={setRiskLevel}
+        vendorName={vendorName}
+        onVendorNameChange={setVendorName}
+        businessUnit={businessUnit}
+        onBusinessUnitChange={setBusinessUnit}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
       />
 
       {isLoading ? (

@@ -1,7 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { documentApi } from "../api/document-api";
 
-export function useDrive(currentFolderId?: string | null, search?: string, isGlobal?: boolean, documentType?: string) {
+export function useDrive(
+  currentFolderId?: string | null, 
+  search?: string, 
+  isGlobal?: boolean, 
+  documentType?: string,
+  riskLevel?: string,
+  vendorName?: string,
+  businessUnit?: string,
+  sortBy?: string,
+  sortOrder?: string
+) {
   const queryClient = useQueryClient();
 
   const foldersQuery = useQuery({
@@ -10,8 +20,8 @@ export function useDrive(currentFolderId?: string | null, search?: string, isGlo
   });
 
   const documentsQuery = useQuery({
-    queryKey: ["documents", currentFolderId, search, isGlobal, documentType],
-    queryFn: () => documentApi.getDocuments(currentFolderId, search, isGlobal, documentType),
+    queryKey: ["documents", currentFolderId, search, isGlobal, documentType, riskLevel, vendorName, businessUnit, sortBy, sortOrder],
+    queryFn: () => documentApi.getDocuments(currentFolderId, search, isGlobal, documentType, riskLevel, vendorName, businessUnit, sortBy, sortOrder),
   });
 
   const pathQuery = useQuery({

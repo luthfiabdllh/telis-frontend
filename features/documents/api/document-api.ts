@@ -31,6 +31,11 @@ export interface DocumentType {
   summary?: string;
 }
 
+export interface MetadataOptions {
+  vendors: string[];
+  business_units: string[];
+}
+
 export const documentApi = {
   // Folders
   getFolders: async (parentId?: string | null, search?: string, isGlobal?: boolean) => {
@@ -72,10 +77,26 @@ export const documentApi = {
   },
 
   // Documents
-  getDocuments: async (folderId?: string | null, search?: string, isGlobal?: boolean, documentType?: string) => {
+  getDocuments: async (
+    folderId?: string | null, 
+    search?: string, 
+    isGlobal?: boolean, 
+    documentType?: string,
+    riskLevel?: string,
+    vendorName?: string,
+    businessUnit?: string,
+    sortBy?: string,
+    sortOrder?: string
+  ) => {
     const params = new URLSearchParams();
     if (search) params.append("search", search);
-    if (documentType) params.append("document_type", documentType);
+    if (documentType && documentType !== "ALL") params.append("document_type", documentType);
+    if (riskLevel && riskLevel !== "ALL") params.append("risk_level", riskLevel);
+    if (vendorName) params.append("vendor_name", vendorName);
+    if (businessUnit) params.append("business_unit", businessUnit);
+    if (sortBy) params.append("sort_by", sortBy);
+    if (sortOrder) params.append("sort_order", sortOrder);
+    
     if (isGlobal) {
       params.append("is_global", "true");
     } else if (folderId !== undefined && folderId !== null) {
@@ -90,6 +111,10 @@ export const documentApi = {
   getDocumentByID: async (id: string) => {
     const res = await apiClient.get(`/documents/${id}`);
     return res.data as DocumentType;
+  },
+  getMetadataOptions: async () => {
+    const res = await apiClient.get(`/documents/metadata-options`);
+    return res.data as MetadataOptions;
   },
   updateMetadata: async (id: string, metadata: Partial<DocumentType>) => {
     const res = await apiClient.patch(`/documents/${id}/metadata`, metadata);
@@ -149,11 +174,21 @@ export const documentApi = {
     });
     return res.data;
   },
-  searchDrive: async (query: string, folderId?: string | null, isGlobal: boolean = false) => {
-    if (!query) return { folders: [], documents: [] };
+  searchDrive: async (
+    query: string, 
+    folderId?: string | null, 
+    isGlobal: boolean = false,
+    documentType?: string,
+    riskLevel?: string,
+    vendorName?: string,
+    businessUnit?: string,
+    sortBy?: string,
+    sortOrder?: string
+  ) => {
+    if (!query && !documentType && !riskLevel && !vendorName && !businessUnit) return { folders: [], documents: [] };
     
     const folderParams = new URLSearchParams();
-    folderParams.append("search", query);
+    if (query) folderParams.append("search", query);
     if (isGlobal) {
       folderParams.append("is_global", "true");
     } else if (folderId) {
@@ -163,15 +198,22 @@ export const documentApi = {
     }
 
     const docParams = new URLSearchParams();
-    docParams.append("search", query);
+    if (query) docParams.append("search", query);
+    if (documentType && documentType !== "ALL") docParams.append("document_type", documentType);
+    if (riskLevel && riskLevel !== "ALL") docParams.append("risk_level", riskLevel);
+    if (vendorName && vendorName !== "ALL") docParams.append("vendor_name", vendorName);
+    if (businessUnit && businessUnit !== "ALL") docParams.append("business_unit", businessUnit);
+    if (sortBy) docParams.append("sort_by", sortBy);
+    if (sortOrder) docParams.append("sort_order", sortOrder);
+
     if (isGlobal) {
       docParams.append("is_global", "true");
-    } else if (folderId) {
+    } else if (folderId !== undefined && folderId !== null) {
       docParams.append("folder_id", folderId);
     } else if (folderId === null) {
       docParams.append("folder_id", "null");
     }
-    docParams.append("_t", Date.now().toString()); // Cache-buster
+    docParams.append("_t", Date.now().toString());
 
     const [folderRes, docRes] = await Promise.all([
       apiClient.get(`/folders?${folderParams.toString()}`),

@@ -13,9 +13,10 @@ import {
 
 interface DriveBreadcrumbProps {
   path: Folder[];
+  isSearch?: boolean;
 }
 
-export function DriveBreadcrumb({ path }: DriveBreadcrumbProps) {
+export function DriveBreadcrumb({ path, isSearch }: DriveBreadcrumbProps) {
   return (
     <Breadcrumb className="pb-4 border-b mb-4">
       <BreadcrumbList>
@@ -29,7 +30,7 @@ export function DriveBreadcrumb({ path }: DriveBreadcrumbProps) {
         </BreadcrumbItem>
 
         {path.map((folder, index) => {
-          const isLast = index === path.length - 1;
+          const isLast = index === path.length - 1 && !isSearch;
           return (
             <Fragment key={folder.id}>
               <BreadcrumbSeparator />
@@ -47,6 +48,15 @@ export function DriveBreadcrumb({ path }: DriveBreadcrumbProps) {
             </Fragment>
           );
         })}
+
+        {isSearch && (
+          <Fragment>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Hasil Pencarian</BreadcrumbPage>
+            </BreadcrumbItem>
+          </Fragment>
+        )}
       </BreadcrumbList>
     </Breadcrumb>
   );

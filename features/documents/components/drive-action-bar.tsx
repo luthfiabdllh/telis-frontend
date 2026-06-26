@@ -2,17 +2,7 @@ import { Button } from "@/components/ui/button";
 import { FolderPlus, UploadCloud, LayoutGrid, List as ListIcon } from "lucide-react";
 import { DriveBreadcrumb } from "./drive-breadcrumb";
 import { Folder } from "../api/document-api";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 import { DriveSearch } from "./drive-search";
-
-const CATEGORIES = [
-  "ALL", "NDA", "PROCUREMENT_CONTRACT", "PARTNERSHIP_AGREEMENT",
-  "SLA_AGREEMENT", "REGULATORY_DOCUMENT", "COMPLIANCE_DOCUMENT",
-  "INTERNAL_POLICY", "LEGAL_CORRESPONDENCE", "MINUTES_OF_MEETING",
-  "LITIGATION_DOCUMENT", "OTHER"
-];
-
 
 interface DriveActionBarProps {
   path: Folder[];
@@ -20,18 +10,28 @@ interface DriveActionBarProps {
   onViewModeChange: (mode: "grid" | "list") => void;
   documentType: string;
   onDocumentTypeChange: (type: string) => void;
+  riskLevel: string;
+  onRiskLevelChange: (value: string) => void;
+  vendorName: string;
+  onVendorNameChange: (value: string) => void;
+  businessUnit: string;
+  onBusinessUnitChange: (value: string) => void;
+  sortBy: string;
+  onSortByChange: (value: string) => void;
+  sortOrder: string;
+  onSortOrderChange: (value: string) => void;
   onCreateFolderClick: () => void;
   onUploadClick: () => void;
+  isSearch?: boolean;
 }
 
 export function DriveActionBar({
   path,
   viewMode,
   onViewModeChange,
-  documentType,
-  onDocumentTypeChange,
   onCreateFolderClick,
   onUploadClick,
+  isSearch,
 }: DriveActionBarProps) {
   const currentFolderId = path.length > 0 ? path[path.length - 1].id : null;
 
@@ -45,45 +45,36 @@ export function DriveActionBar({
         </div>
 
         <div className="flex items-center space-x-2">
-          <Select value={documentType} onValueChange={onDocumentTypeChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c === "ALL" ? "Semua Kategori" : c}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center bg-muted rounded-md p-1 mx-2">
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onViewModeChange("grid")}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onViewModeChange("list")}
+            >
+              <ListIcon className="h-4 w-4" />
+            </Button>
+          </div>
 
-          <div className="flex items-center bg-muted rounded-md p-1 mr-2">
-          <Button
-            variant={viewMode === "grid" ? "secondary" : "ghost"}
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onViewModeChange("grid")}
-          >
-            <LayoutGrid className="h-4 w-4" />
+          <Button variant="outline" onClick={onCreateFolderClick}>
+            <FolderPlus className="h-4 w-4 mr-2" />
+            New Folder
           </Button>
-          <Button
-            variant={viewMode === "list" ? "secondary" : "ghost"}
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onViewModeChange("list")}
-          >
-            <ListIcon className="h-4 w-4" />
+          <Button onClick={onUploadClick}>
+            <UploadCloud className="h-4 w-4 mr-2" />
+            Upload
           </Button>
         </div>
-
-        <Button variant="outline" onClick={onCreateFolderClick}>
-          <FolderPlus className="h-4 w-4 mr-2" />
-          New Folder
-        </Button>
-        <Button onClick={onUploadClick}>
-          <UploadCloud className="h-4 w-4 mr-2" />
-          Upload
-        </Button>
       </div>
-      </div>
-      <DriveBreadcrumb path={path} />
+      <DriveBreadcrumb path={path} isSearch={isSearch} />
     </div>
   );
 }
