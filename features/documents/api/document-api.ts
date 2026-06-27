@@ -24,6 +24,7 @@ export interface DocumentType {
   folder_path?: string;
   document_type?: string;
   risk_level?: string;
+  risk_reasoning?: string;
   vendor_name?: string;
   business_unit?: string;
   effective_date?: string;

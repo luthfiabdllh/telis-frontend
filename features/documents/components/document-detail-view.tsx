@@ -161,12 +161,24 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium">
-                      {document.risk_level ? (
-                        <span className={document.risk_level === 'HIGH' ? 'text-red-500' : document.risk_level === 'MEDIUM' ? 'text-amber-500' : 'text-emerald-500'}>
-                          {document.risk_level}
-                        </span>
-                      ) : "-"}
+                    <div className="space-y-2">
+                      <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium">
+                        {document.risk_level ? (
+                          <span className={document.risk_level === 'HIGH' ? 'text-red-500' : document.risk_level === 'MEDIUM' ? 'text-amber-500' : 'text-emerald-500'}>
+                            {document.risk_level}
+                          </span>
+                        ) : "-"}
+                      </div>
+                      {document.risk_reasoning && (
+                        <div className={`p-3 border rounded-md text-xs leading-relaxed italic ${
+                          document.risk_level === 'HIGH' ? 'bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-300 border-red-200 dark:border-red-900/50' : 
+                          document.risk_level === 'MEDIUM' ? 'bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/50' : 
+                          'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50'
+                        }`}>
+                          <strong className="block mb-1 not-italic">Risk Reasoning:</strong>
+                          {document.risk_reasoning}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
