@@ -34,9 +34,19 @@ export interface DashboardMetrics {
   user_role_dist: UserRoleDist[];
 }
 
+export interface RecentActivity {
+  id: number;
+  type: string;
+  title: string;
+  tokens: number;
+  cost: number;
+  timestamp: string;
+}
+
 export interface MyMetrics {
-  user_id: string;
   total_cost_this_month: number;
+  daily_trend: DailyUsage[];
+  recent_activities: RecentActivity[];
 }
 
 export interface RiskHeatmap {
