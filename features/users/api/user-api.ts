@@ -69,4 +69,9 @@ export const userApi = {
     const res = await apiClient.put(`/users/${userId}/ban`, { is_banned: isBanned });
     return res.data;
   },
+
+  searchUsers: async (q: string): Promise<Array<{ id: string; username: string; email: string }>> => {
+    const res = await apiClient.get(`/users/search?q=${encodeURIComponent(q)}`);
+    return res.data;
+  },
 };

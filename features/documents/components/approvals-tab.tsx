@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { documentApi } from "../api/document-api";
+import { userApi } from "../../users/api/user-api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,8 +20,16 @@ interface ApprovalsTabProps {
 export function ApprovalsTab({ documentId }: ApprovalsTabProps) {
   const queryClient = useQueryClient();
   const [approverId, setApproverId] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
   const [notes, setNotes] = useState("");
   
+  const { data: searchResults, isLoading: isSearching } = useQuery({
+    queryKey: ["search-users", searchQuery],
+    queryFn: () => userApi.searchUsers(searchQuery),
+    enabled: searchQuery.length > 1,
+  });
+
   const { data: approvals, isLoading } = useQuery({
     queryKey: ["document-approvals", documentId],
     queryFn: () => documentApi.getDocumentApprovals(documentId),
@@ -31,7 +40,9 @@ export function ApprovalsTab({ documentId }: ApprovalsTabProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["document-approvals", documentId] });
       toast.success("Approval requested successfully");
+      toast.success("Approval requested successfully");
       setApproverId("");
+      setSearchQuery("");
       setNotes("");
     },
     onError: (err: any) => {
@@ -61,13 +72,43 @@ export function ApprovalsTab({ documentId }: ApprovalsTabProps) {
           <CardDescription>Minta persetujuan dokumen ke user lain.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Approver ID</Label>
+          <div className="space-y-2 relative">
+            <Label>Approver</Label>
             <Input 
-              placeholder="Masukkan ID User Approver (ex: user123)" 
-              value={approverId}
-              onChange={(e) => setApproverId(e.target.value)}
+              placeholder="Cari berdasarkan username atau email..." 
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowDropdown(true);
+                setApproverId(""); // reset id when typing
+              }}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
             />
+            {showDropdown && searchQuery.length > 1 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-popover text-popover-foreground border rounded-md shadow-md z-50 max-h-60 overflow-auto">
+                {isSearching ? (
+                  <div className="p-4 flex justify-center"><Spinner className="w-4 h-4"/></div>
+                ) : searchResults && searchResults.length > 0 ? (
+                  searchResults.map(user => (
+                    <div 
+                      key={user.id} 
+                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                      onClick={() => {
+                        setApproverId(user.id);
+                        setSearchQuery(`${user.username} (${user.email})`);
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <div className="font-medium">{user.username}</div>
+                      <div className="text-xs text-muted-foreground">{user.email}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-3 text-center text-sm text-muted-foreground">User tidak ditemukan.</div>
+                )}
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Catatan</Label>
@@ -103,7 +144,7 @@ export function ApprovalsTab({ documentId }: ApprovalsTabProps) {
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium text-sm">
-                        {approval.status === 'PENDING' ? 'Menunggu Review' : 'Telah Direview'}
+                        {approval.status === 'PENDING_REVIEW' ? 'Menunggu Review' : 'Telah Direview'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Approver: {approval.approver_id}
@@ -112,7 +153,7 @@ export function ApprovalsTab({ documentId }: ApprovalsTabProps) {
                     <div className="flex items-center gap-1.5">
                       {approval.status === 'APPROVED' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
                       {approval.status === 'REJECTED' && <XCircle className="w-4 h-4 text-red-500" />}
-                      {approval.status === 'PENDING' && <Clock className="w-4 h-4 text-amber-500" />}
+                      {approval.status === 'PENDING_REVIEW' && <Clock className="w-4 h-4 text-amber-500" />}
                       <span className={`text-xs font-semibold ${
                         approval.status === 'APPROVED' ? 'text-emerald-500' : 
                         approval.status === 'REJECTED' ? 'text-red-500' : 
@@ -133,7 +174,7 @@ export function ApprovalsTab({ documentId }: ApprovalsTabProps) {
                     Requested {formatDistanceToNow(parseISO(approval.created_at), { addSuffix: true, locale: id })}
                   </div>
 
-                  {approval.status === 'PENDING' && (
+                  {approval.status === 'PENDING_REVIEW' && (
                     <div className="flex gap-2 mt-2 pt-2 border-t">
                       <Button 
                         size="sm" 

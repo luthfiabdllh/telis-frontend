@@ -118,6 +118,9 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
             {document.filename}
             {document.document_type && <Badge variant="outline">{document.document_type}</Badge>}
             {document.risk_level && <Badge className={document.risk_level === 'HIGH' ? 'bg-red-500 hover:bg-red-600' : document.risk_level === 'MEDIUM' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'}>{document.risk_level}</Badge>}
+            {document.status === 'PENDING_APPROVAL' && <Badge className="bg-amber-500 hover:bg-amber-600">Menunggu Persetujuan</Badge>}
+            {document.status === 'APPROVED' && <Badge className="bg-emerald-500 hover:bg-emerald-600">Disetujui</Badge>}
+            {document.status === 'REJECTED' && <Badge className="bg-red-500 hover:bg-red-600">Ditolak</Badge>}
           </h1>
           <p className="text-sm text-muted-foreground">{formatBytes(document.file_size_bytes)} • Uploaded by {document.uploaded_by}</p>
         </div>

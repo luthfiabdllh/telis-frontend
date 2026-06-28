@@ -58,6 +58,9 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRest
             <span className="font-medium truncate flex items-center gap-2">
               {file.filename}
               {isDeprecated && <Badge variant="secondary" className="text-[10px] h-4">Deprecated</Badge>}
+              {file.status === 'PENDING_APPROVAL' && <Badge className="bg-amber-500 hover:bg-amber-600 text-[10px] h-4">Menunggu Persetujuan</Badge>}
+              {file.status === 'APPROVED' && <Badge className="bg-emerald-500 hover:bg-emerald-600 text-[10px] h-4">Disetujui</Badge>}
+              {file.status === 'REJECTED' && <Badge className="bg-red-500 hover:bg-red-600 text-[10px] h-4">Ditolak</Badge>}
             </span>
             <span className="text-xs text-muted-foreground">
               {formattedSize} • {new Date(file.created_at).toLocaleDateString()}
@@ -103,10 +106,15 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRest
       </div>
       
       <div className="flex-1">
-        <h3 className="font-semibold text-sm line-clamp-2" title={file.filename}>
+        <span className="font-medium truncate block max-w-full group-hover:text-red-600 transition-colors" title={file.filename}>
           {file.filename}
-        </h3>
-        {isDeprecated && <Badge variant="secondary" className="mt-1">Deprecated</Badge>}
+        </span>
+        <div className="flex flex-wrap gap-1 mt-1">
+          {isDeprecated && <Badge variant="secondary" className="text-[10px]">Deprecated</Badge>}
+          {file.status === 'PENDING_APPROVAL' && <Badge className="bg-amber-500 hover:bg-amber-600 text-[10px]">Menunggu Persetujuan</Badge>}
+          {file.status === 'APPROVED' && <Badge className="bg-emerald-500 hover:bg-emerald-600 text-[10px]">Disetujui</Badge>}
+          {file.status === 'REJECTED' && <Badge className="bg-red-500 hover:bg-red-600 text-[10px]">Ditolak</Badge>}
+        </div>
       </div>
 
       <div className="text-xs text-muted-foreground mt-3 pt-3 border-t flex justify-between items-center">
