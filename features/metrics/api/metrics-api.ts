@@ -39,6 +39,30 @@ export interface MyMetrics {
   total_cost_this_month: number;
 }
 
+export interface RiskHeatmap {
+  business_unit: string;
+  document_type: string;
+  risk_level: string;
+  count: number;
+}
+
+export interface ExpiringContract {
+  id: string;
+  filename: string;
+  document_type: string;
+  risk_level: string;
+  vendor_name: string;
+  expiry_date: string;
+}
+
+export interface RegulatoryImpact {
+  id: string;
+  impact_level: string;
+  regulation_name: string;
+  internal_document_name: string;
+  created_at: string;
+}
+
 export const metricsApi = {
   getDashboardMetrics: async (): Promise<DashboardMetrics> => {
     const res = await apiClient.get('/metrics/tokens');
@@ -47,6 +71,21 @@ export const metricsApi = {
   
   getMyMetrics: async (): Promise<MyMetrics> => {
     const res = await apiClient.get('/metrics/tokens/me');
+    return res.data;
+  },
+
+  getRiskHeatmap: async (): Promise<RiskHeatmap[]> => {
+    const res = await apiClient.get('/metrics/risk-heatmap');
+    return res.data;
+  },
+
+  getExpiringContracts: async (): Promise<ExpiringContract[]> => {
+    const res = await apiClient.get('/metrics/expiring-contracts');
+    return res.data;
+  },
+
+  getRegulatoryImpacts: async (): Promise<RegulatoryImpact[]> => {
+    const res = await apiClient.get('/metrics/regulatory-impacts');
     return res.data;
   }
 };

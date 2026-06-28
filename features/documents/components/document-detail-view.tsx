@@ -11,9 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Sparkles, RefreshCw, LayoutGrid, ShieldAlert, Building, Building2, CalendarDays, DollarSign, ListChecks, FileText } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Save, Sparkles, RefreshCw, LayoutGrid, ShieldAlert, Building, Building2, CalendarDays, DollarSign, ListChecks, FileText, CheckSquare } from "lucide-react";
 import Link from "next/link";
 import { formatBytes } from "./file-card";
+import { ApprovalsTab } from "./approvals-tab";
 
 interface DocumentDetailViewProps {
   id: string;
@@ -123,11 +125,20 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel: Metadata & Summary */}
-        <div className="w-[450px] flex flex-col border-r overflow-y-auto bg-muted/20">
-          
-          {/* Metadata Card */}
-          <div className="p-4">
-            <Card>
+        <div className="w-[450px] flex flex-col border-r bg-muted/10 h-full overflow-hidden">
+          <Tabs defaultValue="metadata" className="flex flex-col h-full">
+            <div className="px-4 pt-4 pb-2 border-b">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="metadata" className="text-xs">Metadata & AI</TabsTrigger>
+                <TabsTrigger value="approvals" className="text-xs flex items-center gap-1">
+                  <CheckSquare className="w-3 h-3" />
+                  Persetujuan
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="metadata" className="flex-1 overflow-y-auto p-4 m-0">
+              <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">Metadata</CardTitle>
@@ -223,11 +234,10 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
 
               </CardContent>
             </Card>
-          </div>
 
-          {/* AI Summary Card */}
-          <div className="p-4 pt-0 flex-1">
-            <Card className="h-full flex flex-col border-emerald-500/30 bg-emerald-500/5">
+            {/* AI Summary Card */}
+            <div className="mt-4 flex-1">
+              <Card className="h-full flex flex-col border-emerald-500/30 bg-emerald-500/5">
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="text-lg flex items-center text-emerald-700 dark:text-emerald-400">
@@ -320,7 +330,13 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
                 )}
               </CardContent>
             </Card>
-          </div>
+            </div>
+            </TabsContent>
+
+            <TabsContent value="approvals" className="flex-1 overflow-y-auto p-4 m-0">
+              <ApprovalsTab documentId={id} />
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Right Panel: PDF Viewer */}

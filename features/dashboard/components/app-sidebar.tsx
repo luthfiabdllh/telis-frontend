@@ -9,6 +9,7 @@ import {
   FileText,
   ShieldCheck,
   BarChart3,
+  PieChart,
 } from "lucide-react";
 import {
   Sidebar,
@@ -95,6 +96,14 @@ export function AppSidebar({ session }: { session: Session | null }) {
                     <Link href="/dashboard/metrics">
                       <BarChart3 className="h-4 w-4" />
                       <span>Statistik Token Saya</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Dashboard Analytics">
+                    <Link href="/dashboard/analytics">
+                      <PieChart className="h-4 w-4" />
+                      <span>Dashboard Analytics</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

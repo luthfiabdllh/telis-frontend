@@ -37,6 +37,17 @@ export interface MetadataOptions {
   business_units: string[];
 }
 
+export interface ApprovalWorkflow {
+  id: string;
+  document_id: string;
+  requester_id: string;
+  approver_id: string;
+  status: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const documentApi = {
   // Folders
   getFolders: async (parentId?: string | null, search?: string, isGlobal?: boolean) => {
@@ -226,4 +237,24 @@ export const documentApi = {
       documents: docRes.data.data as DocumentType[] || [],
     };
   },
+  
+  // Approvals
+  requestApproval: async (id: string, approverId: string, notes: string) => {
+    const res = await apiClient.post(`/documents/${id}/approvals`, {
+      approver_id: approverId,
+      notes: notes,
+    });
+    return res.data as ApprovalWorkflow;
+  },
+  reviewApproval: async (id: string, approvalId: string, status: string, notes: string) => {
+    const res = await apiClient.put(`/documents/${id}/approvals/${approvalId}`, {
+      status: status,
+      notes: notes,
+    });
+    return res.data;
+  },
+  getDocumentApprovals: async (id: string) => {
+    const res = await apiClient.get(`/documents/${id}/approvals`);
+    return res.data as ApprovalWorkflow[];
+  }
 };
