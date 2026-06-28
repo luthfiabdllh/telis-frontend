@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, Copy, Download, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";

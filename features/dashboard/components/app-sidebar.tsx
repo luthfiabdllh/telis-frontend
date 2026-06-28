@@ -85,7 +85,7 @@ export function AppSidebar({ session }: { session: Session | null }) {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Analisis Redline">
-                    <Link href="/dashboard/redline">
+                    <Link href="/dashboard/redlining">
                       <FileText className="h-4 w-4" />
                       <span>Analisis Redline</span>
                     </Link>

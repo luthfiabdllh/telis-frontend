@@ -3,8 +3,6 @@ import { AppSidebar } from "@/features/dashboard/components/app-sidebar";
 import { auth } from "@/auth";
 import { LayoutHeader } from "@/features/dashboard/components/layout-header";
 import { GlobalUploadProgress } from "@/features/documents/components/global-upload-progress";
-import { ServiceBar } from "@/features/dashboard/components/service-bar";
-import { AiServicePanel } from "@/features/dashboard/components/ai-service-panel";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -25,8 +23,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         {/* Global Floating Components */}
         <GlobalUploadProgress />
-        <ServiceBar />
-        <AiServicePanel />
       </div>
     </SidebarProvider>
   );
