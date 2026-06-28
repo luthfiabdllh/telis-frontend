@@ -3,9 +3,10 @@
 import React from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { MessageSquare, ShieldAlert, FileSignature, ArrowUpRight } from "lucide-react";
-import { ChatContainer } from "@/features/chat/components/chat-container";
-import { useAiServiceStore } from "../stores/use-ai-service-store";
 import Link from "next/link";
+import { ChatContainer } from "@/features/chat/components/chat-container";
+import { RedlineInterface } from "@/features/redlining/components/redline-interface";
+import { useAiServiceStore } from "../stores/use-ai-service-store";
 
 export function AiServicePanel() {
   const { isOpen, activeService, closeService } = useAiServiceStore();
@@ -18,12 +19,7 @@ export function AiServicePanel() {
           description: "Tanyakan apapun terkait dokumen legal Anda kepada AI.",
           icon: MessageSquare,
         };
-      case "impact":
-        return {
-          title: "Regulatory Impact Analysis",
-          description: "Pantau dokumen internal mana saja yang terdampak oleh regulasi terbaru.",
-          icon: ShieldAlert,
-        };
+
       case "redlining":
         return {
           title: "Smart Redlining",
@@ -71,15 +67,10 @@ export function AiServicePanel() {
               <ChatContainer />
             </div>
           )}
-          {activeService === "impact" && (
-            <div className="flex flex-col h-full items-center p-6 justify-center text-zinc-400">
-              <p>Regulatory Impact Dashboard is empty.</p>
-              <p className="text-sm mt-2">No HIGH risk impacts detected today.</p>
-            </div>
-          )}
+
           {activeService === "redlining" && (
-            <div className="flex flex-col h-full items-center p-6 justify-center text-zinc-400">
-              <p>Smart Redlining interface goes here</p>
+            <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-950">
+              <RedlineInterface />
             </div>
           )}
         </div>

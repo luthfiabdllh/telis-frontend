@@ -17,7 +17,6 @@ interface ServiceItem {
 
 const services: ServiceItem[] = [
   { id: "chat", icon: MessageSquare, label: "Legal Chat Assistant" },
-  { id: "impact", icon: ShieldAlert, label: "Regulatory Impact", hasNotification: true },
   { id: "redlining", icon: FileSignature, label: "Smart Redlining" },
 ];
 

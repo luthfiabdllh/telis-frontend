@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AiServiceType = 'chat' | 'impact' | 'redlining' | null;
+export type AiServiceType = 'chat' | 'redlining' | null;
 
 interface AiServiceState {
   activeService: AiServiceType;

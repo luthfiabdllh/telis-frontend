@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { metricsApi, RiskHeatmap, ExpiringContract, RegulatoryImpact } from "@/features/metrics/api/metrics-api";
+import { metricsApi, RiskHeatmap, ExpiringContract } from "@/features/metrics/api/metrics-api";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from "recharts";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
@@ -19,20 +19,18 @@ const RISK_COLORS: Record<string, string> = {
 export default function AnalyticsDashboardPage() {
   const [heatmap, setHeatmap] = useState<RiskHeatmap[]>([]);
   const [expiringContracts, setExpiringContracts] = useState<ExpiringContract[]>([]);
-  const [regulatoryImpacts, setRegulatoryImpacts] = useState<RegulatoryImpact[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [hm, ec, ri] = await Promise.all([
+        const [hm, ec] = await Promise.all([
           metricsApi.getRiskHeatmap(),
-          metricsApi.getExpiringContracts(),
-          metricsApi.getRegulatoryImpacts()
+          metricsApi.getExpiringContracts()
         ]);
         setHeatmap(hm || []);
         setExpiringContracts(ec || []);
-        setRegulatoryImpacts(ri || []);
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
       } finally {
@@ -129,42 +127,6 @@ export default function AnalyticsDashboardPage() {
               ) : (
                 <div className="text-sm text-muted-foreground text-center pt-4">
                   Tidak ada kontrak yang mendesak.
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Regulatory Impacts */}
-        <Card className="col-span-full">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
-              Dampak Regulasi Terbaru
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {regulatoryImpacts.length > 0 ? (
-                regulatoryImpacts.map((impact) => (
-                  <div key={impact.id} className="rounded-lg border p-4 shadow-sm flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${impact.impact_level === 'HIGH' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                        {impact.impact_level} IMPACT
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(parseISO(impact.created_at), { addSuffix: true, locale: id })}
-                      </span>
-                    </div>
-                    <p className="text-sm font-semibold mt-1 line-clamp-2">{impact.regulation_name}</p>
-                    <div className="mt-auto pt-2 border-t text-xs text-muted-foreground">
-                      Berdampak pada: <span className="font-medium text-foreground">{impact.internal_document_name}</span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full text-sm text-muted-foreground text-center py-8">
-                  Belum ada dokumen internal yang terdampak regulasi baru.
                 </div>
               )}
             </div>

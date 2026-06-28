@@ -55,13 +55,7 @@ export interface ExpiringContract {
   expiry_date: string;
 }
 
-export interface RegulatoryImpact {
-  id: string;
-  impact_level: string;
-  regulation_name: string;
-  internal_document_name: string;
-  created_at: string;
-}
+
 
 export const metricsApi = {
   getDashboardMetrics: async (): Promise<DashboardMetrics> => {
@@ -81,11 +75,6 @@ export const metricsApi = {
 
   getExpiringContracts: async (): Promise<ExpiringContract[]> => {
     const res = await apiClient.get('/metrics/expiring-contracts');
-    return res.data;
-  },
-
-  getRegulatoryImpacts: async (): Promise<RegulatoryImpact[]> => {
-    const res = await apiClient.get('/metrics/regulatory-impacts');
     return res.data;
   }
 };
