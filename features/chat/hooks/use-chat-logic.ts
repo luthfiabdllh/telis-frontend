@@ -17,6 +17,8 @@ export function useChatLogic(initialSessionId?: string) {
   const [streamingSources, setStreamingSources] = useState<{title: string, href: string}[] | undefined>();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sessionId, setSessionId] = useState<string | undefined>(initialSessionId);
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [isExtracting, setIsExtracting] = useState(false);
   const sessionIdRef = useRef(initialSessionId);
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export function useChatLogic(initialSessionId?: string) {
 
   const isSubmittingRef = useRef(false);
 
-  const streamResponse = async (content: string) => {
+  const streamResponse = async (content: string, contextData?: string) => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     
@@ -101,6 +103,7 @@ export function useChatLogic(initialSessionId?: string) {
             message: content,
             document_filters: selectedCategories,
             llm_temperature: 0.7,
+            context_data: contextData || "",
           }),
           async onopen(res) {
             if (res.ok && res.status === 200) {
@@ -193,7 +196,7 @@ export function useChatLogic(initialSessionId?: string) {
   };
 
   const addUserMessage = useCallback(
-    (content: string) => {
+    (content: string, contextData?: string) => {
       const userMessage: MessageType = {
         from: "user",
         key: `user-${Date.now()}`,
@@ -207,22 +210,40 @@ export function useChatLogic(initialSessionId?: string) {
 
       setMessages((prev) => [...prev, userMessage]);
 
-      // We can call streamResponse directly here because it does not rely on outdated closures
-      // other than sessionIdRef which is mutable and fresh.
-      streamResponse(content);
+      streamResponse(content, contextData);
     },
     [] 
   );
 
   const handleSubmit = useCallback(
-    (message: PromptInputMessage) => {
+    async (message: PromptInputMessage) => {
       if (!message.text) return;
-      if (isSubmittingRef.current) return;
+      if (isSubmittingRef.current || isExtracting) return;
+      
       setStatus("submitted");
-      addUserMessage(message.text);
+      
+      let contextData = "";
+      if (attachedFile) {
+        setIsExtracting(true);
+        try {
+          const formData = new FormData();
+          formData.append("file", attachedFile);
+          const res = await apiClient.post("/chat/extract-text", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          contextData = res.data?.text || "";
+        } catch (e) {
+          console.error("Failed to extract text from file", e);
+        } finally {
+          setIsExtracting(false);
+          setAttachedFile(null); // Clear file after sending
+        }
+      }
+      
+      addUserMessage(message.text, contextData);
       setText("");
     },
-    [addUserMessage]
+    [addUserMessage, attachedFile, isExtracting]
   );
 
   const handleSuggestionClick = useCallback(
@@ -245,8 +266,8 @@ export function useChatLogic(initialSessionId?: string) {
   );
 
   const isSubmitDisabled = useMemo(
-    () => !(text.trim() || status) || status === "streaming",
-    [text, status]
+    () => !(text.trim() || status) || status === "streaming" || isExtracting,
+    [text, status, isExtracting]
   );
 
   const displayMessages = useMemo(() => {
@@ -281,5 +302,8 @@ export function useChatLogic(initialSessionId?: string) {
     isSubmitDisabled,
     selectedCategories,
     setSelectedCategories,
+    attachedFile,
+    setAttachedFile,
+    isExtracting,
   };
 }

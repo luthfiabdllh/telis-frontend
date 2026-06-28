@@ -22,6 +22,7 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools,
+  PromptInputButton,
 } from "@/components/ai-elements/prompt-input";
 import {
   Reasoning,
@@ -40,7 +41,15 @@ import { type MessageType, suggestions } from "../schemas/chat";
 import { SuggestionItem } from "./suggestion-item";
 import { MessageFeedback } from "./message-feedback";
 import { Badge } from "@/components/ui/badge";
-import { Filter } from "lucide-react";
+import { Filter, Paperclip, Loader2 } from "lucide-react";
+import { useRef } from "react";
+import {
+  Attachments,
+  Attachment,
+  AttachmentPreview,
+  AttachmentInfo,
+  AttachmentRemove,
+} from "@/components/ai-elements/attachments";
 
 const CATEGORIES = [
   "NDA", "PROCUREMENT_CONTRACT", "PARTNERSHIP_AGREEMENT",
@@ -60,6 +69,9 @@ export interface ChatInterfaceProps {
   isSubmitDisabled: boolean;
   selectedCategories: string[];
   setSelectedCategories: (categories: string[]) => void;
+  attachedFile: File | null;
+  setAttachedFile: (file: File | null) => void;
+  isExtracting: boolean;
 }
 
 export const ChatInterface = ({
@@ -73,8 +85,11 @@ export const ChatInterface = ({
   isSubmitDisabled,
   selectedCategories,
   setSelectedCategories,
+  attachedFile,
+  setAttachedFile,
+  isExtracting,
 }: ChatInterfaceProps) => {
-  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const toggleCategory = (cat: string) => {
     if (selectedCategories.includes(cat)) {
       setSelectedCategories(selectedCategories.filter(c => c !== cat));
@@ -181,11 +196,63 @@ export const ChatInterface = ({
           </div>
           <PromptInput onSubmit={handleSubmit}>
             <PromptInputBody>
-              <PromptInputTextarea onChange={handleTextChange} value={text} disabled={status === "streaming" || status === "submitted"} />
+              {attachedFile && (
+                <div className="w-full flex justify-start px-3 pt-3">
+                  <Attachments variant="inline">
+                    <Attachment 
+                      data={{
+                        id: "upload",
+                        type: "file",
+                        filename: attachedFile.name,
+                        mediaType: attachedFile.type,
+                        url: URL.createObjectURL(attachedFile),
+                      }} 
+                      onRemove={() => {
+                        setAttachedFile(null);
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = "";
+                        }
+                      }}
+                    >
+                      <AttachmentPreview />
+                      <AttachmentInfo />
+                      <AttachmentRemove />
+                    </Attachment>
+                  </Attachments>
+                </div>
+              )}
+              {isExtracting && (
+                <div className="flex items-center gap-2 px-3 py-1.5 mb-2 mx-3 mt-2 text-muted-foreground text-xs font-medium">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Mengekstrak teks...
+                </div>
+              )}
+              <PromptInputTextarea onChange={handleTextChange} value={text} disabled={status === "streaming" || status === "submitted" || isExtracting} />
             </PromptInputBody>
             <PromptInputFooter>
               <PromptInputTools>
-
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept=".pdf" 
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      setAttachedFile(e.target.files[0]);
+                    }
+                    // Reset value so selecting the same file again triggers onChange
+                    e.target.value = "";
+                  }} 
+                />
+                <PromptInputButton
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isExtracting}
+                  tooltip="Lampirkan Dokumen (PDF)"
+                >
+                  <Paperclip className="size-4" />
+                </PromptInputButton>
+                
                 <SpeechInput
                   className="shrink-0"
                   onTranscriptionChange={handleTranscriptionChange}
