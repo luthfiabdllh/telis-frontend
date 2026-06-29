@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import type { JWT } from "next-auth/jwt"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+const API_BASE_URL = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
 const INTERNAL_SSO_SECRET = process.env.INTERNAL_SSO_SECRET || "telis_super_secret_sso_key_2026"
 
 // Fungsi utilitas untuk men-decode JWT di Node.js
