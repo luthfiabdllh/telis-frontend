@@ -73,33 +73,55 @@ export const triggerUpload = async (
   const store = useUploadStore.getState();
   
   try {
-    // 1. Upload to API Gateway (returns 202 quickly)
-    await documentApi.uploadDocument(
+    // 1. Upload to API Gateway (returns 200 or 202)
+    const response = await documentApi.uploadDocument(
       file, 
       folderId, 
       null, 
       (p) => store.updateProgress(uploadId, p)
     );
     
+    const documentId = response.document_id;
+    if (!documentId) {
+      store.updateStatus(uploadId, 'success');
+      queryClient.invalidateQueries({ queryKey: ["documents"] });
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      return;
+    }
+
     // 2. Upload done, now waiting for Ingestion Worker (Processing)
     store.updateStatus(uploadId, 'processing');
     
-    // 3. Poll to automatically refresh the drive list
+    // 3. Poll to verify actual status from backend
     let count = 0;
-    const interval = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ["documents"] });
-      queryClient.invalidateQueries({ queryKey: ["folders"] });
-      count++;
-      
-      // Stop polling after 14 seconds (Worker usually takes 2-5 seconds)
-      if (count > 7) {
-        clearInterval(interval);
-        store.updateStatus(uploadId, 'success');
+    const interval = setInterval(async () => {
+      try {
+        const doc = await documentApi.getDocumentByID(documentId);
+        queryClient.invalidateQueries({ queryKey: ["documents"] });
+        queryClient.invalidateQueries({ queryKey: ["folders"] });
+        
+        if (doc.status === "COMPLETED") {
+          clearInterval(interval);
+          store.updateStatus(uploadId, 'success');
+        } else if (doc.status === "FAILED") {
+          clearInterval(interval);
+          store.updateStatus(uploadId, 'error', "Proses ingestion gagal");
+        }
+        
+        count++;
+        // Timeout polling after 60s
+        if (count > 30) {
+          clearInterval(interval);
+          // If still pending, just keep it processing or assume success (backend will handle it)
+          store.updateStatus(uploadId, 'success'); 
+        }
+      } catch (err) {
+        console.error("Error polling document status", err);
       }
     }, 2000);
     
-  } catch (error) {
+  } catch (error: any) {
     console.error("Upload failed", error);
-    store.updateStatus(uploadId, 'error', "Gagal mengunggah dokumen");
+    store.updateStatus(uploadId, 'error', error?.response?.data?.error || "Gagal mengunggah dokumen");
   }
 };

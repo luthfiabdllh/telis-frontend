@@ -52,10 +52,16 @@ import {
 } from "@/components/ai-elements/attachments";
 
 const CATEGORIES = [
-  "NDA", "PROCUREMENT_CONTRACT", "PARTNERSHIP_AGREEMENT",
-  "SLA_AGREEMENT", "COMPLIANCE_DOCUMENT",
-  "INTERNAL_POLICY", "LEGAL_CORRESPONDENCE", "MINUTES_OF_MEETING",
-  "LITIGATION_DOCUMENT", "OTHER"
+  "NDA",
+  "PROCUREMENT_CONTRACT",
+  "PARTNERSHIP_AGREEMENT",
+  "SLA_AGREEMENT",
+  "COMPLIANCE_DOCUMENT",
+  "INTERNAL_POLICY",
+  "LEGAL_CORRESPONDENCE",
+  "MINUTES_OF_MEETING",
+  "LITIGATION_DOCUMENT",
+  "OTHER",
 ];
 
 export interface ChatInterfaceProps {
@@ -92,7 +98,7 @@ export const ChatInterface = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const toggleCategory = (cat: string) => {
     if (selectedCategories.includes(cat)) {
-      setSelectedCategories(selectedCategories.filter(c => c !== cat));
+      setSelectedCategories(selectedCategories.filter((c) => c !== cat));
     } else {
       setSelectedCategories([...selectedCategories, cat]);
     }
@@ -113,7 +119,9 @@ export const ChatInterface = ({
                     <div>
                       {(message.sources?.length ?? 0) > 0 && (
                         <Sources>
-                          <SourcesTrigger count={message.sources?.length || 0} />
+                          <SourcesTrigger
+                            count={message.sources?.length || 0}
+                          />
                           <SourcesContent>
                             {message.sources?.map((source, index) => (
                               <Source
@@ -137,7 +145,9 @@ export const ChatInterface = ({
                         {(() => {
                           let content = version.content;
                           let attachmentName = null;
-                          const match = content.match(/^\[ATTACHMENT:(.*?)\]\n\n/);
+                          const match = content.match(
+                            /^\[ATTACHMENT:(.*?)\]\n\n/,
+                          );
                           if (match) {
                             attachmentName = match[1];
                             content = content.replace(match[0], "");
@@ -145,11 +155,14 @@ export const ChatInterface = ({
                           return (
                             <>
                               {attachmentName && (
-                                <div className="flex flex-col gap-1 rounded-md bg-zinc-800/80 p-3 mb-2 w-fit min-w-[140px] max-w-[250px] border border-zinc-700">
-                                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                                    {attachmentName.split('.').pop() || 'TXT'}
+                                <div className="flex flex-col gap-1 rounded-md bg-white p-3 mb-2 w-fit min-w-[140px] max-w-[250px] border border-gray-200 shadow-sm">
+                                  <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                    {attachmentName.split(".").pop() || "TXT"}
                                   </div>
-                                  <div className="text-xs text-zinc-200 truncate" title={attachmentName}>
+                                  <div
+                                    className="text-xs text-gray-800 font-medium truncate"
+                                    title={attachmentName}
+                                  >
                                     {attachmentName}
                                   </div>
                                 </div>
@@ -161,7 +174,10 @@ export const ChatInterface = ({
                       </MessageContent>
                       {message.from === "assistant" && versions[0].id && (
                         <div className="opacity-0 transition-opacity group-hover:opacity-100 flex items-center gap-1 mt-2">
-                          <MessageFeedback messageId={versions[0].id} initialFeedback={message.feedback} />
+                          <MessageFeedback
+                            messageId={versions[0].id}
+                            initialFeedback={message.feedback}
+                          />
                         </div>
                       )}
                     </div>
@@ -196,22 +212,30 @@ export const ChatInterface = ({
           <div className="mb-3 flex items-center w-full min-w-0">
             <div className="flex items-center mr-3 text-muted-foreground shrink-0">
               <Filter className="w-4 h-4 mr-1.5" />
-              <span className="text-xs font-medium uppercase tracking-wider">Filter:</span>
+              <span className="text-xs font-medium uppercase tracking-wider">
+                Filter:
+              </span>
             </div>
-            <div 
-              className="flex-1 min-w-0 overflow-x-auto no-scrollbar flex gap-2 pb-1 pr-14 scroll-smooth" 
-              style={{ maskImage: "linear-gradient(to right, black 90%, transparent 100%)", WebkitMaskImage: "linear-gradient(to right, black 90%, transparent 100%)" }}
+            <div
+              className="flex-1 min-w-0 overflow-x-auto no-scrollbar flex gap-2 pb-1 pr-14 scroll-smooth"
+              style={{
+                maskImage:
+                  "linear-gradient(to right, black 90%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to right, black 90%, transparent 100%)",
+              }}
             >
-              {CATEGORIES.map(cat => {
+              {CATEGORIES.map((cat) => {
                 const isSelected = selectedCategories.includes(cat);
                 const isLast = cat === CATEGORIES[CATEGORIES.length - 1];
                 return (
-                  <Badge 
-                    key={cat} 
+                  <Badge
+                    key={cat}
                     variant={isSelected ? "default" : "outline"}
-                    className={`cursor-pointer whitespace-nowrap transition-all duration-200 shrink-0 ${isSelected ? "bg-emerald-600 hover:bg-emerald-700 shadow-sm" : "hover:bg-muted/60 text-muted-foreground font-normal"} ${isLast ? 'mr-6' : ''}`}                    onClick={() => toggleCategory(cat)}
+                    className={`cursor-pointer whitespace-nowrap transition-all duration-200 shrink-0 ${isSelected ? "bg-emerald-600 hover:bg-emerald-700 shadow-sm" : "hover:bg-muted/60 text-muted-foreground font-normal"} ${isLast ? "mr-6" : ""}`}
+                    onClick={() => toggleCategory(cat)}
                   >
-                    {cat.replace(/_/g, ' ')}
+                    {cat.replace(/_/g, " ")}
                   </Badge>
                 );
               })}
@@ -222,14 +246,14 @@ export const ChatInterface = ({
               {attachedFile && (
                 <div className="w-full flex justify-start px-3 pt-3">
                   <Attachments variant="inline">
-                    <Attachment 
+                    <Attachment
                       data={{
                         id: "upload",
                         type: "file",
                         filename: attachedFile.name,
                         mediaType: attachedFile.type,
                         url: URL.createObjectURL(attachedFile),
-                      }} 
+                      }}
                       onRemove={() => {
                         setAttachedFile(null);
                         if (fileInputRef.current) {
@@ -250,22 +274,30 @@ export const ChatInterface = ({
                   Mengekstrak teks...
                 </div>
               )}
-              <PromptInputTextarea onChange={handleTextChange} value={text} disabled={status === "streaming" || status === "submitted" || isExtracting} />
+              <PromptInputTextarea
+                onChange={handleTextChange}
+                value={text}
+                disabled={
+                  status === "streaming" ||
+                  status === "submitted" ||
+                  isExtracting
+                }
+              />
             </PromptInputBody>
             <PromptInputFooter>
               <PromptInputTools>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden" 
-                  accept=".pdf" 
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".pdf"
                   onChange={(e) => {
                     if (e.target.files?.[0]) {
                       setAttachedFile(e.target.files[0]);
                     }
                     // Reset value so selecting the same file again triggers onChange
                     e.target.value = "";
-                  }} 
+                  }}
                 />
                 <PromptInputButton
                   type="button"
@@ -275,14 +307,13 @@ export const ChatInterface = ({
                 >
                   <Paperclip className="size-4" />
                 </PromptInputButton>
-                
+
                 <SpeechInput
                   className="shrink-0"
                   onTranscriptionChange={handleTranscriptionChange}
                   size="icon-sm"
                   variant="ghost"
                 />
-
               </PromptInputTools>
               <PromptInputSubmit disabled={isSubmitDisabled} status={status} />
             </PromptInputFooter>
@@ -291,4 +322,4 @@ export const ChatInterface = ({
       </div>
     </div>
   );
-}
+};

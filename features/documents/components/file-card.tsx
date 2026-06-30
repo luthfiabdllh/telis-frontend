@@ -61,6 +61,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRest
               {file.status === 'PENDING_APPROVAL' && <Badge className="bg-amber-500 hover:bg-amber-600 text-[10px] h-4">Menunggu Persetujuan</Badge>}
               {file.status === 'APPROVED' && <Badge className="bg-emerald-500 hover:bg-emerald-600 text-[10px] h-4">Disetujui</Badge>}
               {file.status === 'REJECTED' && <Badge className="bg-red-500 hover:bg-red-600 text-[10px] h-4">Ditolak</Badge>}
+              {file.status === 'FAILED' && <Badge variant="destructive" className="text-[10px] h-4">Gagal Diproses</Badge>}
             </span>
             <span className="text-xs text-muted-foreground">
               {formattedSize} • {new Date(file.created_at).toLocaleDateString()}
@@ -114,6 +115,7 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRest
           {file.status === 'PENDING_APPROVAL' && <Badge className="bg-amber-500 hover:bg-amber-600 text-[10px]">Menunggu Persetujuan</Badge>}
           {file.status === 'APPROVED' && <Badge className="bg-emerald-500 hover:bg-emerald-600 text-[10px]">Disetujui</Badge>}
           {file.status === 'REJECTED' && <Badge className="bg-red-500 hover:bg-red-600 text-[10px]">Ditolak</Badge>}
+          {file.status === 'FAILED' && <Badge variant="destructive" className="text-[10px]">Gagal Diproses</Badge>}
         </div>
       </div>
 

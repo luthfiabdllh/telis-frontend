@@ -12,7 +12,7 @@ import { UploadDocumentModal } from "./modals/upload-document-modal";
 import { RenameModal } from "./modals/rename-modal";
 import { MoveItemModal } from "./modals/move-item-modal";
 import { ConfirmActionModal, ConfirmActionType } from "./modals/confirm-action-modal";
-import { Folder, DocumentType } from "../api/document-api";
+import { Folder, DocumentType, documentApi } from "../api/document-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Folder as FolderIcon } from "lucide-react";
@@ -189,13 +189,56 @@ export function DriveContainer() {
 
       // Polling for UI update
       let count = 0;
-      const interval = setInterval(() => {
-        queryClient.invalidateQueries({ queryKey: ["documents"] });
-        queryClient.invalidateQueries({ queryKey: ["folders"] });
-        count++;
-        if (count > 7) {
-          clearInterval(interval);
-          updateStatus(actionId, "success");
+      const interval = setInterval(async () => {
+        try {
+          if (type === "folder") {
+            queryClient.invalidateQueries({ queryKey: ["folders"] });
+            count++;
+            if (count > 7) {
+              clearInterval(interval);
+              updateStatus(actionId, "success");
+            }
+            return;
+          }
+
+          // For files, poll document status
+          let doc = null;
+          try {
+            doc = await documentApi.getDocumentByID(item.id);
+          } catch (e) {
+            // Document might be completely gone
+          }
+
+          queryClient.invalidateQueries({ queryKey: ["documents"] });
+          queryClient.invalidateQueries({ queryKey: ["folders"] });
+
+          if (doc) {
+            if (action === "delete" && doc.status === "DELETED") {
+              clearInterval(interval);
+              updateStatus(actionId, "success");
+            } else if (action === "deprecate" && doc.is_deprecated) {
+              clearInterval(interval);
+              updateStatus(actionId, "success");
+            } else if (action === "restore" && doc.status === "COMPLETED") {
+              clearInterval(interval);
+              updateStatus(actionId, "success");
+            } else if (doc.status === "FAILED") {
+              clearInterval(interval);
+              updateStatus(actionId, "error", "Proses gagal di latar belakang");
+            }
+          } else if (action === "delete") {
+             // If doc is null (404), it's definitely deleted
+             clearInterval(interval);
+             updateStatus(actionId, "success");
+          }
+
+          count++;
+          if (count > 30) {
+            clearInterval(interval);
+            updateStatus(actionId, "success");
+          }
+        } catch (e) {
+          console.error("Polling error", e);
         }
       }, 2000);
 
