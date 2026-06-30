@@ -134,7 +134,30 @@ export const ChatInterface = ({
                         </Reasoning>
                       )}
                       <MessageContent>
-                        <MessageResponse>{version.content}</MessageResponse>
+                        {(() => {
+                          let content = version.content;
+                          let attachmentName = null;
+                          const match = content.match(/^\[ATTACHMENT:(.*?)\]\n\n/);
+                          if (match) {
+                            attachmentName = match[1];
+                            content = content.replace(match[0], "");
+                          }
+                          return (
+                            <>
+                              {attachmentName && (
+                                <div className="flex flex-col gap-1 rounded-md bg-zinc-800/80 p-3 mb-2 w-fit min-w-[140px] max-w-[250px] border border-zinc-700">
+                                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                    {attachmentName.split('.').pop() || 'TXT'}
+                                  </div>
+                                  <div className="text-xs text-zinc-200 truncate" title={attachmentName}>
+                                    {attachmentName}
+                                  </div>
+                                </div>
+                              )}
+                              <MessageResponse>{content}</MessageResponse>
+                            </>
+                          );
+                        })()}
                       </MessageContent>
                       {message.from === "assistant" && versions[0].id && (
                         <div className="opacity-0 transition-opacity group-hover:opacity-100 flex items-center gap-1 mt-2">

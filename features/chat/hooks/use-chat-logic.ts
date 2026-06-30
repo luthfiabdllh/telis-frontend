@@ -223,6 +223,7 @@ export function useChatLogic(initialSessionId?: string) {
       setStatus("submitted");
       
       let contextData = "";
+      let finalContent = message.text;
       if (attachedFile) {
         setIsExtracting(true);
         try {
@@ -232,6 +233,7 @@ export function useChatLogic(initialSessionId?: string) {
             headers: { "Content-Type": "multipart/form-data" },
           });
           contextData = res.data?.text || "";
+          finalContent = `[ATTACHMENT:${attachedFile.name}]\n\n${message.text}`;
         } catch (e) {
           console.error("Failed to extract text from file", e);
         } finally {
@@ -240,7 +242,7 @@ export function useChatLogic(initialSessionId?: string) {
         }
       }
       
-      addUserMessage(message.text, contextData);
+      addUserMessage(finalContent, contextData);
       setText("");
     },
     [addUserMessage, attachedFile, isExtracting]
