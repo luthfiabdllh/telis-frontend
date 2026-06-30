@@ -91,7 +91,19 @@ export const triggerUpload = async (
 
     // 2. Upload done, now waiting for Ingestion Worker (Processing)
     store.updateStatus(uploadId, 'processing');
+    store.updateProgress(uploadId, 30); // Start processing at 30%
     
+    // Simulate ingestion progress dynamically up to 95%
+    let simulatedProgress = 30;
+    const progressInterval = setInterval(() => {
+      if (simulatedProgress < 95) {
+        // Slow down the increment as it gets closer to 95%
+        const increment = Math.max(1, Math.floor((95 - simulatedProgress) / 10));
+        simulatedProgress += increment;
+        store.updateProgress(uploadId, simulatedProgress);
+      }
+    }, 1500);
+
     // 3. Poll to verify actual status from backend
     let count = 0;
     const interval = setInterval(async () => {
@@ -102,9 +114,12 @@ export const triggerUpload = async (
         
         if (doc.status === "COMPLETED") {
           clearInterval(interval);
+          clearInterval(progressInterval);
+          store.updateProgress(uploadId, 100);
           store.updateStatus(uploadId, 'success');
         } else if (doc.status === "FAILED") {
           clearInterval(interval);
+          clearInterval(progressInterval);
           store.updateStatus(uploadId, 'error', "Proses ingestion gagal");
         }
         
@@ -112,6 +127,7 @@ export const triggerUpload = async (
         // Timeout polling after 60s
         if (count > 30) {
           clearInterval(interval);
+          clearInterval(progressInterval);
           // If still pending, just keep it processing or assume success (backend will handle it)
           store.updateStatus(uploadId, 'success'); 
         }

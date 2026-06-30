@@ -66,7 +66,7 @@ export function GlobalUploadProgress() {
                 <p className="text-xs font-medium truncate" title={upload.filename}>
                   {upload.filename}
                 </p>
-                {upload.status === 'uploading' && (
+                {(upload.status === 'uploading' || upload.status === 'processing') && (
                   <Progress value={upload.progress} className="h-1 mt-1.5" />
                 )}
                 {upload.status === 'processing' && (
@@ -80,7 +80,7 @@ export function GlobalUploadProgress() {
               </div>
               
               <div className="shrink-0 w-6 flex justify-end">
-                {upload.status === 'uploading' && (
+                {(upload.status === 'uploading' || upload.status === 'processing') && (
                   <span className="text-[10px] font-medium text-muted-foreground">{upload.progress}%</span>
                 )}
                 {upload.status === 'processing' && (
