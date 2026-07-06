@@ -1,19 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { AppBreadcrumbs } from "@/features/dashboard/components/app-breadcrumbs";
 import { CustomSidebarTrigger } from "@/features/dashboard/components/custom-sidebar-trigger";
 import { navLinks } from "@/features/dashboard/components/app-shared";
-import { NavUser } from "@/features/dashboard/components/nav-user";
-import { BellIcon } from "lucide-react";
+import { BellIcon, Moon, Sun } from "lucide-react";
 import type { Session } from "next-auth";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 
 export function AppHeader({ session }: { session: Session | null }) {
     const pathname = usePathname();
     const activeItem = navLinks.find((item) => item.path === pathname) || navLinks[0];
+    
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
 	return (
 		<header
@@ -37,7 +45,18 @@ export function AppHeader({ session }: { session: Session | null }) {
 					className="h-4 data-[orientation=vertical]:self-center"
 					orientation="vertical"
 				/>
-				<NavUser session={session} />
+				<Button 
+                    aria-label="Toggle Theme" 
+                    size="icon" 
+                    variant="ghost" 
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                    {mounted ? (
+                        theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />
+                    ) : (
+                        <Moon className="size-4" />
+                    )}
+                </Button>
 			</div>
 		</header>
 	);

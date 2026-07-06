@@ -1,18 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Scale } from "lucide-react";
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
 	SidebarHeader,
-	SidebarMenu,
 	SidebarMenuButton,
-	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavGroup } from "@/features/dashboard/components/nav-group";
 import { navGroups } from "@/features/dashboard/components/app-shared";
 import type { Session } from "next-auth";
+import { NavUser } from "@/features/dashboard/components/nav-user";
 
 export function AppSidebar({ session }: { session: Session | null }) {
     const role = session?.user?.role || "User";
@@ -44,7 +44,7 @@ export function AppSidebar({ session }: { session: Session | null }) {
 				))}
 			</SidebarContent>
 			<SidebarFooter>
-				{/* LatestChange and footerNavLinks removed for cleaner layout */}
+				<NavUser session={session} />
 			</SidebarFooter>
 		</Sidebar>
 	);
