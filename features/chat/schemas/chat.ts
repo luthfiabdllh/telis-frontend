@@ -1,5 +1,12 @@
 import type { ToolUIPart } from "ai";
 import { nanoid } from "nanoid";
+import { z } from "zod";
+
+export const renameChatSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+});
+
+export type RenameChatFormValues = z.infer<typeof renameChatSchema>;
 
 export interface MessageType {
   key: string;

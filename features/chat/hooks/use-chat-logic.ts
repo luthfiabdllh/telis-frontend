@@ -5,7 +5,8 @@ import { getSession } from "next-auth/react";
 import { nanoid } from "nanoid";
 import { apiClient } from "@/lib/api-client";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { useChatMessages } from "./use-chat";
 
 export function useChatLogic(initialSessionId?: string) {
   const queryClient = useQueryClient();
@@ -25,15 +26,7 @@ export function useChatLogic(initialSessionId?: string) {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
 
-  const { data: historyData } = useQuery({
-    queryKey: ["chat-messages", initialSessionId],
-    queryFn: async () => {
-      const res = await apiClient.get(`/chat/sessions/${initialSessionId}/messages`);
-      return res.data;
-    },
-    enabled: !!initialSessionId,
-    staleTime: 0, // ensure it refetches if we revisit
-  });
+  const { data: historyData } = useChatMessages(initialSessionId);
 
   useEffect(() => {
     if (historyData && Array.isArray(historyData)) {

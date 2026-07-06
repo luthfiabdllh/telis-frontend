@@ -6,9 +6,12 @@ import { Session } from "next-auth";
 import { useChatStore, type ChatSession } from "@/features/chat/store/use-chat-store";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { isToday, isYesterday, subDays, isAfter, parseISO } from "date-fns";
+import { isToday, isYesterday, subDays, isAfter } from "date-fns";
+import { useChatSessions, useRenameChat, useDeleteChat } from "@/features/chat/hooks/use-chat";
+import { renameChatSchema, type RenameChatFormValues } from "@/features/chat/schemas/chat";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,34 +52,7 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["chat-sessions", query],
-    queryFn: async ({ pageParam = 1 }) => {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/chat/sessions`);
-      url.searchParams.set("page", pageParam.toString());
-      url.searchParams.set("limit", "20");
-      if (query) {
-        url.searchParams.set("search", query);
-      }
-      const res = await fetch(url.toString(), {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      });
-      if (!res.ok) throw new Error("Failed to fetch chat sessions");
-      return res.json();
-    },
-    getNextPageParam: (lastPage, allPages) => {
-      // Assuming API returns array or { data: [], hasNextPage: boolean, nextCursor: number }
-      // If it just returns array, we check length
-      if (Array.isArray(lastPage)) {
-        return lastPage.length === 20 ? allPages.length + 1 : undefined;
-      }
-      return lastPage.hasNextPage ? lastPage.nextCursor : undefined;
-    },
-    initialPageParam: 1,
-    enabled: !!session?.accessToken,
-  });
+  } = useChatSessions({ search: query });
 
   React.useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -275,61 +251,58 @@ function ChatGroup({ groupName, chats, session, selectedSessionId, setSelectedSe
 
 function ChatItem({ chat, session, selectedSessionId, setSelectedSessionId, pathname }: any) {
   const [isEditing, setIsEditing] = React.useState(false);
-  const [title, setTitle] = React.useState(chat.title);
-  const queryClient = useQueryClient();
   const isActive = selectedSessionId === chat.id || pathname === "/dashboard/chat/" + chat.id;
 
-  const handleRename = async (e: React.KeyboardEvent | React.FocusEvent) => {
-    if (e.type === "keydown" && (e as React.KeyboardEvent).key !== "Enter") return;
-    
-    setIsEditing(false);
-    if (title.trim() === "" || title === chat.title) {
-      setTitle(chat.title);
-      return;
-    }
+  const renameMutation = useRenameChat();
+  const deleteMutation = useDeleteChat();
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/chat/sessions/${chat.id}/title`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-        body: JSON.stringify({ title: title.trim() }),
-      });
-      
-      if (!res.ok) throw new Error("Failed to rename chat");
-      
-      queryClient.invalidateQueries({ queryKey: ["chat-sessions"] });
-    } catch (error) {
-      console.error(error);
-      setTitle(chat.title);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setFocus,
+    formState: { errors },
+  } = useForm<RenameChatFormValues>({
+    resolver: zodResolver(renameChatSchema),
+    defaultValues: {
+      title: chat.title,
+    },
+  });
+
+  React.useEffect(() => {
+    if (isEditing) {
+      setTimeout(() => setFocus("title"), 50);
     }
+  }, [isEditing, setFocus]);
+
+  const onSubmit = (data: RenameChatFormValues) => {
+    setIsEditing(false);
+    if (data.title === chat.title) return;
+    renameMutation.mutate(
+      { id: chat.id, data },
+      {
+        onError: () => {
+          reset({ title: chat.title }); // Revert on error
+        },
+      }
+    );
   };
 
-  const handleDelete = async () => {
+  const handleBlur = handleSubmit(onSubmit);
+
+  const handleDelete = () => {
     if (!window.confirm("Are you sure you want to delete this chat?")) return;
-    
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/chat/sessions/${chat.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      });
-      
-      if (!res.ok) throw new Error("Failed to delete chat");
-      
-      queryClient.invalidateQueries({ queryKey: ["chat-sessions"] });
-      
-      if (isActive) {
-        setSelectedSessionId(null);
-        window.location.href = "/dashboard/chat";
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Failed to delete chat");
-    }
+    deleteMutation.mutate(chat.id, {
+      onSuccess: () => {
+        if (isActive) {
+          setSelectedSessionId(null);
+          window.location.href = "/dashboard/chat";
+        }
+      },
+      onError: () => {
+        alert("Failed to delete chat");
+      },
+    });
   };
 
   return (
@@ -347,20 +320,20 @@ function ChatItem({ chat, session, selectedSessionId, setSelectedSessionId, path
       }}
     >
       {isEditing ? (
-        <input
-          autoFocus
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={handleRename}
-          onBlur={handleRename}
-          className="flex-1 bg-background border border-sidebar-border px-2 py-1 rounded text-sm focus:outline-none focus:ring-1 focus:ring-sidebar-ring w-full"
-          onClick={(e) => e.stopPropagation()}
-        />
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full relative" onClick={(e) => e.stopPropagation()}>
+          <input
+            {...register("title")}
+            onBlur={handleBlur}
+            className={cn(
+              "flex-1 bg-background border px-2 py-1 rounded text-sm focus:outline-none focus:ring-1 w-full",
+              errors.title ? "border-destructive focus:ring-destructive" : "border-sidebar-border focus:ring-sidebar-ring"
+            )}
+          />
+        </form>
       ) : (
         <>
           <span className="truncate flex-1">
-            {title}
+            {chat.title}
           </span>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto pl-2 flex shrink-0">
             <DropdownMenu>
