@@ -11,9 +11,9 @@ export function AppShell({
   session: Session | null;
 }) {
   return (
-    <SidebarProvider>
-      <AppSidebar session={session} />
-      <SidebarInset className="flex-1 overflow-hidden flex flex-col min-w-0">
+    <SidebarProvider className="bg-zinc-100 dark:bg-zinc-900">
+      <AppSidebar session={session}/>
+      <SidebarInset className="flex-1 overflow-hidden flex flex-col min-w-0 bg-sidebar md:my-2 md:mr-2 md:rounded-xl md:shadow-sm md:ring-1 md:ring-sidebar-border">
         <AppHeader session={session} />
         <div className="flex-1 overflow-auto p-4 md:p-6 relative">
           {children}

@@ -35,7 +35,7 @@ export function NavGroup({ label, items }: SidebarNavGroup) {
 							{item.subItems?.length ? (
 								<>
 									<CollapsibleTrigger asChild>
-										<SidebarMenuButton isActive={item.isActive}>
+										<SidebarMenuButton isActive={item.isActive} tooltip={item.title}>
 											{item.icon}
 											<span>{item.title}</span>
 											<ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -60,7 +60,7 @@ export function NavGroup({ label, items }: SidebarNavGroup) {
 									</CollapsibleContent>
 								</>
 							) : (
-								<SidebarMenuButton asChild isActive={item.isActive}>
+								<SidebarMenuButton asChild isActive={item.isActive} tooltip={item.title}>
 									<a href={item.path}>
 										{item.icon}
 										<span>{item.title}</span>
