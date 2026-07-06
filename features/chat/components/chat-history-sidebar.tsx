@@ -2,14 +2,6 @@
 
 import * as React from "react";
 import { MessageSquare, X, Plus } from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarInput,
-} from "@/components/ui/sidebar";
 import { Session } from "next-auth";
 import { useChatStore, type ChatSession } from "@/features/chat/store/use-chat-store";
 import { formatDistanceToNow } from "date-fns";
@@ -60,18 +52,15 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
   if (!isChatRoute) return null;
 
   return (
-    <div
+    <aside
       className={cn(
-        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r border-border/50",
-        "absolute md:relative z-40 left-0 md:left-auto top-0 md:top-auto bg-sidebar/95 backdrop-blur-xl shadow-2xl md:shadow-none",
+        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r border-border bg-sidebar text-sidebar-foreground",
+        "absolute md:relative z-40 left-0 md:left-auto top-0 md:top-auto shadow-xl md:shadow-none",
         (!mounted || isChatHistoryOpen) ? "w-[85vw] sm:w-80 opacity-100" : "w-0 opacity-0 border-none",
       )}
     >
-      <Sidebar
-        collapsible="none"
-        className="flex-1 w-full h-full bg-transparent border-none"
-      >
-        <SidebarHeader className="gap-3.5 border-b p-4">
+      <div className="flex flex-col h-full w-[85vw] sm:w-80">
+        <div className="flex flex-col gap-3.5 border-b p-4">
           <div className="flex w-full items-center justify-between">
             <div className="text-foreground text-base font-medium flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
@@ -83,7 +72,7 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
                   setSelectedSessionId(null);
                   window.location.href = "/dashboard/chat";
                 }}
-                className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                className="p-1 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md text-muted-foreground transition-colors"
                 title="Obrolan Baru"
               >
                 <Plus className="h-4 w-4" />
@@ -92,22 +81,21 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
                 onClick={() =>
                   useChatStore.getState().setChatHistoryOpen(false)
                 }
-                className="md:hidden p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md"
+                className="md:hidden p-1 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md text-muted-foreground transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
           </div>
-          <SidebarInput
+          <input
             placeholder="Cari obrolan..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-8"
+            className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup className="px-0 pt-0">
-          <SidebarGroupContent>
+        </div>
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+          <div className="flex flex-col gap-1 p-0">
             {!mounted ? (
               <div className="p-4" suppressHydrationWarning />
             ) : isLoading ? (
@@ -132,11 +120,10 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
                   />
                 ))
               )}
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
-    </div>
+          </div>
+        </div>
+      </div>
+    </aside>
   );
 }
 

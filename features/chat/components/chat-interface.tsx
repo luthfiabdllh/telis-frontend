@@ -80,6 +80,10 @@ export interface ChatInterfaceProps {
   isExtracting: boolean;
 }
 
+import { useChatStore } from "../store/use-chat-store";
+import { Button } from "@/components/ui/button";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+
 export const ChatInterface = ({
   text,
   status,
@@ -96,6 +100,7 @@ export const ChatInterface = ({
   isExtracting,
 }: ChatInterfaceProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isChatHistoryOpen, setChatHistoryOpen } = useChatStore();
   const toggleCategory = (cat: string) => {
     if (selectedCategories.includes(cat)) {
       setSelectedCategories(selectedCategories.filter((c) => c !== cat));
@@ -105,9 +110,19 @@ export const ChatInterface = ({
   };
 
   return (
-    <div className="relative flex size-full flex-col divide-y overflow-hidden">
+    <div className="relative flex size-full flex-col overflow-hidden">
+      <div className="absolute top-4 left-4 z-10">
+        <Button
+          size="icon"
+          className="h-8 w-8 bg-background/80 backdrop-blur-md shadow-sm text-muted-foreground hover:text-foreground"
+          onClick={() => setChatHistoryOpen(!isChatHistoryOpen)}
+          title={isChatHistoryOpen ? "Tutup Riwayat" : "Buka Riwayat"}
+        >
+          {isChatHistoryOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+        </Button>
+      </div>
       <Conversation>
-        <ConversationContent>
+        <ConversationContent className="pt-14">
           {messages.map(({ versions, ...message }) => (
             <MessageBranch defaultBranch={0} key={message.key}>
               <MessageBranchContent>
@@ -196,7 +211,7 @@ export const ChatInterface = ({
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
-      <div className="grid shrink-0 gap-4 pt-4 min-w-0 w-full">
+      <div className="grid shrink-0 gap-4 pt-4 min-w-0 w-full border-t">
         {messages.length === 0 && (
           <Suggestions className="px-4">
             {suggestions.map((suggestion) => (
