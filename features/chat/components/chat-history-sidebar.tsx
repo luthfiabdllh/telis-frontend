@@ -54,7 +54,7 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
   return (
     <aside
       className={cn(
-        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r border-sidebar-border bg-sidebar backdrop-blur-xl text-sidebar-foreground",
+        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
         "absolute md:relative z-40 left-0 md:left-auto top-0 md:top-auto shadow-xl md:shadow-none",
         (!mounted || isChatHistoryOpen) ? "w-[85vw] sm:w-80 opacity-100" : "w-0 opacity-0 border-none",
       )}

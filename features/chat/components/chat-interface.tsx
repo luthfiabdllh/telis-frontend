@@ -114,7 +114,7 @@ export const ChatInterface = ({
       <div className="absolute top-4 left-4 z-10">
         <Button
           size="icon"
-          className="h-8 w-8 bg-background/80 backdrop-blur-md shadow-sm text-muted-foreground hover:text-foreground"
+          className="h-8 w-8 bg-background/80 backdrop-blur-md shadow-sm text-muted-foreground hover:text-foreground hover:bg-background border border-sidebar-border"
           onClick={() => setChatHistoryOpen(!isChatHistoryOpen)}
           title={isChatHistoryOpen ? "Tutup Riwayat" : "Buka Riwayat"}
         >

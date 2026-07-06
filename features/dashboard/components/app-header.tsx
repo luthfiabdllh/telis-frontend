@@ -26,7 +26,7 @@ export function AppHeader({ session }: { session: Session | null }) {
 	return (
 		<header
 			className={cn(
-				"p-4 flex items-center justify-between gap-2 border-b border-zinc-200 dark:border-zinc-800"
+				"p-4 flex items-center justify-between gap-2 border-b border-sidebar-border"
 			)}
 		>
 			<div className="flex items-center gap-3">

@@ -6,7 +6,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await auth();
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950 relative">
+    <div className="flex h-dvh w-full overflow-hidden bg-zinc-50 dark:bg-zinc-900/80 relative">
       <AppShell session={session}>
         {children}
       </AppShell>
