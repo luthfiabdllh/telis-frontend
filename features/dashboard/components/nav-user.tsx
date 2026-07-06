@@ -103,7 +103,7 @@ export function NavUser({ session }: { session: Session | null }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                className="w-full cursor-pointer text-red-500 hover:text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+                className="w-full cursor-pointer text-destructive focus:text-destructive-foreground focus:bg-destructive"
                 onClick={() => signOut({ callbackUrl: "/login" })}
               >
                 <LogOutIcon />
