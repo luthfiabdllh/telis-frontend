@@ -54,15 +54,15 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
   return (
     <aside
       className={cn(
-        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r border-border bg-sidebar text-sidebar-foreground",
+        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r border-sidebar-border bg-sidebar backdrop-blur-xl text-sidebar-foreground",
         "absolute md:relative z-40 left-0 md:left-auto top-0 md:top-auto shadow-xl md:shadow-none",
         (!mounted || isChatHistoryOpen) ? "w-[85vw] sm:w-80 opacity-100" : "w-0 opacity-0 border-none",
       )}
     >
       <div className="flex flex-col h-full w-[85vw] sm:w-80">
-        <div className="flex flex-col gap-3.5 border-b p-4">
+        <div className="flex flex-col gap-3.5 border-b border-sidebar-border p-4">
           <div className="flex w-full items-center justify-between">
-            <div className="text-foreground text-base font-medium flex items-center gap-2">
+            <div className="text-sidebar-foreground text-base font-medium flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Riwayat Obrolan
             </div>
@@ -91,7 +91,7 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
             placeholder="Cari obrolan..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-8 w-full rounded-md border border-sidebar-border bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sidebar-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
         <div className="flex-1 overflow-y-auto no-scrollbar">
@@ -100,12 +100,12 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
               <div className="p-4" suppressHydrationWarning />
             ) : isLoading ? (
               <div className="flex flex-col gap-2 p-4">
-                <div className="h-12 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
-                <div className="h-12 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
-                <div className="h-12 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
+                <div className="h-12 bg-sidebar-accent rounded-lg animate-pulse" />
+                <div className="h-12 bg-sidebar-accent rounded-lg animate-pulse" />
+                <div className="h-12 bg-sidebar-accent rounded-lg animate-pulse" />
               </div>
             ) : filteredSessions.length === 0 ? (
-                <div className="text-muted-foreground p-4 text-sm text-center mt-4">
+                <div className="text-sidebar-foreground/70 p-4 text-sm text-center mt-4">
                   Belum ada obrolan
                 </div>
               ) : (
@@ -163,7 +163,7 @@ function ChatItem({ chat, session, selectedSessionId, setSelectedSessionId, path
 
   return (
     <div
-      className={`group relative flex w-full flex-col items-start gap-2 border-b p-4 text-sm leading-tight text-left transition-colors cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${selectedSessionId === chat.id || pathname === "/dashboard/chat/" + chat.id ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
+      className={`group relative flex w-full flex-col items-start gap-2 border-b border-sidebar-border p-4 text-sm leading-tight text-left transition-colors cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${selectedSessionId === chat.id || pathname === "/dashboard/chat/" + chat.id ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
     >
       <div className="flex w-full items-center justify-between gap-2">
         {isEditing ? (
@@ -174,7 +174,7 @@ function ChatItem({ chat, session, selectedSessionId, setSelectedSessionId, path
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleRename}
             onBlur={handleRename}
-            className="w-full bg-background/50 border px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full bg-background border border-sidebar-border px-2 py-1 rounded text-sm focus:outline-none focus:ring-2 focus:ring-sidebar-ring"
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
@@ -194,7 +194,7 @@ function ChatItem({ chat, session, selectedSessionId, setSelectedSessionId, path
               e.stopPropagation();
               setIsEditing(true);
             }}
-            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition-opacity"
+            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-background rounded transition-opacity"
             title="Ubah Judul"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
@@ -202,7 +202,7 @@ function ChatItem({ chat, session, selectedSessionId, setSelectedSessionId, path
         )}
       </div>
       <span 
-        className="text-xs text-muted-foreground line-clamp-1 w-full whitespace-break-spaces"
+        className="text-xs text-sidebar-foreground/60 line-clamp-1 w-full whitespace-break-spaces"
         onClick={() => {
           setSelectedSessionId(chat.id);
           window.location.href = `/dashboard/chat/${chat.id}`;
