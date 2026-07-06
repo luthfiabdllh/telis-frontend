@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
+import MicrosoftEntraId from "next-auth/providers/microsoft-entra-id"
 import type { JWT } from "next-auth/jwt"
 
 const API_BASE_URL = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
@@ -11,7 +12,9 @@ function decodeJwt(token: string) {
   try {
     const base64Url = token.split('.')[1]
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const jsonPayload = Buffer.from(base64, 'base64').toString('utf-8')
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
     return JSON.parse(jsonPayload)
   } catch (e) {
     return {}
@@ -52,6 +55,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    MicrosoftEntraId({
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
+      issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_TENANT_ID ? `https://login.microsoftonline.com/${process.env.AUTH_MICROSOFT_ENTRA_ID_TENANT_ID}/v2.0` : undefined,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -98,10 +106,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === "google") {
+      if (account?.provider === "google" || account?.provider === "microsoft-entra-id") {
         try {
           // Verify with Golang Backend
-          const res = await fetch(`${API_BASE_URL}/auth/sso/google`, {
+          const res = await fetch(`${API_BASE_URL}/auth/sso/${account?.provider === 'google' ? 'google' : 'microsoft'}`, {
             method: 'POST',
             headers: { 
               "Content-Type": "application/json",
