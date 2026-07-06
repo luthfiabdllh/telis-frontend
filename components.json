@@ -23,6 +23,7 @@
   },
   "registries": {
     "@blocks-so": "https://blocks.so/r/{name}.json",
-    "@ai-elements": "https://ai-sdk.dev/elements/api/registry/{name}.json"
+    "@ai-elements": "https://ai-sdk.dev/elements/api/registry/{name}.json",
+    "@efferd": "https://efferd.com/r/{style}/{name}.json"
   }
 }
