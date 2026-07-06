@@ -58,8 +58,8 @@ export function MessageFeedback({ messageId, initialFeedback }: { messageId: str
           <TooltipTrigger asChild>
             <button
               onClick={() => handleRate(1)}
-              className={`p-1.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors ${
-                feedback?.rating === 1 ? "text-green-600 dark:text-green-500 bg-zinc-100 dark:bg-zinc-800" : "text-muted-foreground"
+              className={`p-1.5 rounded hover:bg-muted transition-colors ${
+                feedback?.rating === 1 ? "text-green-600 dark:text-green-500 bg-muted" : "text-muted-foreground"
               }`}
               title="Membantu"
             >
@@ -74,8 +74,8 @@ export function MessageFeedback({ messageId, initialFeedback }: { messageId: str
           <TooltipTrigger asChild>
             <button
               onClick={() => handleRate(-1)}
-              className={`p-1.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors ${
-                feedback?.rating === -1 ? "text-red-600 dark:text-red-500 bg-zinc-100 dark:bg-zinc-800" : "text-muted-foreground"
+              className={`p-1.5 rounded hover:bg-muted transition-colors ${
+                feedback?.rating === -1 ? "text-red-600 dark:text-red-500 bg-muted" : "text-muted-foreground"
               }`}
               title="Kurang Membantu"
             >

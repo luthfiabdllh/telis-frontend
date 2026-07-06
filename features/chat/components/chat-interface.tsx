@@ -169,22 +169,25 @@ export const ChatInterface = ({
     <div className="relative flex size-full flex-col overflow-hidden">
       {/* Glowing Orb Background */}
       <div 
+        suppressHydrationWarning
         className={cn(
           "absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-in-out mix-blend-screen dark:mix-blend-lighten",
           isEmpty ? "opacity-100" : "opacity-0"
         )}
       >
         <div 
+          suppressHydrationWarning
           className="absolute top-1/2 left-[25%] w-[400px] h-[400px] -translate-y-1/2 bg-indigo-400/20 dark:bg-indigo-600/25 rounded-full blur-[100px] animate-pulse" 
           style={{ animationDuration: '6s' }} 
         />
         <div 
+          suppressHydrationWarning
           className="absolute top-1/2 right-[25%] w-[300px] h-[300px] -translate-y-1/2 bg-purple-400/20 dark:bg-purple-600/25 rounded-full blur-[100px] animate-pulse" 
           style={{ animationDuration: '8s' }} 
         />
       </div>
 
-      <div className="absolute top-4 left-4 z-10">
+      <div className="absolute top-4 left-4 z-50">
         <Button
           size="icon"
           className="h-8 w-8 bg-background/80 backdrop-blur-md shadow-sm text-muted-foreground hover:text-foreground hover:bg-background border border-sidebar-border"
@@ -248,12 +251,12 @@ export const ChatInterface = ({
                             return (
                               <>
                                 {attachmentName && (
-                                  <div className="flex flex-col gap-1 rounded-md bg-white p-3 mb-2 w-fit min-w-[140px] max-w-[250px] border border-gray-200 shadow-sm">
-                                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                  <div className="flex flex-col gap-1 rounded-md bg-background p-3 mb-2 w-fit min-w-[140px] max-w-[250px] border border-border shadow-sm">
+                                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                                       {attachmentName.split(".").pop() || "TXT"}
                                     </div>
                                     <div
-                                      className="text-xs text-gray-800 font-medium truncate"
+                                      className="text-xs text-foreground font-medium truncate"
                                       title={attachmentName}
                                     >
                                       {attachmentName}
