@@ -62,14 +62,14 @@ export function ChatHistorySidebar({ session }: { session: Session | null }) {
   return (
     <div
       className={cn(
-        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r",
-        "absolute md:relative z-40 left-0 md:left-auto top-0 md:top-auto bg-sidebar shadow-2xl md:shadow-none",
+        "transition-all duration-300 ease-in-out h-full overflow-hidden shrink-0 border-r border-border/50",
+        "absolute md:relative z-40 left-0 md:left-auto top-0 md:top-auto bg-sidebar/95 backdrop-blur-xl shadow-2xl md:shadow-none",
         (!mounted || isChatHistoryOpen) ? "w-[85vw] sm:w-80 opacity-100" : "w-0 opacity-0 border-none",
       )}
     >
       <Sidebar
         collapsible="none"
-        className="flex-1 w-full h-full bg-sidebar border-none"
+        className="flex-1 w-full h-full bg-transparent border-none"
       >
         <SidebarHeader className="gap-3.5 border-b p-4">
           <div className="flex w-full items-center justify-between">

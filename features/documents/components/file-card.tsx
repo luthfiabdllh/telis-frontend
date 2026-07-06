@@ -87,10 +87,10 @@ export function FileCard({ file, onRename, onMove, onDelete, onDeprecate, onRest
   return (
     <div 
       onClick={handleCardClick}
-      className={`border rounded-xl p-4 hover:shadow-md hover:border-red-500/50 transition-all group bg-card flex flex-col cursor-pointer ${isDeprecated ? 'opacity-60 grayscale' : ''}`}
+      className={`border border-border/50 rounded-2xl p-4 hover:shadow-lg hover:border-red-500/50 hover:-translate-y-1 transition-all duration-300 group bg-card/60 backdrop-blur-xl flex flex-col cursor-pointer ${isDeprecated ? 'opacity-60 grayscale' : ''}`}
     >
       <div className="flex justify-between items-start mb-3">
-        <div className="p-3 bg-red-500/10 rounded-xl text-red-500">
+        <div className="p-3 bg-red-500/10 rounded-2xl text-red-500 group-hover:scale-110 transition-transform duration-300">
           <FileText className="w-8 h-8" />
         </div>
         <div onClick={(e) => e.stopPropagation()}>

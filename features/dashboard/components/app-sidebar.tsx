@@ -35,7 +35,7 @@ export function AppSidebar({ session }: { session: Session | null }) {
       <Sidebar
         style={{ "--sidebar-width": "16rem" } as React.CSSProperties}
         collapsible="icon"
-        className="border-r p-2 px-1 shrink-0 bg-sidebar"
+        className="border-r border-border/50 p-2 px-1 shrink-0 bg-sidebar/95 backdrop-blur-xl shadow-sm"
       >
         <SidebarHeader>
           <SidebarMenu>

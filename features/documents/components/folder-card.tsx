@@ -55,10 +55,10 @@ export function FolderCard({ folder, onRename, onMove, onDelete, onOpenLocation,
   return (
     <div 
       onClick={handleNavigate}
-      className="border rounded-xl p-4 hover:shadow-md hover:border-primary/50 transition-all group bg-card cursor-pointer"
+      className="border border-border/50 rounded-2xl p-4 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 transition-all duration-300 group bg-card/60 backdrop-blur-xl cursor-pointer"
     >
       <div className="flex justify-between items-start mb-2">
-        <div className="p-3 bg-primary/10 rounded-xl text-primary">
+        <div className="p-3 bg-primary/10 rounded-2xl text-primary group-hover:scale-110 transition-transform duration-300">
           <FolderIcon className="w-8 h-8 fill-current" />
         </div>
         <div onClick={(e) => e.stopPropagation()}>

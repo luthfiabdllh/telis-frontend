@@ -241,7 +241,8 @@ export const ChatInterface = ({
               })}
             </div>
           </div>
-          <PromptInput onSubmit={handleSubmit}>
+          <div className="bg-background/60 backdrop-blur-xl border border-border/50 shadow-lg rounded-2xl overflow-hidden transition-all focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/30">
+            <PromptInput onSubmit={handleSubmit} className="border-none shadow-none bg-transparent">
             <PromptInputBody>
               {attachedFile && (
                 <div className="w-full flex justify-start px-3 pt-3">
@@ -318,6 +319,7 @@ export const ChatInterface = ({
               <PromptInputSubmit disabled={isSubmitDisabled} status={status} />
             </PromptInputFooter>
           </PromptInput>
+          </div>
         </div>
       </div>
     </div>

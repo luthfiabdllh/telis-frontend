@@ -12,7 +12,7 @@ export function LayoutHeader() {
   const isChatRoute = pathname?.startsWith("/dashboard/chat");
 
   return (
-    <header className="h-16 flex items-center px-4 border-b shrink-0 bg-white dark:bg-zinc-900 shadow-sm z-10 gap-2">
+    <header className="h-16 flex items-center px-4 border-b border-border/50 shrink-0 bg-background/80 backdrop-blur-xl shadow-sm z-10 gap-2 sticky top-0">
       <SidebarTrigger className="mr-2" />
       {isChatRoute && (
         <Button
