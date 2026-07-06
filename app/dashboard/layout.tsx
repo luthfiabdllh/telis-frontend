@@ -10,7 +10,7 @@ export default async function DashboardLayout({
   const session = await auth();
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden bg-zinc-50 dark:bg-zinc-900/80 relative">
+    <div className="flex h-dvh w-full overflow-hidden bg-[#e8e9ed] dark:bg-[#131313] relative">
       <AppShell session={session}>{children}</AppShell>
       <GlobalUploadProgress />
     </div>

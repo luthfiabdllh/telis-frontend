@@ -85,7 +85,6 @@ export interface ChatInterfaceProps {
 import { useChatStore } from "../store/use-chat-store";
 import { Button } from "@/components/ui/button";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { useSession } from "next-auth/react";
 
 export const ChatInterface = ({
   text,
@@ -154,7 +153,7 @@ export const ChatInterface = ({
             <Badge
               key={cat}
               variant={isSelected ? "default" : "outline"}
-              className={`cursor-pointer whitespace-nowrap transition-all duration-200 shrink-0 ${isSelected ? "bg-emerald-600 hover:bg-emerald-700 shadow-sm" : "hover:bg-muted/60 text-muted-foreground font-normal"} ${isLast ? "mr-6" : ""}`}
+              className={`cursor-pointer whitespace-nowrap transition-all duration-200 shrink-0 ${isSelected ? "bg-primary hover:bg-primary/80 shadow-sm" : "hover:bg-muted/60 text-muted-foreground font-normal"} ${isLast ? "mr-6" : ""}`}
               onClick={() => toggleCategory(cat)}
             >
               {cat.replace(/_/g, " ")}
@@ -171,18 +170,18 @@ export const ChatInterface = ({
       <div 
         suppressHydrationWarning
         className={cn(
-          "absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-in-out mix-blend-screen dark:mix-blend-lighten",
+          "absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-in-out dark:mix-blend-screen",
           isEmpty ? "opacity-100" : "opacity-0"
         )}
       >
         <div 
           suppressHydrationWarning
-          className="absolute top-1/2 left-[25%] w-[400px] h-[400px] -translate-y-1/2 bg-indigo-400/20 dark:bg-indigo-600/25 rounded-full blur-[100px] animate-pulse" 
+          className="absolute top-1/2 left-[25%] w-[400px] h-[400px] -translate-y-1/2 bg-indigo-500/30 dark:bg-indigo-600/25 rounded-full blur-[100px] animate-pulse" 
           style={{ animationDuration: '6s' }} 
         />
         <div 
           suppressHydrationWarning
-          className="absolute top-1/2 right-[25%] w-[300px] h-[300px] -translate-y-1/2 bg-purple-400/20 dark:bg-purple-600/25 rounded-full blur-[100px] animate-pulse" 
+          className="absolute top-1/2 right-[25%] w-[300px] h-[300px] -translate-y-1/2 bg-purple-500/30 dark:bg-purple-600/25 rounded-full blur-[100px] animate-pulse" 
           style={{ animationDuration: '8s' }} 
         />
       </div>
