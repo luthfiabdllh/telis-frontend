@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import FolderGraphic from "./folder";
 
 interface FolderCardProps {
   folder: Folder;
@@ -55,25 +56,29 @@ export function FolderCard({ folder, onRename, onMove, onDelete, onOpenLocation,
   return (
     <div 
       onClick={handleNavigate}
-      className="border border-border/50 rounded-2xl p-4 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 transition-all duration-300 group bg-card/60 backdrop-blur-xl cursor-pointer"
+      className="relative aspect-square border border-border/50 rounded-2xl hover:shadow-lg hover:border-primary/50 transition-all duration-300 group bg-card/60 backdrop-blur-xl cursor-pointer overflow-hidden flex flex-col"
     >
-      <div className="flex justify-between items-start mb-2">
-        <div className="p-3 bg-primary/10 rounded-2xl text-primary group-hover:scale-110 transition-transform duration-300">
-          <FolderIcon className="w-8 h-8 fill-current" />
-        </div>
-        <div onClick={(e) => e.stopPropagation()}>
-          <FolderActions
-            folder={folder}
-            onRename={onRename}
-            onMove={onMove}
-            onDelete={onDelete}
-            onOpenLocation={onOpenLocation}
-          />
+      <div className="absolute top-2 right-2 z-50" onClick={(e) => e.stopPropagation()}>
+        <FolderActions
+          folder={folder}
+          onRename={onRename}
+          onMove={onMove}
+          onDelete={onDelete}
+          onOpenLocation={onOpenLocation}
+        />
+      </div>
+      
+      <div className="w-full flex-1 relative flex items-center justify-center pointer-events-none mt-2">
+        <div className="flex items-center justify-center w-0 h-0">
+          <div className="transform scale-[0.4] sm:scale-[0.45] lg:scale-50 group-hover:scale-[0.45] sm:group-hover:scale-[0.5] lg:group-hover:scale-[0.55] transition-transform duration-300">
+            <FolderGraphic/>
+          </div>
         </div>
       </div>
-      <div>
-        <h3 className="font-semibold text-sm truncate mt-3">{folder.name}</h3>
-        <p className="text-xs text-muted-foreground mt-1">
+
+      <div className="p-3 sm:p-4 w-full text-center relative z-10 bg-linear-to-t from-card/80 to-transparent mt-auto">
+        <h3 className="font-semibold text-xs sm:text-sm truncate">{folder.name}</h3>
+        <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
           {new Date(folder.created_at).toLocaleDateString()}
         </p>
       </div>

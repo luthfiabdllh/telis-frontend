@@ -259,7 +259,7 @@ export function DriveContainer() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background p-6">
+    <div className="flex flex-col h-full p-6">
       <DriveActionBar
         path={path}
         viewMode={viewMode}
