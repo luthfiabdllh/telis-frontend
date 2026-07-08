@@ -67,8 +67,8 @@ function FilterPill({
           className={cn(
             "flex items-center gap-2 px-3 py-1.5 text-xs font-medium border rounded-full transition-colors",
             isActive
-              ? "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100"
-              : "border-gray-300 text-gray-700 hover:bg-muted",
+              ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
+              : "border-border text-foreground hover:bg-muted",
           )}
         >
           {label}
@@ -231,7 +231,7 @@ export function DriveSearch({ currentFolderId }: DriveSearchProps) {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverAnchor asChild>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
             <Input
               ref={inputRef}
               value={searchQuery}
@@ -371,7 +371,7 @@ export function DriveSearch({ currentFolderId }: DriveSearchProps) {
               label={
                 <>
                   {getSortLabel()}
-                  <span className="flex items-center justify-center w-5 h-5 bg-blue-100 rounded-full text-blue-600 border border-blue-200 ml-1">
+                  <span className="flex items-center justify-center w-5 h-5 bg-primary/10 rounded-full text-primary border border-primary/20 ml-1">
                     {sortOrder === "asc" ? (
                       <ArrowUp className="w-3 h-3" />
                     ) : (
