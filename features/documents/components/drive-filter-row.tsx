@@ -19,8 +19,12 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { LayoutGrid, List as ListIcon } from "lucide-react";
 
 interface DriveFilterRowProps {
+  viewMode: "grid" | "list";
+  onViewModeChange: (mode: "grid" | "list") => void;
   documentType: string;
   onDocumentTypeChange: (value: string) => void;
   riskLevel: string;
@@ -81,6 +85,8 @@ function FilterPill({
 }
 
 export function DriveFilterRow({
+  viewMode,
+  onViewModeChange,
   documentType,
   onDocumentTypeChange,
   riskLevel,
@@ -140,7 +146,7 @@ export function DriveFilterRow({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-4">
+    <div className="flex flex-nowrap md:flex-wrap items-center gap-2 mb-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-full">
       {/* Kategori / Jenis */}
       <FilterPill
         isActive={documentType !== "ALL"}
@@ -298,6 +304,42 @@ export function DriveFilterRow({
           </CommandList>
         </Command>
       </FilterPill>
+
+      {/* View Mode Toggle */}
+      <ToggleGroup
+        type="single"
+        value={viewMode}
+        onValueChange={(value) => {
+          if (value) onViewModeChange(value as "grid" | "list");
+        }}
+        className="ml-auto border border-border rounded-full p-0.5 bg-card/60 backdrop-blur-xl"
+      >
+        <ToggleGroupItem
+          value="grid"
+          aria-label="Grid View"
+          className={cn(
+            "h-8 w-8 rounded-full p-0",
+            viewMode === "grid"
+              ? "bg-primary/10 text-primary data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <LayoutGrid className="h-4 w-4" />
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="list"
+          aria-label="List View"
+          className={cn(
+            "h-8 w-8 rounded-full p-0",
+            viewMode === "list"
+              ? "bg-primary/10 text-primary data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <ListIcon className="h-4 w-4" />
+        </ToggleGroupItem>
+      </ToggleGroup>
+
       {hasFilters && (
         <Button onClick={clearFilters} variant="ghost" className="rounded-full text-muted-foreground">
           <X className="w-4 h-4" />

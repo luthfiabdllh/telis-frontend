@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import { Folder } from "../api/document-api";
+import { Folder } from "../schemas/document-schemas";
 import { Home } from "lucide-react";
 import {
   Breadcrumb,
@@ -18,13 +18,12 @@ interface DriveBreadcrumbProps {
 
 export function DriveBreadcrumb({ path, isSearch }: DriveBreadcrumbProps) {
   return (
-    <Breadcrumb className="pb-4 border-b mb-4">
-      <BreadcrumbList>
+    <Breadcrumb>
+      <BreadcrumbList className="text-lg sm:text-xl">
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link href="/dashboard/documents" className="flex items-center">
-              <Home className="h-4 w-4 mr-1" />
-              Root
+              File Manager
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>

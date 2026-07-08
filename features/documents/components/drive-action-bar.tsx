@@ -1,24 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { FolderPlus, UploadCloud, LayoutGrid, List as ListIcon } from "lucide-react";
+import { FolderPlus, UploadCloud } from "lucide-react";
 import { DriveBreadcrumb } from "./drive-breadcrumb";
 import { Folder } from "../schemas/document-schemas";
 
 interface DriveActionBarProps {
   path: Folder[];
-  viewMode: "grid" | "list";
-  onViewModeChange: (mode: "grid" | "list") => void;
-  documentType: string;
-  onDocumentTypeChange: (type: string) => void;
-  riskLevel: string;
-  onRiskLevelChange: (value: string) => void;
-  vendorName: string;
-  onVendorNameChange: (value: string) => void;
-  businessUnit: string;
-  onBusinessUnitChange: (value: string) => void;
-  sortBy: string;
-  onSortByChange: (value: string) => void;
-  sortOrder: string;
-  onSortOrderChange: (value: string) => void;
   onCreateFolderClick: () => void;
   onUploadClick: () => void;
   isSearch?: boolean;
@@ -26,8 +12,6 @@ interface DriveActionBarProps {
 
 export function DriveActionBar({
   path,
-  viewMode,
-  onViewModeChange,
   onCreateFolderClick,
   onUploadClick,
   isSearch,
@@ -37,41 +21,21 @@ export function DriveActionBar({
   return (
     <div className="flex flex-col mb-6 space-y-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-        <h1 className="text-2xl font-bold tracking-tight">Documents</h1>
+        <DriveBreadcrumb path={path} isSearch={isSearch} />
         
         <div className="flex-1" />
 
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center bg-muted rounded-md p-1 mx-2">
-            <Button
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onViewModeChange("grid")}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === "list" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onViewModeChange("list")}
-            >
-              <ListIcon className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <Button variant="outline" onClick={onCreateFolderClick}>
+        <div className="flex w-full md:w-auto items-center space-x-2">
+          <Button variant="outline" onClick={onCreateFolderClick} className="flex-1 md:flex-none">
             <FolderPlus className="h-4 w-4 mr-2" />
-            New Folder
+            <span className="truncate">New Folder</span>
           </Button>
-          <Button onClick={onUploadClick}>
+          <Button onClick={onUploadClick} className="flex-1 md:flex-none">
             <UploadCloud className="h-4 w-4 mr-2" />
-            Upload
+            <span className="truncate">Upload</span>
           </Button>
         </div>
       </div>
-      <DriveBreadcrumb path={path} isSearch={isSearch} />
     </div>
   );
 }

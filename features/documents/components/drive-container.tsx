@@ -260,42 +260,33 @@ export function DriveContainer() {
   };
 
   return (
-    <div className="flex flex-col h-full p-6">
-      <DriveActionBar
-        path={path}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        documentType={documentType}
-        onDocumentTypeChange={setDocumentType}
-        riskLevel={riskLevel}
-        onRiskLevelChange={setRiskLevel}
-        vendorName={vendorName}
-        onVendorNameChange={setVendorName}
-        businessUnit={businessUnit}
-        onBusinessUnitChange={setBusinessUnit}
-        sortBy={sortBy}
-        onSortByChange={setSortBy}
-        sortOrder={sortOrder}
-        onSortOrderChange={setSortOrder}
-        onCreateFolderClick={() => setModals((p) => ({ ...p, createFolder: true }))}
-        onUploadClick={() => setModals((p) => ({ ...p, uploadDocument: true }))}
-        isSearch={isSearch}
-      />
+    // drive header
+    <div className="flex flex-col h-full">
+      <div className="sticky -top-4 md:-top-6 z-20 bg-sidebar pb-2 -mt-4 pt-4 md:-mt-6 md:pt-6 -mx-4 px-4 md:-mx-6 md:px-6">
+        <DriveActionBar
+          path={path}
+          onCreateFolderClick={() => setModals((p) => ({ ...p, createFolder: true }))}
+          onUploadClick={() => setModals((p) => ({ ...p, uploadDocument: true }))}
+          isSearch={isSearch}
+        />
 
-      <DriveFilterRow
-        documentType={documentType}
-        onDocumentTypeChange={setDocumentType}
-        riskLevel={riskLevel}
-        onRiskLevelChange={setRiskLevel}
-        vendorName={vendorName}
-        onVendorNameChange={setVendorName}
-        businessUnit={businessUnit}
-        onBusinessUnitChange={setBusinessUnit}
-        sortBy={sortBy}
-        onSortByChange={setSortBy}
-        sortOrder={sortOrder}
-        onSortOrderChange={setSortOrder}
-      />
+        <DriveFilterRow
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          documentType={documentType}
+          onDocumentTypeChange={setDocumentType}
+          riskLevel={riskLevel}
+          onRiskLevelChange={setRiskLevel}
+          vendorName={vendorName}
+          onVendorNameChange={setVendorName}
+          businessUnit={businessUnit}
+          onBusinessUnitChange={setBusinessUnit}
+          sortBy={sortBy}
+          onSortByChange={setSortBy}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
+        />
+      </div>
 
       {isLoading ? (
         <div className="flex-1 overflow-auto mt-4">
