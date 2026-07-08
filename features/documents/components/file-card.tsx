@@ -1,5 +1,5 @@
-import { FileText, MoreVertical, Pencil, FolderInput, Trash2, Ban, Download, Eye } from "lucide-react";
-import { DocumentType, documentApi } from "../api/document-api";
+import { MoreVertical, Pencil, FolderInput, Trash2, Ban, Download, Eye } from "lucide-react";
+import { DocumentType } from "../schemas/document-schemas";
 import {
   DropdownMenu,
   DropdownMenuContent,

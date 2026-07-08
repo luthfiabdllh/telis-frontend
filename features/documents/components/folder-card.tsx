@@ -1,5 +1,5 @@
 import { Folder as FolderIcon, MoreVertical, Pencil, FolderInput, Trash2 } from "lucide-react";
-import { Folder } from "../api/document-api";
+import { Folder } from "../schemas/document-schemas";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,

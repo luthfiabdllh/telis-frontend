@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FolderPlus, UploadCloud, LayoutGrid, List as ListIcon } from "lucide-react";
 import { DriveBreadcrumb } from "./drive-breadcrumb";
-import { Folder } from "../api/document-api";
-import { DriveSearch } from "./drive-search";
+import { Folder } from "../schemas/document-schemas";
 
 interface DriveActionBarProps {
   path: Folder[];
@@ -40,9 +39,7 @@ export function DriveActionBar({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <h1 className="text-2xl font-bold tracking-tight">Documents</h1>
         
-        <div className="flex-1 flex justify-center w-full md:max-w-2xl px-0 md:px-4">
-          <DriveSearch currentFolderId={currentFolderId} />
-        </div>
+        <div className="flex-1" />
 
         <div className="flex items-center space-x-2">
           <div className="flex items-center bg-muted rounded-md p-1 mx-2">
