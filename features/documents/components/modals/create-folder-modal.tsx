@@ -4,12 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useEffect } from "react";
-
-const formSchema = z.object({
-  name: z.string().min(1, "Folder name is required").max(100),
-});
+import { createFolderSchema, CreateFolderInput } from "../../schemas/document-schemas";
 
 interface CreateFolderModalProps {
   isOpen: boolean;
@@ -19,8 +15,8 @@ interface CreateFolderModalProps {
 }
 
 export function CreateFolderModal({ isOpen, onClose, onSubmit, isLoading }: CreateFolderModalProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateFolderInput>({
+    resolver: zodResolver(createFolderSchema),
     defaultValues: { name: "" },
   });
 

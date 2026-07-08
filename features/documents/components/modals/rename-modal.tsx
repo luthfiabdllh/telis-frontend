@@ -4,12 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useEffect } from "react";
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required").max(150),
-});
+import { renameSchema, RenameInput } from "../../schemas/document-schemas";
 
 interface RenameModalProps {
   isOpen: boolean;
@@ -21,8 +17,8 @@ interface RenameModalProps {
 }
 
 export function RenameModal({ isOpen, onClose, onSubmit, isLoading, initialName, type }: RenameModalProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<RenameInput>({
+    resolver: zodResolver(renameSchema),
     defaultValues: { name: initialName },
   });
 

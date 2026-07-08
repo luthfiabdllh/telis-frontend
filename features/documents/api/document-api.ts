@@ -1,51 +1,21 @@
 import { apiClient } from "@/lib/api-client";
 
-export interface Folder {
-  id: string;
-  name: string;
-  parent_id?: string | null;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-  folder_path?: string;
-}
+import {
+  Folder,
+  DocumentType,
+  MetadataOptions,
+  ApprovalWorkflow,
+  folderSchema,
+  documentSchema,
+  metadataOptionsSchema,
+  approvalWorkflowSchema
+} from "../schemas/document-schemas";
 
-export interface DocumentType {
-  id: string;
-  folder_id?: string | null;
-  filename: string;
-  status: string;
-  uploaded_by: string;
-  file_size_bytes: number;
-  is_deprecated: boolean;
-  version: number;
-  created_at: string;
-  updated_at: string;
-  folder_path?: string;
-  document_type?: string;
-  risk_level?: string;
-  risk_reasoning?: string;
-  vendor_name?: string;
-  business_unit?: string;
-  effective_date?: string;
-  expiry_date?: string;
-  summary?: string;
-}
-
-export interface MetadataOptions {
-  vendors: string[];
-  business_units: string[];
-}
-
-export interface ApprovalWorkflow {
-  id: string;
-  document_id: string;
-  requester_id: string;
-  approver_id: string;
-  status: string;
-  notes: string;
-  created_at: string;
-  updated_at: string;
+function extractArray(data: any): any[] {
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data)) return data;
+  if (data?.data === null || data === null || data === undefined) return [];
+  return data?.data || data;
 }
 
 export const documentApi = {
@@ -61,15 +31,32 @@ export const documentApi = {
       params.append("parent_id", "null");
     }
     const res = await apiClient.get(`/folders?${params.toString()}`);
-    return res.data.data as Folder[];
+    const payload = extractArray(res.data);
+    const parsed = folderSchema.array().safeParse(payload);
+    if (!parsed.success) {
+      console.error("Zod parse error on getFolders. Raw res.data:", res.data, "Error:", parsed.error);
+      return [];
+    }
+    return parsed.data;
   },
   getFolderByID: async (id: string) => {
     const res = await apiClient.get(`/folders/${id}`);
-    return res.data as Folder;
+    const parsed = folderSchema.safeParse(res.data);
+    if (!parsed.success) {
+      console.error("Zod parse error on getFolderByID:", parsed.error);
+      return res.data as Folder;
+    }
+    return parsed.data;
   },
   getFolderPath: async (id: string) => {
     const res = await apiClient.get(`/folders/${id}/path`);
-    return res.data.data as Folder[];
+    const payload = extractArray(res.data);
+    const parsed = folderSchema.array().safeParse(payload);
+    if (!parsed.success) {
+      console.error("Zod parse error on getFolderPath. Raw res.data:", res.data, "Error:", parsed.error);
+      return [];
+    }
+    return parsed.data;
   },
   createFolder: async (name: string, parentId?: string | null) => {
     const res = await apiClient.post("/folders", { name, parent_id: parentId });
@@ -118,15 +105,31 @@ export const documentApi = {
     }
     params.append("_t", Date.now().toString()); // Cache-buster
     const res = await apiClient.get(`/documents?${params.toString()}`);
-    return res.data.data as DocumentType[]; // Assuming backend returns { data: [...] }
+    const payload = extractArray(res.data);
+    const parsed = documentSchema.array().safeParse(payload);
+    if (!parsed.success) {
+      console.error("Zod parse error on getDocuments. Raw res.data:", res.data, "Error:", parsed.error);
+      return [];
+    }
+    return parsed.data;
   },
   getDocumentByID: async (id: string) => {
     const res = await apiClient.get(`/documents/${id}`);
-    return res.data as DocumentType;
+    const parsed = documentSchema.safeParse(res.data);
+    if (!parsed.success) {
+      console.error("Zod parse error on getDocumentByID:", parsed.error);
+      return res.data as DocumentType;
+    }
+    return parsed.data;
   },
   getMetadataOptions: async () => {
     const res = await apiClient.get(`/documents/metadata-options`);
-    return res.data as MetadataOptions;
+    const parsed = metadataOptionsSchema.safeParse(res.data);
+    if (!parsed.success) {
+      console.error("Zod parse error on getMetadataOptions:", parsed.error);
+      return res.data as MetadataOptions;
+    }
+    return parsed.data;
   },
   updateMetadata: async (id: string, metadata: Partial<DocumentType>) => {
     const res = await apiClient.patch(`/documents/${id}/metadata`, metadata);
@@ -232,9 +235,15 @@ export const documentApi = {
       apiClient.get(`/documents?${docParams.toString()}`)
     ]);
 
+    const parsedFolders = folderSchema.array().safeParse(extractArray(folderRes.data));
+    const parsedDocs = documentSchema.array().safeParse(extractArray(docRes.data));
+    
+    if (!parsedFolders.success) console.error("Zod parse error on searchDrive folders. Raw data:", folderRes.data, "Error:", parsedFolders.error);
+    if (!parsedDocs.success) console.error("Zod parse error on searchDrive documents. Raw data:", docRes.data, "Error:", parsedDocs.error);
+
     return {
-      folders: folderRes.data.data as Folder[] || [],
-      documents: docRes.data.data as DocumentType[] || [],
+      folders: parsedFolders.success ? parsedFolders.data : [],
+      documents: parsedDocs.success ? parsedDocs.data : [],
     };
   },
   
@@ -244,7 +253,12 @@ export const documentApi = {
       approver_id: approverId,
       notes: notes,
     });
-    return res.data as ApprovalWorkflow;
+    const parsed = approvalWorkflowSchema.safeParse(res.data);
+    if (!parsed.success) {
+      console.error("Zod parse error on requestApproval:", parsed.error);
+      return res.data as ApprovalWorkflow;
+    }
+    return parsed.data;
   },
   reviewApproval: async (id: string, approvalId: string, status: string, notes: string) => {
     const res = await apiClient.put(`/documents/${id}/approvals/${approvalId}`, {
@@ -255,6 +269,12 @@ export const documentApi = {
   },
   getDocumentApprovals: async (id: string) => {
     const res = await apiClient.get(`/documents/${id}/approvals`);
-    return res.data as ApprovalWorkflow[];
+    const payload = extractArray(res.data);
+    const parsed = approvalWorkflowSchema.array().safeParse(payload);
+    if (!parsed.success) {
+      console.error("Zod parse error on getDocumentApprovals. Raw res.data:", res.data, "Error:", parsed.error);
+      return [];
+    }
+    return parsed.data;
   }
 };
