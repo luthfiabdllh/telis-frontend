@@ -193,7 +193,7 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       {/* Modern Header */}
-      <div className="flex items-start md:items-center gap-3 md:gap-4 px-4 md:px-6 py-4 border-b">
+      <div className="flex items-start md:items-center gap-3 md:gap-4 py-4 border-b">
         <Link
           href={`/dashboard/documents${document.folder_id ? `?folder_id=${document.folder_id}` : ""}`}
         >
