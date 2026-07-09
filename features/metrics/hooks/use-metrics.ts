@@ -16,3 +16,17 @@ export const useMyMetrics = () => {
     staleTime: 60000, // 1 minute
   });
 };
+
+export const useRiskHeatmap = () => {
+  return useQuery({
+    queryKey: ['risk-heatmap'],
+    queryFn: () => metricsApi.getRiskHeatmap(),
+  });
+};
+
+export const useExpiringContracts = () => {
+  return useQuery({
+    queryKey: ['expiring-contracts'],
+    queryFn: () => metricsApi.getExpiringContracts(),
+  });
+};
