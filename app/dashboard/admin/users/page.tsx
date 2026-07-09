@@ -1,9 +1,8 @@
 import { Metadata } from "next";
 
 import { auth } from "@/auth";
+import { notFound } from "next/navigation";
 import { UserManagement } from "@/features/users/components/user-management";
-import { UsersIcon } from "lucide-react";
-
 export const metadata: Metadata = {
   title: "Manajemen Pengguna - TELIS",
   description: "Kelola pengguna, wewenang, dan akses sistem.",
@@ -11,6 +10,10 @@ export const metadata: Metadata = {
 
 export default async function UsersPage() {
   const session = await auth();
+
+  if (session?.user?.role !== "Admin" && session?.user?.role !== "1") {
+    notFound();
+  }
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 w-full max-w-full overflow-x-hidden">

@@ -8,7 +8,16 @@ export const metadata: Metadata = {
     "Wawasan tingkat risiko, penggunaan token AI, dan performa sistem.",
 };
 
-export default function AnalyticsDashboardPage() {
+import { auth } from "@/auth";
+import { notFound } from "next/navigation";
+
+export default async function AnalyticsDashboardPage() {
+  const session = await auth();
+  const role = session?.user?.role;
+  if (role !== "Admin" && role !== "1" && role !== "Legal" && role !== "3") {
+    notFound();
+  }
+
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 w-full max-w-full overflow-x-hidden">
       <div className="flex items-center justify-between space-y-2">
