@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, ShieldAlert, ShieldCheck, Ban, UserCog, User as UserIcon } from "lucide-react";
+import { MoreHorizontal, ShieldAlert, ShieldCheck, Ban, UserCog, User as UserIcon, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { User } from "../api/user-api";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,9 +12,12 @@ interface UserTableProps {
   onChangeRole: (user: User) => void;
   onBanToggle: (user: User) => void;
   currentUserId?: string;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+  onSort?: (column: string) => void;
 }
 
-export function UserTable({ users, onChangeRole, onBanToggle, currentUserId }: UserTableProps) {
+export function UserTable({ users, onChangeRole, onBanToggle, currentUserId, sortBy, sortDir, onSort }: UserTableProps) {
   
   const getRoleBadge = (roleId: number, roleName: string) => {
     switch (roleId) {
@@ -39,16 +42,33 @@ export function UserTable({ users, onChangeRole, onBanToggle, currentUserId }: U
     return name.substring(0, 2).toUpperCase();
   };
 
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortBy !== column) return <ArrowUpDown className="ml-1 h-3 w-3 opacity-20 group-hover:opacity-50 transition-opacity" />;
+    return sortDir === "asc" ? <ArrowUp className="ml-1 h-3 w-3 text-primary" /> : <ArrowDown className="ml-1 h-3 w-3 text-primary" />;
+  };
+
+  const SortableHead = ({ column, children, className = "" }: { column: string, children: React.ReactNode, className?: string }) => (
+    <TableHead 
+      className={`font-semibold text-muted-foreground ${className} ${onSort ? 'cursor-pointer hover:bg-muted/50 transition-colors group' : ''}`}
+      onClick={() => onSort?.(column)}
+    >
+      <div className="flex items-center">
+        {children}
+        {onSort && <SortIcon column={column} />}
+      </div>
+    </TableHead>
+  );
+
   return (
     <div className="rounded-2xl border bg-card/80 backdrop-blur-sm overflow-hidden shadow-sm">
       <Table>
         <TableHeader className="bg-muted/30">
           <TableRow className="hover:bg-transparent">
-            <TableHead className="font-semibold text-muted-foreground w-[300px]">Pengguna</TableHead>
-            <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Kontak</TableHead>
-            <TableHead className="font-semibold text-muted-foreground">Wewenang</TableHead>
-            <TableHead className="font-semibold text-muted-foreground">Status</TableHead>
-            <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Bergabung</TableHead>
+            <SortableHead column="username" className="w-[300px]">Pengguna</SortableHead>
+            <SortableHead column="email" className="hidden md:table-cell">Kontak</SortableHead>
+            <SortableHead column="role_id">Wewenang</SortableHead>
+            <SortableHead column="is_banned">Status</SortableHead>
+            <SortableHead column="created_at" className="hidden md:table-cell">Bergabung</SortableHead>
             <TableHead className="w-[80px]"></TableHead>
           </TableRow>
         </TableHeader>

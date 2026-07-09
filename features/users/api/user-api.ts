@@ -48,6 +48,8 @@ export interface GetUsersParams {
   search?: string;
   role_id?: number | null;
   is_banned?: boolean | null;
+  sort_by?: string;
+  sort_dir?: "asc" | "desc";
 }
 
 export const userApi = {
@@ -58,6 +60,8 @@ export const userApi = {
     if (params.search) searchParams.set('search', params.search);
     if (params.role_id !== undefined && params.role_id !== null) searchParams.set('role_id', params.role_id.toString());
     if (params.is_banned !== undefined && params.is_banned !== null) searchParams.set('is_banned', params.is_banned.toString());
+    if (params.sort_by) searchParams.set('sort_by', params.sort_by);
+    if (params.sort_dir) searchParams.set('sort_dir', params.sort_dir);
 
     const queryString = searchParams.toString();
     const endpoint = `/users${queryString ? `?${queryString}` : ''}`;
