@@ -1,6 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { RiskHeatmap, ExpiringContract } from "../api/metrics-api";
 import { motion } from "framer-motion";
 import { ShieldAlert, FileWarning, BarChart4, FileQuestion } from "lucide-react";
@@ -14,12 +12,6 @@ interface RiskAndContractsProps {
   isLoading?: boolean;
 }
 
-const RISK_COLORS: Record<string, string> = {
-  HIGH: "var(--destructive)",
-  MEDIUM: "var(--chart-3)", 
-  LOW: "var(--chart-2)", 
-  UNKNOWN: "var(--muted-foreground)"
-};
 
 const EmptyState = ({ title, icon: Icon }: { title: string, icon: any }) => (
   <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-muted/10 rounded-xl border border-dashed border-muted-foreground/20">
@@ -40,25 +32,35 @@ export function RiskAndContracts({ heatmap, expiringContracts, isLoading }: Risk
     );
   }
 
-  // Transform heatmap data for BarChart
+  // Transform heatmap data for Custom Matrix
   const businessUnits = Array.from(new Set(heatmap.map(h => h.business_unit)));
-  const barData = businessUnits.map(bu => {
-    const dataObj: any = { name: bu || 'Unknown' };
-    heatmap.filter(h => h.business_unit === bu).forEach(h => {
-      dataObj[h.risk_level] = h.count;
-    });
-    return dataObj;
-  });
+  const riskLevels = ["LOW", "MEDIUM", "HIGH"] as const; // Left to right order
+  
+  // Calculate max count for opacity scaling
+  const maxCount = Math.max(1, ...heatmap.map(h => h.count));
+  
+  const getRiskLabel = (level: string) => {
+    if (level === "HIGH") return "Tinggi";
+    if (level === "MEDIUM") return "Sedang";
+    return "Rendah";
+  };
+
+  const getBaseColor = (level: string) => {
+    if (level === "HIGH") return "var(--destructive)";
+    if (level === "MEDIUM") return "#f97316"; // orange-500
+    if (level === "LOW") return "#10b981"; // emerald-500
+    return "var(--muted)";
+  };
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
       transition={{ delay: 0.3 }}
-      className="grid gap-4 md:grid-cols-2 lg:grid-cols-2"
+      className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 h-full"
     >
-      {/* Risk Heatmap */}
-      <Card className="shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
+      {/* Custom Risk Heatmap */}
+      <Card className="shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80 flex flex-col h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-chart-4/10">
@@ -66,23 +68,60 @@ export function RiskAndContracts({ heatmap, expiringContracts, isLoading }: Risk
             </div>
             Legal Risk Heatmap
           </CardTitle>
-          <CardDescription>Tingkat risiko berdasarkan unit bisnis.</CardDescription>
+          <CardDescription>Peta suhu risiko berdasarkan unit bisnis.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            {barData.length > 0 ? (
-              <ChartContainer config={{}} className="h-full w-full">
-                <BarChart data={barData} margin={{ top: 20, right: 10, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                  <XAxis dataKey="name" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                  <ChartTooltip cursor={{fill: 'var(--muted)'}} content={<ChartTooltipContent />} />
-                  <ChartLegend content={<ChartLegendContent />} wrapperStyle={{ paddingTop: '20px' }} />
-                  <Bar dataKey="HIGH" stackId="a" fill={RISK_COLORS["HIGH"]} radius={[0, 0, 4, 4]} />
-                  <Bar dataKey="MEDIUM" stackId="a" fill={RISK_COLORS["MEDIUM"]} />
-                  <Bar dataKey="LOW" stackId="a" fill={RISK_COLORS["LOW"]} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ChartContainer>
+        <CardContent className="flex-1 flex flex-col">
+          <div className="h-full min-h-[250px] flex flex-col justify-center">
+            {businessUnits.length > 0 ? (
+              <div className="w-full overflow-x-auto pb-2 flex-1 flex flex-col justify-center">
+                <div className="min-w-[300px]">
+                  {/* Matrix Header */}
+                  <div className="grid grid-cols-4 gap-2 mb-2">
+                    <div className="col-span-1"></div>
+                    {riskLevels.map(level => (
+                      <div key={level} className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        {getRiskLabel(level)}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Matrix Rows */}
+                  <div className="space-y-2">
+                    {businessUnits.map(bu => (
+                      <div key={bu} className="grid grid-cols-4 gap-2 items-center">
+                        <div className="col-span-1 text-xs font-medium text-foreground truncate pr-2" title={bu}>
+                          {bu || 'Unknown'}
+                        </div>
+                        {riskLevels.map(level => {
+                          const cellData = heatmap.find(h => h.business_unit === bu && h.risk_level === level);
+                          const count = cellData?.count || 0;
+                          const intensity = count === 0 ? 0 : Math.max(0.15, count / maxCount);
+                          const isDark = intensity > 0.5;
+                          
+                          return (
+                            <div 
+                              key={`${bu}-${level}`} 
+                              className="relative group p-2 flex items-center justify-center h-10 rounded-md border border-border/40 overflow-hidden cursor-help transition-transform hover:scale-[1.05]"
+                              title={`${bu} - Risiko ${getRiskLabel(level)}: ${count} Kontrak`}
+                            >
+                              <div 
+                                className="absolute inset-0 transition-opacity"
+                                style={{ 
+                                  backgroundColor: getBaseColor(level),
+                                  opacity: intensity 
+                                }} 
+                              />
+                              <span className={`relative z-10 text-xs font-bold ${count === 0 ? 'text-muted-foreground/50' : (isDark ? 'text-white' : 'text-foreground')}`}>
+                                {count}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             ) : (
               <EmptyState title="Tidak Ada Data Risiko" icon={BarChart4} />
             )}
@@ -91,7 +130,7 @@ export function RiskAndContracts({ heatmap, expiringContracts, isLoading }: Risk
       </Card>
 
       {/* Expiring Contracts */}
-      <Card className="shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
+      <Card className="shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80 flex flex-col h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-orange-500/10">
@@ -101,8 +140,8 @@ export function RiskAndContracts({ heatmap, expiringContracts, isLoading }: Risk
           </CardTitle>
           <CardDescription>Daftar kontrak yang membutuhkan perhatian segera.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4 max-h-[300px] overflow-y-auto pr-4 scrollbar-thin">
+        <CardContent className="flex-1 overflow-hidden flex flex-col">
+          <div className="space-y-4 h-full overflow-y-auto pr-4 scrollbar-thin">
             {expiringContracts.length > 0 ? (
               expiringContracts.map((contract, idx) => (
                 <motion.div 

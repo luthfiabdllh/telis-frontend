@@ -35,7 +35,7 @@ export function MetricsCards({ metrics, isLoading }: MetricsCardsProps) {
       className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
     >
       <motion.div variants={itemVariant}>
-        <Card className="rounded-2xl h-full">
+        <Card className="shadow-sm border-border/50 rounded-2xl h-full backdrop-blur-sm bg-card/80">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Dokumen</CardTitle>
             <div className="p-2 rounded-xl bg-primary/10">
@@ -54,7 +54,7 @@ export function MetricsCards({ metrics, isLoading }: MetricsCardsProps) {
       </motion.div>
 
       <motion.div variants={itemVariant}>
-        <Card className="shadow-sm border-chart-2/10 bg-linear-to-br from-background to-chart-2/5 rounded-2xl h-full backdrop-blur-sm">
+        <Card className="shadow-sm border-border/50 rounded-2xl h-full backdrop-blur-sm bg-card/80">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Pengguna Aktif
@@ -75,7 +75,7 @@ export function MetricsCards({ metrics, isLoading }: MetricsCardsProps) {
       </motion.div>
 
       <motion.div variants={itemVariant}>
-        <Card className="shadow-sm border-chart-3/10 bg-linear-to-br from-background to-chart-3/5 rounded-2xl h-full backdrop-blur-sm">
+        <Card className="shadow-sm border-border/50 rounded-2xl h-full backdrop-blur-sm bg-card/80">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Folder</CardTitle>
             <div className="p-2 rounded-xl bg-chart-3/10">
@@ -94,7 +94,7 @@ export function MetricsCards({ metrics, isLoading }: MetricsCardsProps) {
       </motion.div>
 
       <motion.div variants={itemVariant}>
-        <Card className="shadow-sm border-destructive/10 bg-linear-to-br from-background to-destructive/5 rounded-2xl h-full backdrop-blur-sm">
+        <Card className="shadow-sm border-border/50 rounded-2xl h-full backdrop-blur-sm bg-card/80">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Estimasi Biaya AI

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserTable } from "./user-table";
 import {
   useUsers,
@@ -47,12 +48,20 @@ interface UserManagementProps {
 }
 
 export function UserManagement({ currentUserId }: UserManagementProps) {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("created_at");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Deriving state from URL
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const searchParam = searchParams.get("search") || "";
+  const roleFilter = searchParams.get("role") || "all";
+  const statusFilter = searchParams.get("status") || "all";
+  const sortBy = searchParams.get("sortBy") || "created_at";
+  const sortDir = (searchParams.get("sortDir") as "asc" | "desc") || "desc";
+
+  // Local state for fast input typing
+  const [localSearch, setLocalSearch] = useState(searchParam);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [roleModalUser, setRoleModalUser] = useState<User | null>(null);
@@ -61,7 +70,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   const { data, isLoading, isError } = useUsers({
     page,
     limit: 10,
-    search: search.length > 1 ? search : undefined,
+    search: searchParam.length > 1 ? searchParam : undefined,
     role_id: roleFilter !== "all" ? parseInt(roleFilter) : undefined,
     is_banned: statusFilter !== "all" ? statusFilter === "banned" : undefined,
     sort_by: sortBy,
@@ -69,8 +78,29 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   });
 
   const { data: metrics } = useUserMetrics();
-
   const updateStatus = useUpdateUserStatus();
+
+  const updateQueryParams = useCallback((updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.keys(updates).forEach((key) => {
+      if (updates[key] === null || updates[key] === "all" && (key === "role" || key === "status")) {
+        params.delete(key);
+      } else {
+        params.set(key, updates[key] as string);
+      }
+    });
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchParams, pathname, router]);
+
+  // Debounce search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== searchParam) {
+        updateQueryParams({ search: localSearch || null, page: "1" });
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, searchParam, updateQueryParams]);
 
   const handleBanToggle = async () => {
     if (!banConfirmUser) return;
@@ -94,18 +124,19 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    setPage(1); // Reset to first page on search
+    setLocalSearch(e.target.value);
   };
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
-      setSortDir(sortDir === "asc" ? "desc" : "asc");
+      updateQueryParams({ sortDir: sortDir === "asc" ? "desc" : "asc", page: "1" });
     } else {
-      setSortBy(column);
-      setSortDir("asc");
+      updateQueryParams({ sortBy: column, sortDir: "asc", page: "1" });
     }
-    setPage(1);
+  };
+
+  const setPage = (newPage: number) => {
+    updateQueryParams({ page: newPage.toString() });
   };
 
   const totalPages =
@@ -246,7 +277,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
             <Input
               placeholder="Cari nama pengguna atau email..."
               className="pl-9 w-full bg-background/50 border-muted-foreground/20 focus-visible:ring-primary/50 transition-all rounded-xl"
-              value={search}
+              value={localSearch}
               onChange={handleSearch}
             />
           </div>
@@ -255,8 +286,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
             <Select
               value={roleFilter}
               onValueChange={(val) => {
-                setRoleFilter(val);
-                setPage(1);
+                updateQueryParams({ role: val, page: "1" });
               }}
             >
               <SelectTrigger className="w-[130px] bg-background/50">
@@ -272,8 +302,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
             <Select
               value={statusFilter}
               onValueChange={(val) => {
-                setStatusFilter(val);
-                setPage(1);
+                updateQueryParams({ status: val, page: "1" });
               }}
             >
               <SelectTrigger className="w-[140px] bg-background/50">
@@ -353,7 +382,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        onClick={() => setPage(Math.max(1, page - 1))}
                         className={
                           (
                             data?.meta?.has_prev !== undefined
@@ -384,9 +413,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
 
                     <PaginationItem>
                       <PaginationNext
-                        onClick={() =>
-                          setPage((p) => Math.min(totalPages, p + 1))
-                        }
+                        onClick={() => setPage(Math.min(totalPages, page + 1))}
                         className={
                           (
                             data?.meta?.has_next !== undefined

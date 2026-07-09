@@ -38,7 +38,7 @@ export function AdminMetricsCards({
       className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
     >
       <motion.div variants={itemVariant}>
-        <Card className="shadow-sm border-primary/10 rounded-2xl h-full backdrop-blur-sm">
+        <Card className="shadow-sm border-border/50 rounded-2xl h-full backdrop-blur-sm bg-card/80">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Biaya LLM
@@ -48,9 +48,12 @@ export function AdminMetricsCards({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-primary">
+            <div className="text-2xl font-bold text-primary">
               ${(metrics?.total_cost_this_month || 0).toFixed(2)}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Pengeluaran bulan berjalan
+            </p>
           </CardContent>
         </Card>
       </motion.div>
@@ -61,14 +64,17 @@ export function AdminMetricsCards({
             <CardTitle className="text-sm font-medium">
               Total Pengguna
             </CardTitle>
-            <div className="p-2 rounded-xl bg-muted">
-              <Users className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-xl bg-chart-2/10">
+              <Users className="h-4 w-4 text-chart-2" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl font-bold">
               {metrics?.total_users || 0}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Akun yang terdaftar di sistem
+            </p>
           </CardContent>
         </Card>
       </motion.div>
@@ -77,14 +83,17 @@ export function AdminMetricsCards({
         <Card className="shadow-sm border-border/50 rounded-2xl h-full backdrop-blur-sm bg-card/80">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Dokumen</CardTitle>
-            <div className="p-2 rounded-xl bg-muted">
-              <FileText className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-xl bg-chart-3/10">
+              <FileText className="h-4 w-4 text-chart-3" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl font-bold">
               {metrics?.total_documents || 0}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Dokumen berhasil diproses
+            </p>
           </CardContent>
         </Card>
       </motion.div>
@@ -95,14 +104,17 @@ export function AdminMetricsCards({
             <CardTitle className="text-sm font-medium">
               Total Direktori
             </CardTitle>
-            <div className="p-2 rounded-xl bg-muted">
-              <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-xl bg-chart-4/10">
+              <FolderOpen className="h-4 w-4 text-chart-4" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl font-bold">
               {metrics?.total_folders || 0}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Folder penyimpanan terorganisir
+            </p>
           </CardContent>
         </Card>
       </motion.div>
