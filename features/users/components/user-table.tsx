@@ -45,10 +45,10 @@ export function UserTable({ users, onChangeRole, onBanToggle, currentUserId }: U
         <TableHeader className="bg-muted/30">
           <TableRow className="hover:bg-transparent">
             <TableHead className="font-semibold text-muted-foreground w-[300px]">Pengguna</TableHead>
-            <TableHead className="font-semibold text-muted-foreground">Kontak</TableHead>
+            <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Kontak</TableHead>
             <TableHead className="font-semibold text-muted-foreground">Wewenang</TableHead>
             <TableHead className="font-semibold text-muted-foreground">Status</TableHead>
-            <TableHead className="font-semibold text-muted-foreground">Bergabung</TableHead>
+            <TableHead className="font-semibold text-muted-foreground hidden md:table-cell">Bergabung</TableHead>
             <TableHead className="w-[80px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -88,7 +88,7 @@ export function UserTable({ users, onChangeRole, onBanToggle, currentUserId }: U
                 <TableCell className="text-sm text-muted-foreground hidden md:table-cell">{user.email}</TableCell>
                 <TableCell>{getRoleBadge(user.role_id, user.role?.name || "User")}</TableCell>
                 <TableCell>{getStatusBadge(user.is_banned)}</TableCell>
-                <TableCell className="text-muted-foreground text-sm">
+                <TableCell className="text-muted-foreground text-sm hidden md:table-cell">
                   {format(new Date(user.created_at), "dd MMM yyyy")}
                 </TableCell>
                 <TableCell>
