@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Search,
-  Folder,
-  File as FileIcon,
-  Loader2,
-  MapPin,
-} from "lucide-react";
+import { Search, Folder, File as FileIcon, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { documentApi } from "../api/document-api";
@@ -419,7 +413,7 @@ export function DriveSearch({ currentFolderId }: DriveSearchProps) {
             )}
           </div>
           <Command shouldFilter={false} className="border-none">
-            <div className="flex items-center px-3 py-2 border-b bg-muted/30">
+            <div className="flex items-center px-3 py-2 border-b">
               <span className="text-xs font-medium text-muted-foreground mr-2">
                 Location:
               </span>
@@ -467,7 +461,7 @@ export function DriveSearch({ currentFolderId }: DriveSearchProps) {
                       className="flex items-start py-2 cursor-pointer"
                     >
                       <Folder
-                        className="mr-3 h-5 w-5 mt-0.5 text-muted-foreground"
+                        className="mr-3 h-5 w-5 mt-0.5 text-primary"
                         fill="currentColor"
                         fillOpacity={0.2}
                       />
@@ -477,7 +471,7 @@ export function DriveSearch({ currentFolderId }: DriveSearchProps) {
                         </span>
                         {isGlobal && folder.folder_path && (
                           <div className="flex items-center text-xs text-muted-foreground mt-0.5">
-                            <MapPin className="h-3 w-3 mr-1 shrink-0" />
+                            <Folder className="h-2 w-2 mr-1 shrink-0" />
                             <span className="truncate">
                               {folder.folder_path}
                             </span>
@@ -505,8 +499,9 @@ export function DriveSearch({ currentFolderId }: DriveSearchProps) {
                         </span>
                         {isGlobal && doc.folder_path && (
                           <div className="flex items-center text-xs text-muted-foreground mt-0.5">
-                            <MapPin className="h-3 w-3 mr-1 shrink-0" />
-                            <span className="truncate">{doc.folder_path}</span>
+                            <span className="truncate">
+                              File Manager / {doc.folder_path}
+                            </span>
                           </div>
                         )}
                       </div>
