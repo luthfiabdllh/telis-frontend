@@ -29,7 +29,17 @@ export interface PaginatedUsers {
     page: number;
     limit: number;
     total: number;
+    last_page?: number;
+    has_next?: boolean;
+    has_prev?: boolean;
   };
+}
+
+export interface UserMetrics {
+  total_users: number;
+  active_users: number;
+  banned_users: number;
+  total_admins: number;
 }
 
 export interface GetUsersParams {
@@ -53,6 +63,11 @@ export const userApi = {
     const endpoint = `/users${queryString ? `?${queryString}` : ''}`;
     const res = await apiClient.get(endpoint);
     return res.data;
+  },
+
+  getMetrics: async (): Promise<UserMetrics> => {
+    const res = await apiClient.get('/users/metrics');
+    return res.data?.data || res.data;
   },
 
   createUser: async (data: RegisterRequest): Promise<{ message: string; user: Record<string, unknown> }> => {

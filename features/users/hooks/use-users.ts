@@ -8,6 +8,13 @@ export const useUsers = (params: GetUsersParams) => {
   });
 };
 
+export const useUserMetrics = () => {
+  return useQuery({
+    queryKey: ["users", "metrics"],
+    queryFn: () => userApi.getMetrics(),
+  });
+};
+
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
 
