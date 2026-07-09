@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ConfirmActionModal } from "@/features/documents/components/modals/confirm-action-modal";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -177,92 +178,108 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
 
   return (
     <div className="space-y-6">
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-chart-1/10 text-chart-1">
-              <Users className="w-6 h-6" />
+      {/* Stats Overview */}
+      {isLoading ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="shadow-sm border-border/50 rounded-2xl h-[90px] backdrop-blur-sm bg-card/80">
+              <CardContent className="p-5 flex items-center gap-4">
+                <Skeleton className="w-12 h-12 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-6 w-12" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-chart-1/10 text-chart-1">
+                <Users className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Pengguna
+                </p>
+                <h3 className="text-2xl font-bold">
+                  {metrics?.total_users ?? (data?.meta?.total || 0)}
+                </h3>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Total Pengguna
-              </p>
-              <h3 className="text-2xl font-bold">
-                {metrics?.total_users ?? (data?.meta?.total || 0)}
-              </h3>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-chart-2/10 text-chart-2">
-              <Activity className="w-6 h-6" />
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-chart-2/10 text-chart-2">
+                <Activity className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Pengguna Aktif
+                </p>
+                <h3 className="text-2xl font-bold">
+                  {metrics?.active_users ?? 0}
+                </h3>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Pengguna Aktif
-              </p>
-              <h3 className="text-2xl font-bold">
-                {metrics?.active_users ?? 0}
-              </h3>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-destructive/10 text-destructive">
-              <UserX className="w-6 h-6" />
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-destructive/10 text-destructive">
+                <UserX className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Pengguna Banned
+                </p>
+                <h3 className="text-2xl font-bold">
+                  {metrics?.banned_users ?? 0}
+                </h3>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Pengguna Banned
-              </p>
-              <h3 className="text-2xl font-bold">
-                {metrics?.banned_users ?? 0}
-              </h3>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-chart-3/10 text-chart-3">
-              <ShieldAlert className="w-6 h-6" />
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-chart-3/10 text-chart-3">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Admin
+                </p>
+                <h3 className="text-2xl font-bold">
+                  {metrics?.total_admins ?? 0}
+                </h3>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Total Admin
-              </p>
-              <h3 className="text-2xl font-bold">
-                {metrics?.total_admins ?? 0}
-              </h3>
-            </div>
-          </div>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Glassmorphic Toolbar */}
       <motion.div

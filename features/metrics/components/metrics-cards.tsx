@@ -19,7 +19,10 @@ export function MetricsCards({ metrics, isLoading }: MetricsCardsProps) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+          <Card key={i} className="shadow-sm border-border/50 rounded-2xl h-[120px] backdrop-blur-sm bg-card/80">
+            <CardHeader className="pb-2"><Skeleton className="h-4 w-24" /></CardHeader>
+            <CardContent><Skeleton className="h-8 w-16 mb-2" /><Skeleton className="h-3 w-32" /></CardContent>
+          </Card>
         ))}
       </div>
     );

@@ -32,10 +32,20 @@ const EmptyState = ({ title, icon: Icon }: { title: string, icon: any }) => (
 export function AdminDemographicsCharts({ metrics, isLoading }: AdminDemographicsChartsProps) {
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2">
-        <Skeleton className="h-[350px] w-full rounded-2xl" />
-        <Skeleton className="h-[350px] w-full rounded-2xl" />
-      </div>
+      <>
+        <div className="h-full">
+          <Card className="h-full flex flex-col shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
+            <CardHeader><Skeleton className="h-6 w-48 mb-2" /><Skeleton className="h-4 w-64" /></CardHeader>
+            <CardContent className="flex-1 pb-6"><Skeleton className="h-[250px] w-[250px] rounded-full mx-auto" /></CardContent>
+          </Card>
+        </div>
+        <div className="h-full">
+          <Card className="h-full flex flex-col shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
+            <CardHeader><Skeleton className="h-6 w-48 mb-2" /><Skeleton className="h-4 w-64" /></CardHeader>
+            <CardContent className="flex-1 pb-6"><Skeleton className="h-[250px] w-[250px] rounded-full mx-auto" /></CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 

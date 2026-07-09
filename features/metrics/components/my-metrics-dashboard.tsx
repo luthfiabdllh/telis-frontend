@@ -35,9 +35,35 @@ export function MyMetricsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-[120px] w-full max-w-md" />
-        <Skeleton className="h-[300px] w-full" />
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+          <Card className="col-span-1 shadow-sm border-border/50 rounded-2xl h-[160px] backdrop-blur-sm bg-card/80">
+            <CardHeader className="pb-2"><Skeleton className="h-4 w-32" /></CardHeader>
+            <CardContent><Skeleton className="h-10 w-24 mb-2" /><Skeleton className="h-3 w-40" /></CardContent>
+          </Card>
+          <Card className="col-span-1 shadow-sm border-border/50 rounded-2xl h-[160px] backdrop-blur-sm bg-card/80">
+            <CardHeader className="pb-2"><Skeleton className="h-4 w-32" /></CardHeader>
+            <CardContent><Skeleton className="h-10 w-24 mb-2" /><Skeleton className="h-3 w-40" /></CardContent>
+          </Card>
+        </div>
+        <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+          <Card className="col-span-1 lg:col-span-2 shadow-sm border-border/50 rounded-2xl h-[420px] backdrop-blur-sm bg-card/80 flex flex-col">
+            <CardHeader><Skeleton className="h-6 w-48 mb-2" /><Skeleton className="h-4 w-64" /></CardHeader>
+            <CardContent className="flex-1"><Skeleton className="h-full w-full rounded-xl" /></CardContent>
+          </Card>
+          <Card className="col-span-1 shadow-sm border-border/50 rounded-2xl h-[420px] backdrop-blur-sm bg-card/80 flex flex-col">
+            <CardHeader><Skeleton className="h-6 w-40 mb-2" /><Skeleton className="h-4 w-48" /></CardHeader>
+            <CardContent className="flex-1"><Skeleton className="h-[250px] w-[250px] rounded-full mx-auto" /></CardContent>
+          </Card>
+        </div>
+        <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
+          <Card className="shadow-sm border-border/50 rounded-2xl h-[400px] backdrop-blur-sm bg-card/80">
+            <CardHeader><Skeleton className="h-6 w-40 mb-2" /><Skeleton className="h-4 w-64" /></CardHeader>
+            <CardContent className="space-y-4">
+              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

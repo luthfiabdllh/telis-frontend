@@ -26,8 +26,16 @@ export function RiskAndContracts({ heatmap, expiringContracts, isLoading }: Risk
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-        <Skeleton className="h-[400px] rounded-2xl" />
-        <Skeleton className="h-[400px] rounded-2xl" />
+        <Card className="col-span-1 shadow-sm border-border/50 rounded-2xl h-[400px] backdrop-blur-sm bg-card/80">
+          <CardHeader><Skeleton className="h-6 w-48 mb-2" /><Skeleton className="h-4 w-64" /></CardHeader>
+          <CardContent><Skeleton className="h-[250px] w-full rounded-xl" /></CardContent>
+        </Card>
+        <Card className="col-span-1 shadow-sm border-border/50 rounded-2xl h-[400px] backdrop-blur-sm bg-card/80">
+          <CardHeader><Skeleton className="h-6 w-48 mb-2" /><Skeleton className="h-4 w-64" /></CardHeader>
+          <CardContent className="space-y-4">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+          </CardContent>
+        </Card>
       </div>
     );
   }

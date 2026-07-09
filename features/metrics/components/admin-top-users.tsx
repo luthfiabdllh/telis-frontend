@@ -25,7 +25,19 @@ const EmptyState = ({ title, icon: Icon }: { title: string, icon: any }) => (
 
 export function AdminTopUsers({ metrics, isLoading }: AdminTopUsersProps) {
   if (isLoading) {
-    return <Skeleton className="h-[400px] w-full rounded-2xl" />;
+    return (
+      <Card className="shadow-sm border-border/50 rounded-2xl h-[400px] backdrop-blur-sm bg-card/80">
+        <CardHeader className="pb-4">
+          <Skeleton className="h-6 w-48 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-12 w-full rounded-xl" />
+          ))}
+        </CardContent>
+      </Card>
+    );
   }
 
   const hasData = metrics?.top_users && metrics.top_users.length > 0;

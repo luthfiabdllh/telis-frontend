@@ -27,7 +27,20 @@ const EmptyState = ({ title, icon: Icon }: { title: string, icon: any }) => (
 
 export function AdminUsageChart({ metrics, isLoading, dateRange, onDateRangeChange }: AdminUsageChartProps) {
   if (isLoading) {
-    return <Skeleton className="h-[400px] w-full rounded-2xl" />;
+    return (
+      <Card className="col-span-1 lg:col-span-3 shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 pb-4">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-9 w-[280px]" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[350px] w-full rounded-xl" />
+        </CardContent>
+      </Card>
+    );
   }
 
   const chartConfig = {
