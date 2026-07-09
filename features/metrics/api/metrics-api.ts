@@ -68,8 +68,8 @@ export interface ExpiringContract {
 
 
 export const metricsApi = {
-  getDashboardMetrics: async (): Promise<DashboardMetrics> => {
-    const res = await apiClient.get('/metrics/tokens');
+  getDashboardMetrics: async (params?: { start_date?: string; end_date?: string }): Promise<DashboardMetrics> => {
+    const res = await apiClient.get('/metrics/tokens', { params });
     return res.data;
   },
   

@@ -11,6 +11,9 @@ export const metadata: Metadata = {
 export default function AnalyticsDashboardPage() {
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 w-full max-w-full overflow-x-hidden">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
+      </div>
       <div className="flex-1 flex-col space-y-8 flex w-full">
         <AnalyticsDashboardContainer />
       </div>

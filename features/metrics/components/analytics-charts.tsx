@@ -1,14 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { DashboardMetrics } from "../api/metrics-api";
 import { motion } from "framer-motion";
 import { BarChart3, PieChart as PieChartIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { DateRange } from "react-day-picker";
 
 interface AnalyticsChartsProps {
   metrics: DashboardMetrics | null;
   isLoading?: boolean;
+  dateRange?: DateRange;
+  onDateRangeChange?: (date: DateRange | undefined) => void;
 }
 
 const CHART_COLORS = [
@@ -25,35 +29,31 @@ const EmptyState = ({ title, icon: Icon }: { title: string, icon: any }) => (
       <Icon className="w-8 h-8 text-muted-foreground opacity-50" />
     </div>
     <p className="text-sm font-medium text-foreground">{title}</p>
-    <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">Belum ada data yang cukup untuk divisualisasikan.</p>
+    <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">Data tidak tersedia.</p>
   </div>
 );
 
-export function AnalyticsCharts({ metrics, isLoading }: AnalyticsChartsProps) {
+export function AnalyticsAreaChart({ metrics, isLoading, dateRange, onDateRangeChange }: AnalyticsChartsProps) {
   if (isLoading) {
-    return (
-      <div className="grid gap-4 md:grid-cols-7 lg:grid-cols-7">
-        <Skeleton className="col-span-4 h-[400px] rounded-2xl" />
-        <Skeleton className="col-span-3 h-[400px] rounded-2xl" />
-      </div>
-    );
+    return <Skeleton className="h-[400px] w-full rounded-2xl" />;
   }
 
   const dailyTrend = metrics?.daily_trend?.length ? metrics.daily_trend : [];
-  const docStatusDist = metrics?.doc_status_dist?.length ? metrics.doc_status_dist : [];
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
       transition={{ delay: 0.2 }}
-      className="grid gap-4 md:grid-cols-7 lg:grid-cols-7"
+      className="w-full"
     >
-      {/* Cost Over Time Area Chart */}
-      <Card className="col-span-1 md:col-span-7 lg:col-span-4 shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
-        <CardHeader>
-          <CardTitle>Pemakaian Token (30 Hari Terakhir)</CardTitle>
-          <CardDescription>Tren pengeluaran token AI secara global dalam USD.</CardDescription>
+      <Card className="w-full shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 pb-4">
+          <div className="space-y-1.5">
+            <CardTitle>Pemakaian Token (Berdasarkan Waktu)</CardTitle>
+            <CardDescription>Tren pengeluaran token AI secara global dalam USD.</CardDescription>
+          </div>
+          <DatePickerWithRange date={dateRange} onDateChange={onDateRangeChange} />
         </CardHeader>
         <CardContent className="pl-0">
           <div className="h-[300px] w-full pr-4">
@@ -78,14 +78,30 @@ export function AnalyticsCharts({ metrics, isLoading }: AnalyticsChartsProps) {
           </div>
         </CardContent>
       </Card>
+    </motion.div>
+  );
+}
 
-      {/* Status Distribution Donut Chart */}
-      <Card className="col-span-1 md:col-span-7 lg:col-span-3 shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
+export function AnalyticsDonutChart({ metrics, isLoading }: AnalyticsChartsProps) {
+  if (isLoading) {
+    return <Skeleton className="h-[400px] w-full rounded-2xl" />;
+  }
+
+  const docStatusDist = metrics?.doc_status_dist?.length ? metrics.doc_status_dist : [];
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ delay: 0.3 }}
+      className="w-full h-full"
+    >
+      <Card className="w-full h-full shadow-sm border-border/50 rounded-2xl backdrop-blur-sm bg-card/80 flex flex-col">
         <CardHeader>
           <CardTitle>Status Pemrosesan Dokumen</CardTitle>
           <CardDescription>Distribusi status dokumen yang diunggah.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 pb-6">
           <div className="h-[300px] flex items-center justify-center">
             {docStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-full w-full">
