@@ -70,9 +70,12 @@ export function MyMetricsDashboard() {
 
   if (isError || !data) {
     return (
-      <div className="p-6 text-center text-destructive border rounded-xl bg-destructive/10 max-w-md">
-        <AlertTriangle className="h-8 w-8 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold">Gagal memuat data metrik</h3>
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center bg-destructive/5 text-destructive border border-destructive/20 rounded-2xl w-full">
+        <AlertTriangle className="w-12 h-12 mb-4 opacity-80" />
+        <h3 className="font-semibold text-2xl mb-2">Gagal Memuat Data</h3>
+        <p className="text-destructive/80 max-w-md mx-auto">
+          Terjadi kesalahan saat memuat metrik pengguna. Pastikan layanan berjalan dan Anda terautentikasi.
+        </p>
       </div>
     );
   }

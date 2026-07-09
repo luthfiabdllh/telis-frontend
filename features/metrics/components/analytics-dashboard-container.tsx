@@ -27,17 +27,20 @@ export function AnalyticsDashboardContainer() {
 
   const isAnyError = isErrorDashboard || isErrorHeatmap || isErrorContracts;
 
+  if (isAnyError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center bg-destructive/5 text-destructive border border-destructive/20 rounded-2xl w-full">
+        <AlertCircle className="w-12 h-12 mb-4 opacity-80" />
+        <h3 className="font-semibold text-2xl mb-2">Gagal Memuat Data</h3>
+        <p className="text-destructive/80 max-w-md mx-auto">
+          Terjadi kesalahan saat mengambil metrik analitik. Pastikan Anda memiliki wewenang untuk melihat data ini.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col space-y-6 w-full">
-      {isAnyError && (
-        <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Gagal Memuat Data</AlertTitle>
-          <AlertDescription>
-            Beberapa metrik gagal dimuat dari server. Silakan muat ulang halaman.
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* KPI Cards section */}
       <MetricsCards metrics={dashboardMetrics || null} isLoading={isLoadingDashboard} />
