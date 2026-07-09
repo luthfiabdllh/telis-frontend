@@ -146,7 +146,7 @@ export function DriveFilterRow({
   };
 
   return (
-    <div className="flex flex-nowrap md:flex-wrap items-center gap-2 mb-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-full">
+    <div className="flex flex-nowrap md:flex-wrap items-center gap-2 mb-4 overflow-x-auto pb-2 [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden w-full">
       {/* Kategori / Jenis */}
       <FilterPill
         isActive={documentType !== "ALL"}
@@ -304,6 +304,16 @@ export function DriveFilterRow({
           </CommandList>
         </Command>
       </FilterPill>
+      {hasFilters && (
+        <Button
+          onClick={clearFilters}
+          variant="ghost"
+          className="rounded-full text-muted-foreground"
+        >
+          <X className="w-4 h-4" />
+          Reset
+        </Button>
+      )}
 
       {/* View Mode Toggle */}
       <ToggleGroup
@@ -321,7 +331,7 @@ export function DriveFilterRow({
             "h-8 w-8 rounded-full p-0",
             viewMode === "grid"
               ? "bg-primary/10 text-primary data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
-              : "text-muted-foreground hover:text-foreground"
+              : "text-muted-foreground hover:text-foreground",
           )}
         >
           <LayoutGrid className="h-4 w-4" />
@@ -333,19 +343,12 @@ export function DriveFilterRow({
             "h-8 w-8 rounded-full p-0",
             viewMode === "list"
               ? "bg-primary/10 text-primary data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
-              : "text-muted-foreground hover:text-foreground"
+              : "text-muted-foreground hover:text-foreground",
           )}
         >
           <ListIcon className="h-4 w-4" />
         </ToggleGroupItem>
       </ToggleGroup>
-
-      {hasFilters && (
-        <Button onClick={clearFilters} variant="ghost" className="rounded-full text-muted-foreground">
-          <X className="w-4 h-4" />
-          Reset
-        </Button>
-      )}
     </div>
   );
 }

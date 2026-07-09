@@ -2,30 +2,81 @@
 
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { documentApi, DocumentType } from "../api/document-api";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { documentApi } from "../api/document-api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Save, Sparkles, RefreshCw, LayoutGrid, ShieldAlert, Building, Building2, CalendarDays, DollarSign, ListChecks, FileText, CheckSquare } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  RefreshCw,
+  LayoutGrid,
+  ShieldAlert,
+  Building,
+  Building2,
+  CalendarDays,
+  DollarSign,
+  ListChecks,
+  FileText,
+  CheckSquare,
+  BrainCircuit,
+  Info,
+} from "lucide-react";
 import Link from "next/link";
 import { formatBytes } from "./file-card";
 import { ApprovalsTab } from "./approvals-tab";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  documentMetadataSchema,
+  DocumentMetadataInput,
+} from "../schemas/document-schemas";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
+import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
+import { Sparkles, SparklesIcon } from "@/components/animate-ui/icons/sparkles";
+
+const PdfViewerCustom = dynamic(() => import("./pdf-viewer-custom"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col items-center justify-center h-full text-neutral-400 gap-4">
+      <Spinner className="w-8 h-8" />
+      <span className="text-sm font-medium">Memuat PDF Viewer...</span>
+    </div>
+  ),
+});
 
 interface DocumentDetailViewProps {
   id: string;
 }
 
 const CATEGORIES = [
-  "NDA", "PROCUREMENT_CONTRACT", "PARTNERSHIP_AGREEMENT",
-  "SLA_AGREEMENT", "COMPLIANCE_DOCUMENT",
-  "INTERNAL_POLICY", "LEGAL_CORRESPONDENCE", "MINUTES_OF_MEETING",
-  "LITIGATION_DOCUMENT", "OTHER"
+  "NDA",
+  "PROCUREMENT_CONTRACT",
+  "PARTNERSHIP_AGREEMENT",
+  "SLA_AGREEMENT",
+  "COMPLIANCE_DOCUMENT",
+  "INTERNAL_POLICY",
+  "LEGAL_CORRESPONDENCE",
+  "MINUTES_OF_MEETING",
+  "LITIGATION_DOCUMENT",
+  "OTHER",
 ];
 
 const RISK_LEVELS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"];
@@ -33,9 +84,14 @@ const RISK_LEVELS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"];
 export function DocumentDetailView({ id }: DocumentDetailViewProps) {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<DocumentType>>({});
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
 
-  const { data: document, isLoading, error } = useQuery({
+  const {
+    data: document,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["document", id],
     queryFn: () => documentApi.getDocumentByID(id),
   });
@@ -55,21 +111,46 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
     }
   }, [pdfBlob]);
 
+  const { control, handleSubmit, reset } = useForm<DocumentMetadataInput>({
+    resolver: zodResolver(documentMetadataSchema),
+    defaultValues: {
+      document_type: "",
+      risk_level: "",
+      vendor_name: "",
+      business_unit: "",
+      effective_date: "",
+      expiry_date: "",
+    },
+  });
+
   useEffect(() => {
     if (document) {
-      setFormData({
+      reset({
         document_type: document.document_type || "OTHER",
         risk_level: document.risk_level || "UNKNOWN",
         vendor_name: document.vendor_name || "",
         business_unit: document.business_unit || "",
-        effective_date: document.effective_date ? document.effective_date.split('T')[0] : "",
-        expiry_date: document.expiry_date ? document.expiry_date.split('T')[0] : "",
+        effective_date: document.effective_date
+          ? document.effective_date.split("T")[0]
+          : "",
+        expiry_date: document.expiry_date
+          ? document.expiry_date.split("T")[0]
+          : "",
       });
     }
-  }, [document]);
+  }, [document, reset]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: Partial<DocumentType>) => documentApi.updateMetadata(id, data),
+    mutationFn: (data: Partial<DocumentMetadataInput>) =>
+      documentApi.updateMetadata(id, {
+        ...data,
+        effective_date: data.effective_date
+          ? new Date(data.effective_date).toISOString()
+          : undefined,
+        expiry_date: data.expiry_date
+          ? new Date(data.expiry_date).toISOString()
+          : undefined,
+      } as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["document", id] });
       queryClient.invalidateQueries({ queryKey: ["documents"] });
@@ -78,7 +159,7 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
     },
     onError: (err: any) => {
       toast.error("Failed to update metadata", { description: err.message });
-    }
+    },
   });
 
   const summarizeMutation = useMutation({
@@ -89,274 +170,657 @@ export function DocumentDetailView({ id }: DocumentDetailViewProps) {
     },
     onError: (err: any) => {
       toast.error("Failed to generate summary", { description: err.message });
-    }
+    },
   });
 
-  if (isLoading) return <div className="flex items-center justify-center h-full min-h-[600px]"><Spinner /></div>;
-  if (error || !document) return <div className="p-6 text-red-500">Failed to load document</div>;
-
-  const handleSave = () => {
-    updateMutation.mutate({
-      document_type: formData.document_type,
-      risk_level: formData.risk_level,
-      vendor_name: formData.vendor_name,
-      business_unit: formData.business_unit,
-      effective_date: formData.effective_date ? new Date(formData.effective_date).toISOString() : undefined,
-      expiry_date: formData.expiry_date ? new Date(formData.expiry_date).toISOString() : undefined,
-    });
+  const onSubmit = (data: DocumentMetadataInput) => {
+    updateMutation.mutate(data);
   };
 
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+        <Spinner />
+      </div>
+    );
+  if (error || !document)
+    return (
+      <div className="p-6 text-destructive flex h-[calc(100vh-4rem)] items-center justify-center">
+        Failed to load document
+      </div>
+    );
+
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-background">
-      {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b">
-        <Link href={`/dashboard/documents${document.folder_id ? `?folder_id=${document.folder_id}` : ''}`}>
-          <Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button>
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      {/* Modern Header */}
+      <div className="flex items-start md:items-center gap-3 md:gap-4 px-4 md:px-6 py-4 border-b">
+        <Link
+          href={`/dashboard/documents${document.folder_id ? `?folder_id=${document.folder_id}` : ""}`}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full hover:bg-muted shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
         </Link>
-        <div>
-          <h1 className="text-xl font-semibold flex items-center gap-2">
-            {document.filename}
-            {document.document_type && <Badge variant="outline">{document.document_type}</Badge>}
-            {document.risk_level && <Badge className={document.risk_level === 'HIGH' ? 'bg-red-500 hover:bg-red-600' : document.risk_level === 'MEDIUM' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'}>{document.risk_level}</Badge>}
-            {document.status === 'PENDING_APPROVAL' && <Badge className="bg-amber-500 hover:bg-amber-600">Menunggu Persetujuan</Badge>}
-            {document.status === 'APPROVED' && <Badge className="bg-emerald-500 hover:bg-emerald-600">Disetujui</Badge>}
-            {document.status === 'REJECTED' && <Badge className="bg-red-500 hover:bg-red-600">Ditolak</Badge>}
-          </h1>
-          <p className="text-sm text-muted-foreground">{formatBytes(document.file_size_bytes)} • Uploaded by {document.uploaded_by}</p>
+        <div className="flex-1 flex flex-col justify-center min-w-0">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 min-w-0">
+            <h1 className="text-lg md:text-xl font-semibold tracking-tight truncate">
+              {document.filename}
+            </h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              {document.document_type && (
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary hover:bg-primary/20 border-transparent"
+                >
+                  {document.document_type}
+                </Badge>
+              )}
+              {document.status === "PENDING_APPROVAL" && (
+                <Badge className="bg-chart-5/10 text-chart-5 border-chart-5/20 hover:bg-chart-5/20 shadow-none">
+                  Menunggu Persetujuan
+                </Badge>
+              )}
+              {document.status === "APPROVED" && (
+                <Badge className="bg-chart-2/10 text-chart-2 border-chart-2/20 hover:bg-chart-2/20 shadow-none">
+                  Disetujui
+                </Badge>
+              )}
+              {document.status === "REJECTED" && (
+                <Badge className="bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20 shadow-none">
+                  Ditolak
+                </Badge>
+              )}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2 md:mt-1 flex items-center gap-2 flex-wrap">
+            <span>{formatBytes(document.file_size_bytes)}</span>
+            <span className="hidden md:inline">•</span>
+            <span>
+              Diunggah oleh{" "}
+              <span className="font-medium text-foreground">
+                {document.uploaded_by}
+              </span>
+            </span>
+            <span className="hidden md:inline">•</span>
+            <span>{new Date(document.created_at).toLocaleDateString()}</span>
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel: Metadata & Summary */}
-        <div className="w-[450px] flex flex-col border-r bg-muted/10 h-full overflow-hidden">
-          <Tabs defaultValue="metadata" className="flex flex-col h-full">
-            <div className="px-4 pt-4 pb-2 border-b">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="metadata" className="text-xs">Metadata & AI</TabsTrigger>
-                <TabsTrigger value="approvals" className="text-xs flex items-center gap-1">
-                  <CheckSquare className="w-3 h-3" />
-                  Persetujuan
-                </TabsTrigger>
-              </TabsList>
-            </div>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <ResizablePanelGroup
+          key={isTablet ? "vertical" : "horizontal"}
+          orientation={isTablet ? "vertical" : "horizontal"}
+        >
+          {/* Left Panel: PDF Viewer */}
+          <ResizablePanel
+            defaultSize={isTablet ? 70 : 65}
+            minSize={20}
+            className="relative bg-neutral-950"
+          >
+            {isPdfLoading || !pdfUrl ? (
+              <div className="flex flex-col items-center justify-center h-full text-neutral-400 gap-4">
+                <Spinner className="w-8 h-8" />
+                <span className="text-sm font-medium">
+                  Memuat dokumen PDF...
+                </span>
+              </div>
+            ) : (
+              <PdfViewerCustom fileUrl={pdfUrl} />
+            )}
+          </ResizablePanel>
 
-            <TabsContent value="metadata" className="flex-1 overflow-y-auto p-4 m-0">
-              <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Metadata</CardTitle>
-                  <Button variant="ghost" size="sm" onClick={() => isEditing ? handleSave() : setIsEditing(true)}>
-                    {isEditing ? <><Save className="w-4 h-4 mr-2" /> Save</> : "Edit"}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="flex items-center text-muted-foreground"><LayoutGrid className="w-4 h-4 mr-2" /> Category</Label>
-                  {isEditing ? (
-                    <Select value={formData.document_type} onValueChange={(v) => setFormData({...formData, document_type: v})}>
-                      <SelectTrigger className="bg-background"><SelectValue placeholder="Select Category" /></SelectTrigger>
-                      <SelectContent>
-                        {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium">{document.document_type || "-"}</div>
-                  )}
-                </div>
+          <ResizableHandle withHandle />
 
-                <div className="space-y-2">
-                  <Label className="flex items-center text-muted-foreground"><ShieldAlert className="w-4 h-4 mr-2" /> Risk Level</Label>
-                  {isEditing ? (
-                    <Select value={formData.risk_level} onValueChange={(v) => setFormData({...formData, risk_level: v})}>
-                      <SelectTrigger className="bg-background"><SelectValue placeholder="Select Risk" /></SelectTrigger>
-                      <SelectContent>
-                        {RISK_LEVELS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+          {/* Right Panel: Context Sidebar */}
+          <ResizablePanel
+            defaultSize={isTablet ? 30 : 35}
+            minSize={20}
+            className="bg-muted/30"
+          >
+            <Tabs defaultValue="ai" className="flex flex-col h-full">
+              <div className="px-4 py-3 border-b bg-background">
+                <TabsList className="grid w-full grid-cols-3 bg-muted/50 p-1">
+                  <TabsTrigger
+                    value="ai"
+                    className="text-xs data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md transition-all"
+                  >
+                    <Sparkles animateOnView={true} className="w-3.5 h-3.5 mr-1.5" /> AI
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="metadata"
+                    className="text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+                  >
+                    <Info className="w-3.5 h-3.5 mr-1.5" /> Data
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="approvals"
+                    className="text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+                  >
+                    <CheckSquare className="w-3.5 h-3.5 mr-1.5" /> Proses
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              {/* AI Tab */}
+              <TabsContent
+                value="ai"
+                className="flex-1 overflow-y-auto p-0 m-0 data-[state=active]:flex flex-col"
+              >
+                <div className="flex-1 p-4 md:p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                        <BrainCircuit className="w-5 h-5" /> Analisis AI
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Ekstraksi cerdas dokumen oleh LLM
+                      </p>
+                    </div>
+                    {document.summary && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 border-primary/20 hover:bg-primary/10 hover:text-primary"
+                        onClick={() => summarizeMutation.mutate(true)}
+                        disabled={summarizeMutation.isPending}
+                      >
+                        {summarizeMutation.isPending ? (
+                          <Spinner className="w-3.5 h-3.5 mr-1.5" />
+                        ) : (
+                          <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                        )}
+                        Segarkan
+                      </Button>
+                    )}
+                  </div>
+
+                  {document.summary ? (
+                    <div className="space-y-6 pb-6">
+                      {(() => {
+                        try {
+                          const sumObj = JSON.parse(document.summary);
+                          return (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-5">
+                              {/* Summary Box */}
+                              <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-linear-to-br from-primary/10 to-primary/5 p-5 shadow-sm backdrop-blur-md">
+                                <div className="relative z-10">
+                                  <h4 className="text-sm font-semibold text-primary mb-2 flex items-center gap-2">
+                                    Ringkasan Eksekutif
+                                    <SparklesIcon className="w-4 h-4 text-primary" />
+                                  </h4>
+                                  <p className="text-sm leading-relaxed text-foreground/90">
+                                    {sumObj.ringkasan_singkat}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Grid Data */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="rounded-xl border bg-card p-4 shadow-sm transition-all hover:shadow-md">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="p-1.5 rounded-md bg-chart-1/10 text-chart-1">
+                                      <Building className="w-4 h-4" />
+                                    </div>
+                                    <h4 className="text-xs font-semibold">
+                                      Pihak Terlibat
+                                    </h4>
+                                  </div>
+                                  <ul className="space-y-1.5">
+                                    {sumObj.pihak_terlibat?.map(
+                                      (p: string, i: number) => (
+                                        <li
+                                          key={i}
+                                          className="text-xs text-muted-foreground flex items-start gap-1.5"
+                                        >
+                                          <span className="w-1 h-1 rounded-full bg-chart-1/50 mt-1.5 shrink-0" />
+                                          <span className="leading-snug">
+                                            {p}
+                                          </span>
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </div>
+
+                                <div className="rounded-xl border bg-card p-4 shadow-sm transition-all hover:shadow-md">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="p-1.5 rounded-md bg-chart-5/10 text-chart-5">
+                                      <ListChecks className="w-4 h-4" />
+                                    </div>
+                                    <h4 className="text-xs font-semibold">
+                                      Kewajiban Utama
+                                    </h4>
+                                  </div>
+                                  <ul className="space-y-1.5">
+                                    {sumObj.kewajiban_utama?.map(
+                                      (k: string, i: number) => (
+                                        <li
+                                          key={i}
+                                          className="text-xs text-muted-foreground flex items-start gap-1.5"
+                                        >
+                                          <span className="w-1 h-1 rounded-full bg-chart-5/50 mt-1.5 shrink-0" />
+                                          <span className="leading-snug">
+                                            {k}
+                                          </span>
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </div>
+                              </div>
+
+                              {/* Clauses */}
+                              <div className="rounded-xl border bg-card p-4 shadow-sm transition-all hover:shadow-md">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="p-1.5 rounded-md bg-chart-3/10 text-chart-3">
+                                    <FileText className="w-4 h-4" />
+                                  </div>
+                                  <h4 className="text-xs font-semibold">
+                                    Klausul Penting
+                                  </h4>
+                                </div>
+                                <ul className="space-y-2">
+                                  {sumObj.klausul_penting?.map(
+                                    (k: string, i: number) => (
+                                      <li
+                                        key={i}
+                                        className="text-xs text-muted-foreground flex items-start gap-2 bg-muted/30 p-2 rounded-md"
+                                      >
+                                        <span className="text-chart-3 font-bold">
+                                          •
+                                        </span>
+                                        <span className="leading-relaxed">
+                                          {k}
+                                        </span>
+                                      </li>
+                                    ),
+                                  )}
+                                </ul>
+                              </div>
+
+                              {/* Dates & Values */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="rounded-xl border bg-card p-3 shadow-sm flex items-center gap-3">
+                                  <div className="p-2 rounded-full bg-chart-2/10 text-chart-2">
+                                    <CalendarDays className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                                      Masa Berlaku
+                                    </p>
+                                    <p className="text-xs font-medium mt-0.5">
+                                      {sumObj.masa_berlaku}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="rounded-xl border bg-card p-3 shadow-sm flex items-center gap-3">
+                                  <div className="p-2 rounded-full bg-chart-4/10 text-chart-4">
+                                    <DollarSign className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                                      Nilai Kontrak
+                                    </p>
+                                    <p className="text-xs font-medium mt-0.5">
+                                      {sumObj.nilai_kontrak}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        } catch (e) {
+                          return (
+                            <div className="p-4 bg-muted/50 rounded-xl whitespace-pre-wrap text-sm border">
+                              {document.summary}
+                            </div>
+                          );
+                        }
+                      })()}
+                    </div>
                   ) : (
-                    <div className="space-y-2">
-                      <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium">
-                        {document.risk_level ? (
-                          <span className={document.risk_level === 'HIGH' ? 'text-red-500' : document.risk_level === 'MEDIUM' ? 'text-amber-500' : 'text-emerald-500'}>
-                            {document.risk_level}
-                          </span>
-                        ) : "-"}
+                    <div className="flex flex-col items-center justify-center h-[60%] space-y-4 text-center">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                        <Sparkles className="w-8 h-8 text-primary" />
                       </div>
-                      {document.risk_reasoning && (
-                        <div className={`p-3 border rounded-md text-xs leading-relaxed italic ${
-                          document.risk_level === 'HIGH' ? 'bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-300 border-red-200 dark:border-red-900/50' : 
-                          document.risk_level === 'MEDIUM' ? 'bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/50' : 
-                          'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50'
-                        }`}>
-                          <strong className="block mb-1 not-italic">Risk Reasoning:</strong>
-                          {document.risk_reasoning}
-                        </div>
-                      )}
+                      <div>
+                        <h4 className="font-medium text-lg">
+                          Belum Ada Analisis AI
+                        </h4>
+                        <p className="text-sm text-muted-foreground max-w-[250px] mx-auto mt-1">
+                          Biarkan AI membaca dan mengekstrak informasi penting
+                          dari dokumen ini untuk Anda.
+                        </p>
+                      </div>
+                      <Button
+                        onClick={() => summarizeMutation.mutate(false)}
+                        disabled={summarizeMutation.isPending}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
+                      >
+                        {summarizeMutation.isPending ? (
+                          <Spinner className="mr-2" />
+                        ) : (
+                          <Sparkles className="w-4 h-4 mr-2" />
+                        )}
+                        Mulai Analisis
+                      </Button>
                     </div>
                   )}
                 </div>
+              </TabsContent>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="flex items-center text-muted-foreground"><Building className="w-4 h-4 mr-2" /> Vendor Name</Label>
+              {/* Metadata Tab */}
+              <TabsContent
+                value="metadata"
+                className="flex-1 overflow-y-auto p-4 md:p-6 m-0"
+              >
+                <form
+                  id="metadata-form"
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold">Informasi Detail</h3>
                     {isEditing ? (
-                      <Input className="bg-background" value={formData.vendor_name || ""} onChange={(e) => setFormData({...formData, vendor_name: e.target.value})} />
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            reset();
+                            setIsEditing(false);
+                          }}
+                        >
+                          Batal
+                        </Button>
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={updateMutation.isPending}
+                        >
+                          {updateMutation.isPending ? (
+                            <Spinner className="w-3.5 h-3.5 mr-2" />
+                          ) : (
+                            <Save className="w-3.5 h-3.5 mr-2" />
+                          )}
+                          Simpan
+                        </Button>
+                      </div>
                     ) : (
-                      <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium truncate" title={document.vendor_name}>{document.vendor_name || "-"}</div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditing(true)}
+                      >
+                        Edit
+                      </Button>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center text-muted-foreground"><Building2 className="w-4 h-4 mr-2" /> Business Unit</Label>
-                    {isEditing ? (
-                      <Input className="bg-background" value={formData.business_unit || ""} onChange={(e) => setFormData({...formData, business_unit: e.target.value})} />
-                    ) : (
-                      <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium truncate" title={document.business_unit}>{document.business_unit || "-"}</div>
-                    )}
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="flex items-center text-muted-foreground"><CalendarDays className="w-4 h-4 mr-2" /> Effective Date</Label>
-                    {isEditing ? (
-                      <Input className="bg-background" type="date" value={formData.effective_date || ""} onChange={(e) => setFormData({...formData, effective_date: e.target.value})} />
-                    ) : (
-                      <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium">{document.effective_date ? new Date(document.effective_date).toLocaleDateString() : "-"}</div>
+                  {/* Operational Risk Card */}
+                  <div
+                    className={cn(
+                      "p-4 rounded-xl border",
+                      document.risk_level === "HIGH"
+                        ? "bg-destructive/10 border-destructive/20"
+                        : document.risk_level === "MEDIUM"
+                          ? "bg-chart-5/10 border-chart-5/20"
+                          : "bg-chart-2/10 border-chart-2/20",
                     )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center text-muted-foreground"><CalendarDays className="w-4 h-4 mr-2" /> Expiry Date</Label>
-                    {isEditing ? (
-                      <Input className="bg-background" type="date" value={formData.expiry_date || ""} onChange={(e) => setFormData({...formData, expiry_date: e.target.value})} />
-                    ) : (
-                      <div className="p-2 bg-muted/50 border rounded-md text-sm font-medium">{document.expiry_date ? new Date(document.expiry_date).toLocaleDateString() : "-"}</div>
-                    )}
-                  </div>
-                </div>
-
-              </CardContent>
-            </Card>
-
-            {/* AI Summary Card */}
-            <div className="mt-4 flex-1">
-              <Card className="h-full flex flex-col border-emerald-500/30 bg-emerald-500/5">
-              <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg flex items-center text-emerald-700 dark:text-emerald-400">
-                    <Sparkles className="w-5 h-5 mr-2" /> AI Summary
-                  </CardTitle>
-                  <CardDescription>Ringkasan otomatis menggunakan LLM</CardDescription>
-                </div>
-                {document.summary && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => summarizeMutation.mutate(true)}
-                    disabled={summarizeMutation.isPending}
                   >
-                    {summarizeMutation.isPending ? <Spinner className="w-4 h-4 mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-                    Buat Ulang
-                  </Button>
-                )}
-              </CardHeader>
-              <CardContent className="flex-1 overflow-y-auto">
-                {document.summary ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
-                    {(() => {
-                      try {
-                        const sumObj = JSON.parse(document.summary);
-                        return (
-                          <div className="space-y-4">
-                            <div className="bg-emerald-500/10 p-3 rounded-md border border-emerald-500/20">
-                              <strong className="text-emerald-700 dark:text-emerald-400 block mb-1">Ringkasan Singkat:</strong>
-                              <p className="mt-1 leading-relaxed text-emerald-900 dark:text-emerald-100">{sumObj.ringkasan_singkat}</p>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-3 text-xs">
-                              <div className="bg-background p-3 rounded-md border shadow-sm">
-                                <strong className="flex items-center text-emerald-700 dark:text-emerald-400 mb-2">
-                                  <Building className="w-3 h-3 mr-1" /> Pihak Terlibat:
-                                </strong>
-                                <ul className="list-disc pl-4 space-y-1 text-muted-foreground">{sumObj.pihak_terlibat?.map((p:string, i:number) => <li key={i}>{p}</li>)}</ul>
-                              </div>
-                              <div className="bg-background p-3 rounded-md border shadow-sm">
-                                <strong className="flex items-center text-emerald-700 dark:text-emerald-400 mb-2">
-                                  <ListChecks className="w-3 h-3 mr-1" /> Kewajiban Utama:
-                                </strong>
-                                <ul className="list-disc pl-4 space-y-1 text-muted-foreground">{sumObj.kewajiban_utama?.map((k:string, i:number) => <li key={i}>{k}</li>)}</ul>
-                              </div>
-                            </div>
-                            
-                            <div className="bg-background p-3 rounded-md border shadow-sm text-xs">
-                              <strong className="flex items-center text-emerald-700 dark:text-emerald-400 mb-2">
-                                <FileText className="w-3 h-3 mr-1" /> Klausul Penting:
-                              </strong>
-                              <ul className="list-disc pl-4 space-y-1 text-muted-foreground">{sumObj.klausul_penting?.map((k:string, i:number) => <li key={i}>{k}</li>)}</ul>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-3 text-xs">
-                              <div className="bg-background p-2 rounded-md border shadow-sm flex items-center">
-                                <CalendarDays className="w-4 h-4 text-emerald-600 mr-2" />
-                                <div>
-                                  <span className="block text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Masa Berlaku</span>
-                                  <span className="font-medium">{sumObj.masa_berlaku}</span>
-                                </div>
-                              </div>
-                              <div className="bg-background p-2 rounded-md border shadow-sm flex items-center">
-                                <DollarSign className="w-4 h-4 text-emerald-600 mr-2" />
-                                <div>
-                                  <span className="block text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Nilai Kontrak</span>
-                                  <span className="font-medium">{sumObj.nilai_kontrak}</span>
-                                </div>
-                              </div>
-                            </div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <ShieldAlert
+                        className={cn(
+                          "w-4 h-4",
+                          document.risk_level === "HIGH"
+                            ? "text-destructive"
+                            : document.risk_level === "MEDIUM"
+                              ? "text-chart-5"
+                              : "text-chart-2",
+                        )}
+                      />
+                      <h4 className="font-semibold text-sm">
+                        Tingkat Risiko Operasional
+                      </h4>
+                    </div>
+
+                    {isEditing ? (
+                      <Controller
+                        control={control}
+                        name="risk_level"
+                        render={({ field, fieldState }) => (
+                          <Field>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger className="bg-background">
+                                <SelectValue placeholder="Pilih Risiko" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {RISK_LEVELS.map((c) => (
+                                  <SelectItem key={c} value={c}>
+                                    {c}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FieldError errors={[fieldState.error]} />
+                          </Field>
+                        )}
+                      />
+                    ) : (
+                      <div>
+                        <Badge
+                          className={cn(
+                            "shadow-none",
+                            document.risk_level === "HIGH"
+                              ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                              : document.risk_level === "MEDIUM"
+                                ? "bg-chart-5 hover:bg-chart-5/90 text-primary-foreground"
+                                : document.risk_level === "UNKNOWN"
+                                  ? "bg-muted text-foreground"
+                                  : "bg-chart-2 hover:bg-chart-2/90 text-primary-foreground",
+                          )}
+                        >
+                          {document.risk_level || "UNKNOWN"}
+                        </Badge>
+                        {document.risk_reasoning && (
+                          <p className="mt-3 text-xs leading-relaxed text-muted-foreground bg-background/50 p-3 rounded-lg border">
+                            <span className="font-semibold block mb-1">
+                              Catatan Sistem:
+                            </span>
+                            {document.risk_reasoning}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-5">
+                    {/* Category */}
+                    <div className="space-y-2">
+                      <FieldLabel className="text-muted-foreground">
+                        <LayoutGrid className="w-3.5 h-3.5" /> Kategori Dokumen
+                      </FieldLabel>
+                      {isEditing ? (
+                        <Controller
+                          control={control}
+                          name="document_type"
+                          render={({ field, fieldState }) => (
+                            <Field>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
+                                <SelectTrigger className="bg-background">
+                                  <SelectValue placeholder="Pilih Kategori" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {CATEGORIES.map((c) => (
+                                    <SelectItem key={c} value={c}>
+                                      {c}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FieldError errors={[fieldState.error]} />
+                            </Field>
+                          )}
+                        />
+                      ) : (
+                        <div className="font-medium text-sm">
+                          {document.document_type || "-"}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Entities Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <FieldLabel className="text-muted-foreground">
+                          <Building className="w-3.5 h-3.5" /> Nama Vendor
+                        </FieldLabel>
+                        {isEditing ? (
+                          <Controller
+                            control={control}
+                            name="vendor_name"
+                            render={({ field, fieldState }) => (
+                              <Field>
+                                <Input className="bg-background" {...field} />
+                                <FieldError errors={[fieldState.error]} />
+                              </Field>
+                            )}
+                          />
+                        ) : (
+                          <div
+                            className="font-medium text-sm truncate"
+                            title={document.vendor_name}
+                          >
+                            {document.vendor_name || "-"}
                           </div>
-                        );
-                      } catch(e) {
-                        return <div className="whitespace-pre-wrap">{document.summary}</div>;
-                      }
-                    })()}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full space-y-4 text-center py-8">
-                    <p className="text-sm text-muted-foreground">Belum ada ringkasan AI untuk dokumen ini.</p>
-                    <Button 
-                      onClick={() => summarizeMutation.mutate(false)} 
-                      disabled={summarizeMutation.isPending}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                    >
-                      {summarizeMutation.isPending ? <Spinner className="mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                      Buat Ringkasan AI
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            </div>
-            </TabsContent>
+                        )}
+                      </div>
 
-            <TabsContent value="approvals" className="flex-1 overflow-y-auto p-4 m-0">
-              <ApprovalsTab documentId={id} />
-            </TabsContent>
-          </Tabs>
-        </div>
+                      <div className="space-y-2">
+                        <FieldLabel className="text-muted-foreground">
+                          <Building2 className="w-3.5 h-3.5" /> Unit Bisnis
+                        </FieldLabel>
+                        {isEditing ? (
+                          <Controller
+                            control={control}
+                            name="business_unit"
+                            render={({ field, fieldState }) => (
+                              <Field>
+                                <Input className="bg-background" {...field} />
+                                <FieldError errors={[fieldState.error]} />
+                              </Field>
+                            )}
+                          />
+                        ) : (
+                          <div
+                            className="font-medium text-sm truncate"
+                            title={document.business_unit}
+                          >
+                            {document.business_unit || "-"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-        {/* Right Panel: PDF Viewer */}
-        <div className="flex-1 bg-neutral-900 relative">
-          {isPdfLoading || !pdfUrl ? (
-            <div className="flex items-center justify-center h-full text-muted-foreground flex-col gap-4">
-              <Spinner />
-              <span>Memuat dokumen PDF...</span>
-            </div>
-          ) : (
-            <iframe 
-              src={pdfUrl} 
-              className="w-full h-full border-none absolute inset-0"
-              title="PDF Viewer"
-            />
-          )}
-        </div>
+                    {/* Dates Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <FieldLabel className="text-muted-foreground">
+                          <CalendarDays className="w-3.5 h-3.5" /> Tanggal
+                          Efektif
+                        </FieldLabel>
+                        {isEditing ? (
+                          <Controller
+                            control={control}
+                            name="effective_date"
+                            render={({ field, fieldState }) => (
+                              <Field>
+                                <Input
+                                  className="bg-background"
+                                  type="date"
+                                  {...field}
+                                />
+                                <FieldError errors={[fieldState.error]} />
+                              </Field>
+                            )}
+                          />
+                        ) : (
+                          <div className="font-medium text-sm">
+                            {document.effective_date
+                              ? new Date(
+                                  document.effective_date,
+                                ).toLocaleDateString()
+                              : "-"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <FieldLabel className="text-muted-foreground">
+                          <CalendarDays className="w-3.5 h-3.5" /> Tanggal
+                          Kadaluarsa
+                        </FieldLabel>
+                        {isEditing ? (
+                          <Controller
+                            control={control}
+                            name="expiry_date"
+                            render={({ field, fieldState }) => (
+                              <Field>
+                                <Input
+                                  className="bg-background"
+                                  type="date"
+                                  {...field}
+                                />
+                                <FieldError errors={[fieldState.error]} />
+                              </Field>
+                            )}
+                          />
+                        ) : (
+                          <div className="font-medium text-sm">
+                            {document.expiry_date
+                              ? new Date(
+                                  document.expiry_date,
+                                ).toLocaleDateString()
+                              : "-"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </TabsContent>
+
+              {/* Approvals Tab */}
+              <TabsContent
+                value="approvals"
+                className="flex-1 overflow-y-auto p-4 md:p-6 m-0"
+              >
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <CheckSquare className="w-5 h-5" /> Alur Persetujuan
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Pantau dan kelola proses persetujuan dokumen ini
+                  </p>
+                </div>
+                <ApprovalsTab documentId={id} />
+              </TabsContent>
+            </Tabs>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
   );

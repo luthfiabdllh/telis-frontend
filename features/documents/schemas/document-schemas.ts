@@ -70,3 +70,13 @@ export const uploadDocumentSchema = z.object({
   file: z.custom<File>((val) => val instanceof File, "Document file is required"),
 });
 export type UploadDocumentInput = z.infer<typeof uploadDocumentSchema>;
+
+export const documentMetadataSchema = z.object({
+  document_type: z.string().optional(),
+  risk_level: z.string().optional(),
+  vendor_name: z.string().optional(),
+  business_unit: z.string().optional(),
+  effective_date: z.string().optional(),
+  expiry_date: z.string().optional(),
+});
+export type DocumentMetadataInput = z.infer<typeof documentMetadataSchema>;
