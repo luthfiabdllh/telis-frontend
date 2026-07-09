@@ -9,10 +9,10 @@ export const useDashboardMetrics = (params?: { start_date?: string; end_date?: s
   });
 };
 
-export const useMyMetrics = () => {
+export const useMyMetrics = (params?: Record<string, any>) => {
   return useQuery({
-    queryKey: ['my-metrics'],
-    queryFn: () => metricsApi.getMyMetrics(),
+    queryKey: ['my-metrics', params],
+    queryFn: () => metricsApi.getMyMetrics(params),
     staleTime: 60000, // 1 minute
   });
 };

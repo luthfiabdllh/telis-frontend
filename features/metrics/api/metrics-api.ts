@@ -41,12 +41,21 @@ export interface RecentActivity {
   tokens: number;
   cost: number;
   timestamp: string;
+  input_tokens?: number;
+  output_tokens?: number;
+}
+
+export interface FeatureUsageDist {
+  feature: string;
+  cost_usd: number;
+  tokens: number;
 }
 
 export interface MyMetrics {
   total_cost_this_month: number;
   daily_trend: DailyUsage[];
   recent_activities: RecentActivity[];
+  feature_usage_dist?: FeatureUsageDist[];
 }
 
 export interface RiskHeatmap {
@@ -73,8 +82,8 @@ export const metricsApi = {
     return res.data;
   },
   
-  getMyMetrics: async (): Promise<MyMetrics> => {
-    const res = await apiClient.get('/metrics/tokens/me');
+  getMyMetrics: async (params?: { start_date?: string; end_date?: string }): Promise<MyMetrics> => {
+    const res = await apiClient.get('/metrics/tokens/me', { params });
     return res.data;
   },
 
