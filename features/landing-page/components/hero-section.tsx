@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatedGroup } from "@/components/ui/animated-group";
+import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 
 const transitionVariants = {
   item: {
@@ -82,118 +83,111 @@ export function HeroSection() {
               aria-hidden
               className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--background)_75%)]"
             />
-            <div className="mx-auto max-w-7xl px-6">
-              <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
-                <AnimatedGroup variants={transitionVariants}>
-                  <Link
-                    href="#link"
-                    className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-black/5 transition-all duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
-                  >
-                    <span className="text-foreground text-sm">
-                      Introducing Support for AI Models
-                    </span>
-                    <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
-
-                    <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
-                      <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
-                        <span className="flex size-6">
-                          <ArrowRight className="m-auto size-3" />
+            <ContainerScroll
+              titleComponent={
+                <div className="mx-auto max-w-7xl px-6 pb-12">
+                  <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
+                    <AnimatedGroup variants={transitionVariants}>
+                      <Link
+                        href="#link"
+                        className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-black/5 transition-all duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
+                      >
+                        <span className="text-foreground text-sm">
+                          Introducing Support for AI Models
                         </span>
-                        <span className="flex size-6">
-                          <ArrowRight className="m-auto size-3" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
+                        <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
 
-                  <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-                    Modern Solutions for Customer Engagement
-                  </h1>
-                  <p className="mx-auto mt-8 max-w-2xl text-balance text-lg">
-                    Highly customizable components for building modern websites
-                    and applications that look and feel the way you mean it.
-                  </p>
-                </AnimatedGroup>
-
-                <AnimatedGroup
-                  variants={{
-                    container: {
-                      visible: {
-                        transition: {
-                          staggerChildren: 0.05,
-                          delayChildren: 0.75,
-                        },
-                      },
-                    },
-                    ...transitionVariants,
-                  }}
-                  className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row"
-                >
-                  <div
-                    key={1}
-                    className="bg-foreground/10 rounded-[14px] border p-0.5"
-                  >
-                    <Button
-                      asChild
-                      size="lg"
-                      className="rounded-xl px-5 text-base"
-                    >
-                      <Link href="#link">
-                        <span className="text-nowrap">Start Building</span>
+                        <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
+                          <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
+                            <span className="flex size-6">
+                              <ArrowRight className="m-auto size-3" />
+                            </span>
+                            <span className="flex size-6">
+                              <ArrowRight className="m-auto size-3" />
+                            </span>
+                          </div>
+                        </div>
                       </Link>
-                    </Button>
-                  </div>
-                  <Button
-                    key={2}
-                    asChild
-                    size="lg"
-                    variant="ghost"
-                    className="h-10.5 rounded-xl px-5"
-                  >
-                    <Link href="#link">
-                      <span className="text-nowrap">Request a demo</span>
-                    </Link>
-                  </Button>
-                </AnimatedGroup>
-              </div>
-            </div>
 
-            <AnimatedGroup
-              variants={{
-                container: {
-                  visible: {
-                    transition: {
-                      staggerChildren: 0.05,
-                      delayChildren: 0.75,
-                    },
-                  },
-                },
-                ...transitionVariants,
-              }}
+                      <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
+                        Modern Solutions for Customer Engagement
+                      </h1>
+                      <p className="mx-auto mt-8 max-w-2xl text-balance text-lg">
+                        Highly customizable components for building modern
+                        websites and applications that look and feel the way you
+                        mean it.
+                      </p>
+                    </AnimatedGroup>
+
+                    <AnimatedGroup
+                      variants={{
+                        container: {
+                          visible: {
+                            transition: {
+                              staggerChildren: 0.05,
+                              delayChildren: 0.75,
+                            },
+                          },
+                        },
+                        ...transitionVariants,
+                      }}
+                      className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row"
+                    >
+                      <div
+                        key={1}
+                        className="bg-foreground/10 rounded-[14px] border p-0.5"
+                      >
+                        <Button
+                          asChild
+                          size="lg"
+                          className="rounded-xl px-5 text-base"
+                        >
+                          <Link href="#link">
+                            <span className="text-nowrap">Start Building</span>
+                          </Link>
+                        </Button>
+                      </div>
+                      <Button
+                        key={2}
+                        asChild
+                        size="lg"
+                        variant="ghost"
+                        className="h-10.5 rounded-xl px-5"
+                      >
+                        <Link href="#link">
+                          <span className="text-nowrap">Request a demo</span>
+                        </Link>
+                      </Button>
+                    </AnimatedGroup>
+                  </div>
+                </div>
+              }
             >
-              <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
+              <div className="relative h-full w-full">
+                <img
+                  className="object-cover object-left-top h-full w-full hidden rounded-2xl dark:block"
+                  src="https://tailark.com//_next/image?url=%2Fmail2.png&w=3840&q=75"
+                  alt="app screen"
+                  width="2700"
+                  height="1440"
+                />
+                <img
+                  className="object-cover object-left-top h-full w-full rounded-2xl dark:hidden"
+                  src="https://tailark.com/_next/image?url=%2Fmail2-light.png&w=3840&q=75"
+                  alt="app screen"
+                  width="2700"
+                  height="1440"
+                />
                 <div
                   aria-hidden
                   className="bg-linear-to-b to-background absolute inset-0 z-10 from-transparent from-35%"
                 />
-                <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
-                  <img
-                    className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
-                    src="https://tailark.com//_next/image?url=%2Fmail2.png&w=3840&q=75"
-                    alt="app screen"
-                    width="2700"
-                    height="1440"
-                  />
-                  <img
-                    className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-                    src="https://tailark.com/_next/image?url=%2Fmail2-light.png&w=3840&q=75"
-                    alt="app screen"
-                    width="2700"
-                    height="1440"
-                  />
-                </div>
               </div>
-            </AnimatedGroup>
+            </ContainerScroll>
+            <div
+              aria-hidden
+              className="bg-linear-to-b to-background pointer-events-none absolute inset-0 z-10 from-transparent from-40% via-background/80 via-90%"
+            />
           </div>
         </section>
         <CustomerLogos />
