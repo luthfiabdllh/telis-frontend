@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const menuItems = [
   { name: "Features", href: "#link" },
@@ -88,24 +89,15 @@ export const HeroHeader = () => {
                   ))}
                 </ul>
               </div>
-              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className={cn(isScrolled && "lg:hidden")}
-                >
-                  <Link href="#">
-                    <span>Login</span>
-                  </Link>
-                </Button>
+              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit items-center">
+                <ThemeToggle className={cn(isScrolled && "lg:hidden", "w-full sm:w-9")} />
                 <Button
                   asChild
                   size="sm"
                   className={cn(isScrolled && "lg:hidden")}
                 >
                   <Link href="#">
-                    <span>Sign Up</span>
+                    <span>Get Started</span>
                   </Link>
                 </Button>
                 <Button

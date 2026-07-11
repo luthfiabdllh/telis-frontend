@@ -14,79 +14,63 @@ export const CustomerLogos = () => {
             <ChevronRight className="ml-1 inline-block size-3" />
           </Link>
         </div>
-        <div className="group-hover:blur-xs mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 sm:gap-x-16 sm:gap-y-14">
+        <div className="group-hover:blur-xs mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 sm:gap-x-16 sm:gap-y-14 items-center">
           <div className="flex">
             <img
-              className="mx-auto h-5 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/nvidia.svg"
+              className="mx-auto h-5 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg"
               alt="Nvidia Logo"
-              height="20"
-              width="auto"
             />
           </div>
 
           <div className="flex">
             <img
-              className="mx-auto h-4 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/column.svg"
-              alt="Column Logo"
-              height="16"
-              width="auto"
+              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg"
+              alt="Microsoft Logo"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-4 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/github.svg"
+              className="mx-auto h-7 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg"
               alt="GitHub Logo"
-              height="16"
-              width="auto"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-5 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/nike.svg"
+              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg"
               alt="Nike Logo"
-              height="20"
-              width="auto"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-5 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/lemonsqueezy.svg"
-              alt="Lemon Squeezy Logo"
-              height="20"
-              width="auto"
+              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
+              alt="Stripe Logo"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-4 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/laravel.svg"
+              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Laravel.svg"
               alt="Laravel Logo"
-              height="16"
-              width="auto"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-7 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/lilly.svg"
-              alt="Lilly Logo"
-              height="28"
-              width="auto"
+              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
+              alt="Google Logo"
             />
           </div>
 
           <div className="flex">
             <img
-              className="mx-auto h-6 w-fit dark:invert"
-              src="https://html.tailus.io/blocks/customers/openai.svg"
+              className="mx-auto h-7 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg"
               alt="OpenAI Logo"
-              height="24"
-              width="auto"
             />
           </div>
         </div>

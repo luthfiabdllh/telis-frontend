@@ -36,7 +36,7 @@ export function HeroSection() {
       <main className="overflow-hidden">
         <div
           aria-hidden
-          className="z-2 absolute inset-0 pointer-events-none isolate opacity-50 contain-strict hidden lg:block"
+          className="z-2 absolute inset-0 pointer-events-none isolate opacity-50 contain-strict hidden dark:lg:block"
         >
           <div className="w-[35rem] h-[80rem] translate-y-[-350px] absolute left-0 top-0 -rotate-45 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,hsla(0,0%,85%,.08)_0,hsla(0,0%,55%,.02)_50%,hsla(0,0%,45%,0)_80%)]" />
           <div className="h-[80rem] absolute left-0 top-0 w-56 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] [translate:5%_-50%]" />
@@ -74,14 +74,14 @@ export function HeroSection() {
               <img
                 src="https://ik.imagekit.io/lrigu76hy/tailark/night-background.jpg?updatedAt=1745733451120"
                 alt="background"
-                className="absolute inset-x-0 top-56 -z-20 hidden lg:top-32 dark:block"
+                className="absolute inset-x-0 top-56 -z-20 lg:top-32 opacity-20 dark:opacity-100 invert dark:invert-0 transition-opacity"
                 width="3276"
                 height="4095"
               />
             </AnimatedGroup>
             <div
               aria-hidden
-              className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--background)_75%)]"
+              className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,rgba(255,255,255,0)_0%,var(--background)_75%)] dark:[background:radial-gradient(125%_125%_at_50%_100%,rgba(0,0,0,0)_0%,var(--background)_75%)]"
             />
             <ContainerScroll
               titleComponent={
@@ -95,7 +95,7 @@ export function HeroSection() {
                         <span className="text-foreground text-sm">
                           Introducing Support for AI Models
                         </span>
-                        <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
+                        <span className="block h-4 w-0.5 bg-border"></span>
 
                         <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
                           <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
@@ -135,7 +135,7 @@ export function HeroSection() {
                     >
                       <div
                         key={1}
-                        className="bg-foreground/10 rounded-[14px] border p-0.5"
+                        className="bg-primary/10 rounded-[14px] border border-primary/20 p-0.5"
                       >
                         <Button
                           asChild

@@ -71,7 +71,7 @@ export default function FaqSection() {
                   {item.question}
                 </AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-base">{item.answer}</p>
+                  <p className="text-base text-muted-foreground">{item.answer}</p>
                 </AccordionContent>
               </AccordionItem>
             ))}
