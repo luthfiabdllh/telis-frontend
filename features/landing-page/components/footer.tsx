@@ -35,7 +35,7 @@ export function StickyFooter() {
 						<div className="absolute top-0 left-0 h-320 w-60 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,--theme(--color-foreground/.04)_0,--theme(--color-foreground/.01)_80%,transparent_100%)] [translate:5%_-50%]" />
 						<div className="absolute top-0 left-0 h-320 w-60 -translate-y-87.5 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,--theme(--color-foreground/.04)_0,--theme(--color-foreground/.01)_80%,transparent_100%)]" />
 					</div>
-					<div className="relative mx-auto flex size-full max-w-6xl flex-col justify-between gap-5">
+					<div className="relative mx-auto flex size-full max-w-7xl flex-col justify-between gap-5">
 						<div className="grid grid-cols-1 gap-8 px-4 pt-12 md:grid-cols-2 lg:grid-cols-4">
 							<AnimatedContainer className="w-full space-y-4">
 								<Logo className="h-5" />

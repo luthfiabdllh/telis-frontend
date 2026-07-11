@@ -165,14 +165,14 @@ export function HeroSection() {
             >
               <div className="relative h-full w-full">
                 <img
-                  className="object-cover object-left-top h-full w-full hidden rounded-2xl dark:block"
+                  className="object-cover object-top-left h-full w-full hidden rounded-2xl dark:block"
                   src="https://tailark.com//_next/image?url=%2Fmail2.png&w=3840&q=75"
                   alt="app screen"
                   width="2700"
                   height="1440"
                 />
                 <img
-                  className="object-cover object-left-top h-full w-full rounded-2xl dark:hidden"
+                  className="object-cover object-top-left h-full w-full rounded-2xl dark:hidden"
                   src="https://tailark.com/_next/image?url=%2Fmail2-light.png&w=3840&q=75"
                   alt="app screen"
                   width="2700"
