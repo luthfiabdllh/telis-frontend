@@ -30,7 +30,7 @@ export function useLogin() {
       if (res?.error) {
         setError("Email atau password salah.")
       } else {
-        router.push("/dashboard")
+        router.push("/dashboard/chat")
         router.refresh()
       }
     } catch (err) {

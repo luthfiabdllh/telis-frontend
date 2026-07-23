@@ -28,12 +28,6 @@ export const navGroups: SidebarNavGroup[] = [
 		label: "Menu Utama",
 		items: [
 			{
-				title: "Beranda",
-				path: "/dashboard",
-				icon: <HomeIcon />,
-				isActive: true,
-			},
-			{
 				title: "Obrolan AI",
 				path: "/dashboard/chat",
 				icon: <ShieldCheckIcon />,
@@ -42,6 +36,7 @@ export const navGroups: SidebarNavGroup[] = [
 				title: "Repositori Dokumen",
 				path: "/dashboard/documents",
 				icon: <ArchiveIcon />,
+				roles: ["Admin", "Legal"],
 			},
 			{
 				title: "Analisis Redline",
@@ -57,6 +52,7 @@ export const navGroups: SidebarNavGroup[] = [
 				title: "Dashboard Analytics",
 				path: "/dashboard/analytics",
 				icon: <PieChartIcon />,
+				roles: ["Admin"],
 			},
 		],
 	},
@@ -67,7 +63,7 @@ export const navGroups: SidebarNavGroup[] = [
 				title: "Pengelolaan Pengguna",
 				path: "/dashboard/admin/users",
 				icon: <FlagIcon />,
-                roles: ["Admin", "Legal"],
+                roles: ["Admin"],
 			},
 			{
 				title: "Laporan Pemakaian",

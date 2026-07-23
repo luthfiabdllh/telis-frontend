@@ -24,10 +24,23 @@ export default auth((req) => {
       return Response.redirect(new URL("/login", req.nextUrl));
     }
 
-    // Role-based redirect if trying to access the root /dashboard
+    const role = req.auth?.user?.role || "User";
+
+    // Since we removed Beranda, all requests to /dashboard go to /dashboard/chat
     if (req.nextUrl.pathname === '/dashboard') {
-      const role = req.auth?.user?.role;
-      if (role !== "Admin" && role !== "Legal") {
+      return Response.redirect(new URL("/dashboard/chat", req.nextUrl));
+    }
+
+    // Role restrictions for User
+    if (role === "User") {
+      if (req.nextUrl.pathname.startsWith('/dashboard/documents') || req.nextUrl.pathname.startsWith('/dashboard/analytics') || req.nextUrl.pathname.startsWith('/dashboard/admin')) {
+        return Response.redirect(new URL("/dashboard/chat", req.nextUrl));
+      }
+    }
+
+    // Role restrictions for Legal
+    if (role === "Legal") {
+      if (req.nextUrl.pathname.startsWith('/dashboard/admin')) {
         return Response.redirect(new URL("/dashboard/chat", req.nextUrl));
       }
     }

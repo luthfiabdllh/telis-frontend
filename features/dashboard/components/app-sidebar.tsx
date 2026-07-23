@@ -55,7 +55,7 @@ export function AppSidebar({ session }: { session: Session | null }) {
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader className="h-14 justify-center">
         <SidebarMenuButton asChild size="lg">
-          <a href="/dashboard" className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-2"}`}>
+          <a href="/dashboard/chat" className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-2"}`}>
             <LogoIcon className="size-8 text-primary" />
             {!isCollapsed && (
               <span className="text-xl font-semibold tracking-tight">Telis</span>
