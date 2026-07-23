@@ -17,60 +17,60 @@ export const CustomerLogos = () => {
         <div className="group-hover:blur-xs mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 sm:gap-x-16 sm:gap-y-14 items-center">
           <div className="flex">
             <img
-              className="mx-auto h-5 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg"
-              alt="Nvidia Logo"
+              className="mx-auto h-8 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/id/thumb/c/c4/Telkom_Indonesia_2013.svg/3840px-Telkom_Indonesia_2013.svg.png"
+              alt="Telkom Indonesia Logo"
             />
           </div>
 
           <div className="flex">
             <img
-              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg"
-              alt="Microsoft Logo"
+              className="mx-auto h-6 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Telkomsel_%282021%29.svg/3840px-Telkomsel_%282021%29.svg.png"
+              alt="Telkomsel Logo"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-7 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg"
-              alt="GitHub Logo"
+              className="mx-auto h-5 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg"
+              alt="Bank Mandiri Logo"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg"
-              alt="Nike Logo"
+              className="mx-auto h-6 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Pertamina_Logo.svg/3840px-Pertamina_Logo.svg.png"
+              alt="Pertamina Logo"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
-              alt="Stripe Logo"
+              className="mx-auto h-6 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg"
+              alt="BCA Logo"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Laravel.svg"
-              alt="Laravel Logo"
+              className="mx-auto h-6 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/GoTo_Logo.png/3840px-GoTo_Logo.png"
+              alt="GoTo Logo"
             />
           </div>
           <div className="flex">
             <img
-              className="mx-auto h-6 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
-              alt="Google Logo"
+              className="mx-auto h-7 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_PLN.svg"
+              alt="PLN Logo"
             />
           </div>
 
           <div className="flex">
             <img
-              className="mx-auto h-7 w-auto dark:invert opacity-70 hover:opacity-100 transition-opacity"
-              src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg"
-              alt="OpenAI Logo"
+              className="mx-auto h-5 w-auto opacity-70 hover:opacity-100 transition-opacity"
+              src="https://upload.wikimedia.org/wikipedia/commons/6/68/BANK_BRI_logo.svg"
+              alt="BRI Logo"
             />
           </div>
         </div>
