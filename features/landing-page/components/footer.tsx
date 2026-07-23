@@ -8,6 +8,7 @@ import { LinkedinIcon } from "@/components/icons/linkedin-icon";
 import { YoutubeIcon } from "@/components/icons/youtube-icon";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 type FooterLink = {
 	title: string;
@@ -38,7 +39,10 @@ export function StickyFooter() {
 					<div className="relative mx-auto flex size-full max-w-7xl flex-col justify-between gap-5">
 						<div className="grid grid-cols-1 gap-8 px-4 pt-12 md:grid-cols-2 lg:grid-cols-4">
 							<AnimatedContainer className="w-full space-y-4">
-								<Logo className="h-5" />
+								<div className="flex items-center gap-2">
+									<Image src="/logo.png" alt="Telis Logo" width={32} height={32} className="rounded" />
+									<span className="text-xl font-bold tracking-tight">TELIS</span>
+								</div>
 								<p className="mt-8 text-muted-foreground text-sm md:mt-0">
 									Enterprise AI for Corporate Legal Intelligence.
 								</p>

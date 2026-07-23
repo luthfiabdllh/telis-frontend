@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useRef, useEffect, useState } from "react";
 import { Button } from "./button";
 // --- Internal Helper Components (Not exported) --- //
