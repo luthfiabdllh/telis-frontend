@@ -32,16 +32,15 @@ export const GoogleGeminiEffect = ({
   return (
     <div className={cn("sticky top-80", className)}>
       <p className="text-lg md:text-7xl font-normal pb-4 text-center bg-clip-text text-transparent bg-linear-to-b from-foreground to-muted-foreground">
-        {title || `Build with Aceternity UI`}
+        {title || `Experience TELIS AI`}
       </p>
       <p className="text-xs md:text-xl font-normal text-center text-muted-foreground mt-4 max-w-lg mx-auto">
         {description ||
-          `Scroll this component and see the bottom SVG come to life wow this
-        works!`}
+          `Empower your legal team to analyze contracts 10x faster with absolute data privacy and zero hallucination.`}
       </p>
       <div className="w-full h-[890px] -top-60 md:-top-40 flex items-center justify-center absolute">
         <button className="font-bold bg-primary text-primary-foreground rounded-full md:px-4 md:py-2 px-2 py-1 md:mt-24 mt-8 z-30 md:text-base text-xs w-fit mx-auto">
-          View Documentation
+          Request a Demo
         </button>
       </div>
       <svg

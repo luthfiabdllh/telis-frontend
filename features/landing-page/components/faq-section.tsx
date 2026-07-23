@@ -12,33 +12,33 @@ export default function FaqSection() {
   const faqItems = [
     {
       id: "item-1",
-      question: "How long does shipping take?",
+      question: "How does TELIS ensure data privacy?",
       answer:
-        "Standard shipping takes 3-5 business days, depending on your location. Express shipping options are available at checkout for 1-2 business day delivery.",
+        "TELIS uses a proprietary built-in PII (Personally Identifiable Information) Masking service. Before any data is sent to the LLM, sensitive entities like names, addresses, and monetary values are automatically redacted, ensuring zero data leakage.",
     },
     {
       id: "item-2",
-      question: "What payment methods do you accept?",
+      question: "Can TELIS hallucinate legal answers?",
       answer:
-        "We accept all major credit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, and Google Pay. For enterprise customers, we also offer invoicing options.",
+        "No. TELIS is built on an Agentic Retrieval-Augmented Generation (RAG) architecture. It only generates answers based on the internal corporate documents you upload, and always provides exact page and document citations for verification.",
     },
     {
       id: "item-3",
-      question: "Can I change or cancel my order?",
+      question: "Do you offer on-premise deployment?",
       answer:
-        "You can modify or cancel your order within 1 hour of placing it. After this window, please contact our customer support team who will assist you with any changes.",
+        "Yes! For enterprises with strict data residency requirements (like banks or telecommunications), we offer full on-premise deployment so your data never leaves your internal servers.",
     },
     {
       id: "item-4",
-      question: "Do you ship internationally?",
+      question: "How does Smart Redlining work?",
       answer:
-        "Yes, we ship to over 50 countries worldwide. International shipping typically takes 7-14 business days. Additional customs fees may apply depending on your country's import regulations.",
+        "You simply upload two versions of a contract (e.g., initial draft vs. vendor's redline). TELIS will automatically detect all added, modified, or deleted clauses and assign a Risk Score based on your company's standard policies.",
     },
     {
       id: "item-5",
-      question: "What is your return policy?",
+      question: "Can I integrate TELIS into our existing systems?",
       answer:
-        "We offer a 30-day return policy for most items. Products must be in original condition with tags attached. Some specialty items may have different return terms, which will be noted on the product page.",
+        "Absolutely. TELIS is built on a microservices architecture and exposes REST and gRPC APIs, allowing seamless integration with your existing ERP, CRM, or custom legal workflows.",
     },
   ];
 

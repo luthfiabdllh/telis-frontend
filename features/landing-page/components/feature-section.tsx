@@ -15,11 +15,10 @@ export default function FeaturesSection() {
     <section className="py-16 md:py-24 px-4 md:px-6">
       <div className="mx-auto max-w-5xl text-center mb-16">
         <h2 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-          Powerful Features
+          Enterprise Capabilities
         </h2>
         <p className="mx-auto mt-8 max-w-2xl text-balance text-lg">
-          Explore the tools and capabilities designed to supercharge your
-          workflow and enhance your productivity.
+          Explore the tools designed specifically for corporate legal teams to accelerate workflows while maintaining strict data privacy.
         </p>
       </div>
       <BentoGrid className="mx-auto md:auto-rows-[20rem]">
@@ -196,51 +195,39 @@ const SkeletonFour = () => {
         variants={first}
         className="h-full w-1/3 rounded-2xl bg-card p-4 border border-border flex flex-col items-center justify-center"
       >
-        <img
-          src="https://pbs.twimg.com/profile_images/1417752099488636931/cs2R59eW_400x400.jpg"
-          alt="avatar"
-          height="100"
-          width="100"
-          className="rounded-full h-10 w-10"
-        />
+        <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
+          <IconFileBroken className="h-5 w-5 text-destructive" />
+        </div>
         <p className="sm:text-sm text-xs text-center font-semibold text-muted-foreground mt-4">
-          Just code in Vanilla Javascript
+          Vendor NDA 2026.pdf
         </p>
-        <p className="border border-destructive/50 bg-destructive/10 text-destructive text-xs rounded-full px-2 py-0.5 mt-4">
-          Delusional
+        <p className="border border-destructive/50 bg-destructive/10 text-destructive text-[10px] sm:text-xs rounded-full px-2 py-0.5 mt-4">
+          High Risk
         </p>
       </motion.div>
       <motion.div className="h-full relative z-20 w-1/3 rounded-2xl bg-card p-4 border border-border flex flex-col items-center justify-center">
-        <img
-          src="https://pbs.twimg.com/profile_images/1417752099488636931/cs2R59eW_400x400.jpg"
-          alt="avatar"
-          height="100"
-          width="100"
-          className="rounded-full h-10 w-10"
-        />
+        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+           <IconClipboardCopy className="h-5 w-5 text-primary" />
+        </div>
         <p className="sm:text-sm text-xs text-center font-semibold text-muted-foreground mt-4">
-          Tailwind CSS is cool, you know
+          SLA Agreement v2.pdf
         </p>
-        <p className="border border-primary/50 bg-primary/10 text-primary text-xs rounded-full px-2 py-0.5 mt-4">
-          Sensible
+        <p className="border border-primary/50 bg-primary/10 text-primary text-[10px] sm:text-xs rounded-full px-2 py-0.5 mt-4">
+          Approved
         </p>
       </motion.div>
       <motion.div
         variants={second}
         className="h-full w-1/3 rounded-2xl bg-card p-4 border border-border flex flex-col items-center justify-center"
       >
-        <img
-          src="https://pbs.twimg.com/profile_images/1417752099488636931/cs2R59eW_400x400.jpg"
-          alt="avatar"
-          height="100"
-          width="100"
-          className="rounded-full h-10 w-10"
-        />
+        <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
+          <IconTableColumn className="h-5 w-5 text-accent" />
+        </div>
         <p className="sm:text-sm text-xs text-center font-semibold text-muted-foreground mt-4">
-          I love angular, RSC, and Redux.
+          Procurement Policy.pdf
         </p>
-        <p className="border border-accent/50 bg-accent/10 text-accent text-xs rounded-full px-2 py-0.5 mt-4">
-          Helpless
+        <p className="border border-accent/50 bg-accent/10 text-accent text-[10px] sm:text-xs rounded-full px-2 py-0.5 mt-4">
+          Review Needed
         </p>
       </motion.div>
     </motion.div>
@@ -280,25 +267,23 @@ const SkeletonFive = () => {
     >
       <motion.div
         variants={variants}
-        className="flex flex-row rounded-2xl border border-border p-2  items-start space-x-2 bg-card"
+        className="flex flex-row rounded-2xl border border-border p-2 items-center space-x-2 bg-card"
       >
-        <img
-          src="https://pbs.twimg.com/profile_images/1417752099488636931/cs2R59eW_400x400.jpg"
-          alt="avatar"
-          height="100"
-          width="100"
-          className="rounded-full h-10 w-10"
-        />
-        <p className="text-xs text-muted-foreground">
-          There are a lot of cool framerworks out there like React, Angular,
-          Vue, Svelte that can make your life ....
-        </p>
+        <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+          <span className="text-accent text-xs font-bold">$</span>
+        </div>
+        <div className="flex flex-col">
+          <p className="text-xs font-semibold text-foreground">Token Usage Alert</p>
+          <p className="text-[10px] text-muted-foreground">
+            Legal Team A has reached 80% of monthly LLM budget.
+          </p>
+        </div>
       </motion.div>
       <motion.div
         variants={variantsSecond}
         className="flex flex-row rounded-full border border-border p-2 items-center justify-end space-x-2 w-3/4 ml-auto bg-card"
       >
-        <p className="text-xs text-muted-foreground">Use PHP.</p>
+        <p className="text-xs text-muted-foreground">View Dashboard</p>
         <div className="h-6 w-6 rounded-full bg-linear-to-r from-primary to-accent shrink-0" />
       </motion.div>
     </motion.div>
@@ -306,10 +291,10 @@ const SkeletonFive = () => {
 };
 const items = [
   {
-    title: "AI Content Generation",
+    title: "Agentic RAG Chat",
     description: (
       <span className="text-sm">
-        Experience the power of AI in generating unique content.
+        Interactive legal Q&A powered by AI, delivering accurate answers with exact document citations to eliminate hallucinations.
       </span>
     ),
     header: <SkeletonOne />,
@@ -317,10 +302,10 @@ const items = [
     icon: <IconClipboardCopy className="h-4 w-4 text-primary" />,
   },
   {
-    title: "Automated Proofreading",
+    title: "Smart Redlining",
     description: (
       <span className="text-sm">
-        Let AI handle the proofreading of your documents.
+        Instantly compare contract versions with AI-driven change detection and risk scoring.
       </span>
     ),
     header: <SkeletonTwo />,
@@ -328,10 +313,10 @@ const items = [
     icon: <IconFileBroken className="h-4 w-4 text-primary" />,
   },
   {
-    title: "Contextual Suggestions",
+    title: "PII Masking & Privacy",
     description: (
       <span className="text-sm">
-        Get AI-powered suggestions based on your writing context.
+        Built-in NLP censors sensitive entities before reaching external LLMs, ensuring 100% data confidentiality.
       </span>
     ),
     header: <SkeletonThree />,
@@ -339,22 +324,21 @@ const items = [
     icon: <IconSignature className="h-4 w-4 text-primary" />,
   },
   {
-    title: "Sentiment Analysis",
+    title: "Centralized Legal Knowledge Base",
     description: (
       <span className="text-sm">
-        Understand the sentiment of your text with AI analysis.
+        Google Drive-like document management with nested folders and strict Role-Based Access Control (RBAC) for admins and legal staff.
       </span>
     ),
     header: <SkeletonFour />,
     className: "md:col-span-2",
     icon: <IconTableColumn className="h-4 w-4 text-primary" />,
   },
-
   {
-    title: "Text Summarization",
+    title: "FinOps & Cost Control",
     description: (
       <span className="text-sm">
-        Summarize your lengthy documents with AI technology.
+        Real-time analytics dashboard to monitor AI token usage and operational costs across your entire organization.
       </span>
     ),
     header: <SkeletonFive />,

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import { RocketIcon } from "@/components/ui/rocket";
 
 const transitionVariants = {
   item: {
@@ -92,8 +93,9 @@ export function HeroSection() {
                         href="#link"
                         className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-black/5 transition-all duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
                       >
+                        <RocketIcon size={18} className="ml-1" />
                         <span className="text-foreground text-sm">
-                          Introducing Support for AI Models
+                          Powered by Agentic RAG Technology
                         </span>
                         <span className="block h-4 w-0.5 bg-border"></span>
 
@@ -109,13 +111,13 @@ export function HeroSection() {
                         </div>
                       </Link>
 
-                      <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-                        Modern Solutions for Customer Engagement
+                      <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16">
+                        The New Era of Corporate Legal Intelligence.
                       </h1>
                       <p className="mx-auto mt-8 max-w-2xl text-balance text-lg">
-                        Highly customizable components for building modern
-                        websites and applications that look and feel the way you
-                        mean it.
+                        An exclusive AI platform built for your legal team. Cut
+                        contract review time by 90% and make faster business
+                        decisions without the risk of AI hallucination.
                       </p>
                     </AnimatedGroup>
 
@@ -143,7 +145,7 @@ export function HeroSection() {
                           className="rounded-xl px-5 text-base"
                         >
                           <Link href="#link">
-                            <span className="text-nowrap">Start Building</span>
+                            <span className="text-nowrap">Request a demo</span>
                           </Link>
                         </Button>
                       </div>
@@ -155,7 +157,7 @@ export function HeroSection() {
                         className="h-10.5 rounded-xl px-5"
                       >
                         <Link href="#link">
-                          <span className="text-nowrap">Request a demo</span>
+                          <span className="text-nowrap">Our Features</span>
                         </Link>
                       </Button>
                     </AnimatedGroup>
@@ -166,14 +168,14 @@ export function HeroSection() {
               <div className="relative h-full w-full">
                 <img
                   className="object-cover object-top-left h-full w-full hidden rounded-2xl dark:block"
-                  src="https://tailark.com//_next/image?url=%2Fmail2.png&w=3840&q=75"
+                  src="/images/dark-hero.png"
                   alt="app screen"
                   width="2700"
                   height="1440"
                 />
                 <img
                   className="object-cover object-top-left h-full w-full rounded-2xl dark:hidden"
-                  src="https://tailark.com/_next/image?url=%2Fmail2-light.png&w=3840&q=75"
+                  src="/images/light-hero.png"
                   alt="app screen"
                   width="2700"
                   height="1440"

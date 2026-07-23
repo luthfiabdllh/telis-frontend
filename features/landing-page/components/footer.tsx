@@ -40,7 +40,7 @@ export function StickyFooter() {
 							<AnimatedContainer className="w-full space-y-4">
 								<Logo className="h-5" />
 								<p className="mt-8 text-muted-foreground text-sm md:mt-0">
-									Beautifully crafted shadcn blocks by efferd.
+									Enterprise AI for Corporate Legal Intelligence.
 								</p>
 								<div className="flex gap-2">
 									{socialLinks.map((link, index) => (
@@ -82,7 +82,7 @@ export function StickyFooter() {
 						</div>
 						<div className="flex flex-col items-center justify-between gap-2 border-t p-4 text-muted-foreground text-sm md:flex-row">
 							<p>
-								&copy; {new Date().getFullYear()} efferd, All rights reserved.
+								&copy; {new Date().getFullYear()} PT Telkom Indonesia. All rights reserved.
 							</p>
 							<a className="hover:text-foreground" href="#">
 								License
@@ -122,54 +122,32 @@ const footerLinkGroups: FooterLinkGroup[] = [
 	{
 		label: "Product",
 		links: [
-			{ title: "Payments", href: "#" },
-			{ title: "Cards & Issuing", href: "#" },
-			{ title: "Lending & Credit", href: "#" },
-			{ title: "Wealth Management", href: "#" },
-			{ title: "Insurance", href: "#" },
-			{ title: "Crypto Wallets", href: "#" },
-			{ title: "Treasury Management", href: "#" },
-			{ title: "Merchant Services", href: "#" },
-			{ title: "Point of Sale", href: "#" },
-			{ title: "Embedded Finance", href: "#" },
-			{ title: "Open Banking API", href: "#" },
-			{ title: "SDKs & Integrations", href: "#" },
+			{ title: "Agentic RAG", href: "#" },
+			{ title: "Smart Redlining", href: "#" },
+			{ title: "PII Masking", href: "#" },
+			{ title: "FinOps Dashboard", href: "#" },
+			{ title: "Enterprise Search", href: "#" },
 			{ title: "Pricing", href: "/pricing" },
 		],
 	},
 	{
 		label: "Resources",
 		links: [
-			{ title: "Blog", href: "#" },
 			{ title: "Case Studies", href: "#" },
 			{ title: "Documentation", href: "#" },
 			{ title: "API Reference", href: "#" },
-			{ title: "Developer Tools", href: "#" },
-			{ title: "Whitepapers", href: "#" },
-			{ title: "Reports & Research", href: "#" },
-			{ title: "Events & Webinars", href: "#" },
-			{ title: "E-books", href: "#" },
-			{ title: "Community Forum", href: "#" },
-			{ title: "Release Notes", href: "#" },
-			{ title: "System Status", href: "#" },
+			{ title: "Security Whitepaper", href: "#" },
+			{ title: "ROI Calculator", href: "#" },
 		],
 	},
 	{
 		label: "Company",
 		links: [
-			{ title: "About Us", href: "#" },
-			{ title: "Leadership", href: "#" },
-			{ title: "Careers", href: "#" },
-			{ title: "Press", href: "#" },
-			{ title: "Sustainability", href: "#" },
-			{ title: "Diversity & Inclusion", href: "#" },
-			{ title: "Investor Relations", href: "#" },
-			{ title: "Partners", href: "#" },
-			{ title: "Legal & Compliance", href: "#" },
+			{ title: "About Telkom", href: "#" },
+			{ title: "Digistar Program", href: "#" },
+			{ title: "Contact Sales", href: "#" },
 			{ title: "Privacy Policy", href: "#" },
-			{ title: "Cookie Policy", href: "#" },
 			{ title: "Terms of Service", href: "#" },
-			{ title: "AML & KYC Policy", href: "#" },
 		],
 	},
 ];

@@ -2,10 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Logo } from "./logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const menuItems = [
@@ -46,7 +46,14 @@ export const HeroHeader = () => {
                 aria-label="home"
                 className="flex items-center space-x-2"
               >
-                <Logo />
+                <Image
+                  src="/logo.png"
+                  alt="Telis Logo"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 rounded-full"
+                />
+                <span className="font-semibold text-xl">Telis</span>
               </Link>
 
               <button
@@ -90,7 +97,9 @@ export const HeroHeader = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit items-center">
-                <ThemeToggle className={cn(isScrolled && "lg:hidden", "w-full sm:w-9")} />
+                <ThemeToggle
+                  className={cn(isScrolled && "lg:hidden", "w-full sm:w-9")}
+                />
                 <Button
                   asChild
                   size="sm"

@@ -5,38 +5,38 @@ import {
 
 const myPricingPlans: PricingCardProps[] = [
   {
-    planName: "Basic",
-    description: "Perfect for personal projects and hobbyists.",
-    price: "0",
-    features: ["1 User", "1GB Storage", "Community Forum"],
-    buttonText: "Get Started",
+    planName: "SaaS Cloud",
+    description: "Dedicated cloud instance for mid-sized legal teams.",
+    price: "Custom",
+    features: ["Role-Based Access Control", "Automated PII Masking", "Standard Support SLA", "Monthly FinOps Reporting"],
+    buttonText: "Request Quote",
     buttonVariant: "secondary",
   },
   {
-    planName: "Team",
-    description: "Collaborate with your team on multiple projects.",
-    price: "49",
+    planName: "Enterprise / On-Prem",
+    description: "Full on-premise deployment for maximum data residency.",
+    price: "Custom",
     features: [
-      "10 Users",
-      "100GB Storage",
-      "Email Support",
-      "Shared Workspaces",
+      "Deployed on your Servers",
+      "Unlimited Documents",
+      "24/7 Dedicated Support",
+      "Active Directory / SSO",
     ],
-    buttonText: "Choose Team Plan",
+    buttonText: "Contact Sales",
     isPopular: true,
     buttonVariant: "primary",
   },
   {
-    planName: "Agency",
-    description: "Manage all your clients under one roof.",
-    price: "149",
+    planName: "Managed API",
+    description: "Integrate TELIS directly into your existing ERP.",
+    price: "Custom",
     features: [
-      "Unlimited Users",
-      "1TB Storage",
-      "Dedicated Support",
-      "Client Invoicing",
+      "Full API Access (REST/gRPC)",
+      "Custom Workflow Automation",
+      "SLA Guarantees",
+      "Technical Integration Support",
     ],
-    buttonText: "Contact Us",
+    buttonText: "Talk to Engineering",
     buttonVariant: "primary",
   },
 ];
@@ -46,11 +46,10 @@ export default function PricingSection() {
     <ModernPricingPage
       title={
         <>
-          Find the <span className="text-cyan-400">Perfect Plan</span> for Your
-          Business
+          Flexible <span className="text-cyan-400">Enterprise Models</span> for Your Business
         </>
       }
-      subtitle="Start for free, then grow with us. Flexible plans for projects of all sizes."
+      subtitle="Whether you need a dedicated cloud or full on-premise data residency, we have you covered."
       plans={myPricingPlans}
       showAnimatedBackground={true}
     />
